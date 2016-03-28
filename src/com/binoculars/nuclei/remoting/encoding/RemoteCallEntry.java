@@ -1,7 +1,5 @@
 package com.binoculars.nuclei.remoting.encoding;
 
-import org.nustaq.kson.ArgTypes;
-
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -13,7 +11,6 @@ public class RemoteCallEntry implements Serializable {
 	int receiverKey; // id of published nuclei in host, contains cbId in case of callbacks
 	int futureKey; // id of future if any
 	String method;
-	@ArgTypes
 	Object args[];
 	int queue;
 

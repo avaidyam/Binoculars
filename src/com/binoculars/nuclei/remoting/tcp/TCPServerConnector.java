@@ -10,7 +10,6 @@ import com.binoculars.nuclei.remoting.encoding.Coding;
 import com.binoculars.future.CompletableFuture;
 import com.binoculars.future.Future;
 import com.binoculars.util.Log;
-import org.nustaq.net.TCPObjectSocket;
 
 import java.io.EOFException;
 import java.io.IOException;

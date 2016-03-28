@@ -24,7 +24,6 @@ package com.binoculars.future;
 
 import com.binoculars.nuclei.Nucleus;
 import com.binoculars.nuclei.scheduler.ElasticScheduler;
-import com.binoculars.util.Pair;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;

@@ -9,7 +9,6 @@ import com.binoculars.future.Signal;
 import com.binoculars.future.CompletableFuture;
 import com.binoculars.future.Future;
 import com.binoculars.util.Log;
-import org.nustaq.net.TCPObjectSocket;
 import org.nustaq.serialization.util.FSTUtil;
 
 import java.io.EOFException;
