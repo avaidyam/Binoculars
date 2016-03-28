@@ -1,4 +1,4 @@
-package com.binoculars.util;
+package org.kihara.util;
 
 import java.io.File;
 import java.io.IOException;
