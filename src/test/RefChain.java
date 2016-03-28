@@ -1,11 +1,11 @@
 package test;
 
-import com.binoculars.nuclei.Nucleus;
-import com.binoculars.nuclei.remoting.base.ConnectableNucleus;
-import com.binoculars.nuclei.remoting.tcp.TCPConnectable;
-import com.binoculars.nuclei.remoting.tcp.TCPPublisher;
-import com.binoculars.future.CompletableFuture;
-import com.binoculars.future.Future;
+import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.remoting.base.ConnectableNucleus;
+import com.avaidyam.binoculars.remoting.tcp.TCPConnectable;
+import com.avaidyam.binoculars.remoting.tcp.TCPPublisher;
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Future;
 
 public class RefChain {
 	

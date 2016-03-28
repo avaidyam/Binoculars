@@ -1,7 +1,7 @@
 package test;
 
-import com.binoculars.future.Task;
-import com.binoculars.future.TaskScheduler;
+import org.kihara.tasks.Task;
+import org.kihara.tasks.TaskScheduler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

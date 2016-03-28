@@ -1,11 +1,11 @@
 package test;
 
-import com.binoculars.nuclei.Nucleus;
-import com.binoculars.nuclei.remoting.tcp.TCPConnectable;
-import com.binoculars.nuclei.remoting.tcp.TCPServerConnector;
-import com.binoculars.future.Signal;
-import com.binoculars.future.CompletableFuture;
-import com.binoculars.future.Future;
+import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.remoting.tcp.TCPConnectable;
+import com.avaidyam.binoculars.remoting.tcp.TCPServerConnector;
+import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Future;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.LockSupport;

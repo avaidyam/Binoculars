@@ -1,9 +1,9 @@
 package test;
 
-import com.binoculars.nuclei.Nucleus;
-import com.binoculars.nuclei.scheduler.ElasticScheduler;
-import com.binoculars.future.CompletableFuture;
-import com.binoculars.util.Log;
+import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.scheduler.ElasticScheduler;
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;

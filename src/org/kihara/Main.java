@@ -22,8 +22,8 @@
 
 package org.kihara;
 
-import com.binoculars.nuclei.Cortex;
-import com.binoculars.util.Log;
+import com.avaidyam.binoculars.Cortex;
+import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.ParameterFilter;

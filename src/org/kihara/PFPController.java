@@ -22,11 +22,14 @@
 
 package org.kihara;
 
+import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Future;
+import com.avaidyam.binoculars.future.FutureLatch;
 import com.binoculars.nuclei.*;
-import com.binoculars.future.*;
-import com.binoculars.nuclei.Cortex;
-import com.binoculars.util.Eponym;
-import com.binoculars.util.Log;
+import com.avaidyam.binoculars.Cortex;
+import com.avaidyam.binoculars.util.Eponym;
+import com.avaidyam.binoculars.util.Log;
 import org.kihara.util.SeekableFile;
 
 import java.io.*;

@@ -1,11 +1,11 @@
 package test;
 
-import com.binoculars.nuclei.Domain;
-import com.binoculars.nuclei.Nucleus;
-import com.binoculars.future.Signal;
-import com.binoculars.future.CompletableFuture;
-import com.binoculars.future.Future;
-import com.binoculars.future.Spore;
+import com.avaidyam.binoculars.Domain;
+import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Future;
+import com.avaidyam.binoculars.future.Spore;
 
 import java.net.URL;
 import java.util.ArrayList;
