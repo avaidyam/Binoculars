@@ -24,6 +24,7 @@ package com.avaidyam.binoculars;
 
 import com.avaidyam.binoculars.future.Spore;
 import com.avaidyam.binoculars.remoting.NucleusProxyFactory;
+import com.avaidyam.binoculars.remoting.RemoteConnection;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
 import com.avaidyam.binoculars.scheduler.ElasticScheduler;
 import com.avaidyam.binoculars.scheduler.Scheduler;
@@ -86,6 +87,26 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // static API
+
+	/**
+	 * A tagging interface to identify Nucleus proxies. {@link Nucleus#of(Class)}
+	 * internally generates an {@link NucleusProxy} which translates each method
+	 * call into a message to be enqueued by the elastic scheduler to the
+	 * underlying nuclei instance.
+	 *
+	 * @param <T> the type of the Nucleus proxied
+	 */
+	public interface NucleusProxy<T extends Nucleus> {
+
+		/**
+		 * Returns the underlying Nucleus behind this NucleusProxy. Can be
+		 * used to verify if an Object is the real nuclei, or a proxy,
+		 * like so: {@code nuclei.getNucleus() == nuclei}.
+		 *
+		 * @return the nuclei under this proxy
+		 */
+		Nucleus<T> getNucleus();
+	}
 
     public static void addDeadLetter(String s) {
         Log.w(null, s);

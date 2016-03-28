@@ -296,7 +296,7 @@ public class CompletableFuture<T> implements Future<T> {
     public <OUT> Future<OUT> then(final Function<T, Future<OUT>> function) {
         CompletableFuture<OUT> res = new CompletableFuture<>();
         then((r, e) -> {
-            if (isError(e))
+            if (Signal.isError(e))
                 res.complete(null, e);
             else function.apply(r).then(res);
         });
@@ -307,7 +307,7 @@ public class CompletableFuture<T> implements Future<T> {
     public <OUT> Future<OUT> then(Consumer<T> function) {
         CompletableFuture<OUT> res = new CompletableFuture<>();
         then((r, e) -> {
-            if (isError(e)) {
+            if (Signal.isError(e)) {
                 res.complete(null, e);
             } else {
                 function.accept(r);
@@ -321,7 +321,7 @@ public class CompletableFuture<T> implements Future<T> {
     public Future<T> then(Supplier<Future<T>> callable) {
         CompletableFuture<T> res = new CompletableFuture<>();
         then((r, e) -> {
-            if (isError(e)) {
+            if (Signal.isError(e)) {
                 res.complete(null, e);
             } else {
                 Future<T> call = callable.get().then(res);
@@ -334,7 +334,7 @@ public class CompletableFuture<T> implements Future<T> {
     public <OUT> Future<OUT> catchError(final Function<Object, Future<OUT>> function) {
         CompletableFuture<OUT> res = new CompletableFuture<>();
         then((r, e) -> {
-            if (!isError(e))
+            if (!Signal.isError(e))
                 res.complete(null, e);
             else function.apply(e).then(res);
         });
@@ -345,7 +345,7 @@ public class CompletableFuture<T> implements Future<T> {
     public <OUT> Future<OUT> catchError(Consumer<Object> function) {
         CompletableFuture<OUT> res = new CompletableFuture<>();
         then((r, e) -> {
-            if (!isError(e))
+            if (!Signal.isError(e))
                 res.complete(null, e);
             else {
                 function.accept(e);
@@ -528,7 +528,7 @@ public class CompletableFuture<T> implements Future<T> {
     @Override
     public T await(long timeout, TimeUnit timeUnit) {
         awaitFuture(timeout, timeUnit);
-        if (!isError(getError()))
+        if (!Signal.isError(this.getError()))
             return get();
 
         if (getError() instanceof Throwable)

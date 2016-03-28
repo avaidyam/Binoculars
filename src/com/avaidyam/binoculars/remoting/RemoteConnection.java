@@ -20,15 +20,16 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars;
+package com.avaidyam.binoculars.remoting;
 
+import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.Future;
 
 /**
  * A RemoteConnection facilitates a registry mapping of NucleusProxy to IDs
  * and can have a custom ClassLoader.
  */
-public interface RemoteConnection {
+public interface RemoteConnection extends AutoCloseable {
 
     /**
      * Closes the remote connection and clears its registry.

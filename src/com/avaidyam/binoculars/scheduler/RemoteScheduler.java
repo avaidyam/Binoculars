@@ -34,7 +34,7 @@ public class RemoteScheduler extends ElasticScheduler {
 
 	// FIXME: dissimilar from source
     public RemoteScheduler() {
-        super(1);
+        super(DEFQSIZE);
     }
 
     public RemoteScheduler(int defQSize) {
@@ -48,6 +48,10 @@ public class RemoteScheduler extends ElasticScheduler {
             public synchronized void start() {
                 // fake thread, just don't start
             }
+
+			public String toString() {
+				return "REMOTEREF "+super.toString();
+			}
         };
     }
 
@@ -60,5 +64,4 @@ public class RemoteScheduler extends ElasticScheduler {
 	public <T> void runBlockingCall(Nucleus emitter, Callable<T> toCall, Signal<T> resultHandler) {
 		throw new RuntimeException("cannot be used on a remote reference (no thread)");
 	}
-
 }

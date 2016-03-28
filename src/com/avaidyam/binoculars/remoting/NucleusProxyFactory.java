@@ -24,7 +24,6 @@ package com.avaidyam.binoculars.remoting;
 
 import com.avaidyam.binoculars.Domain;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.NucleusProxy;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.util.Log;
@@ -124,7 +123,7 @@ public class NucleusProxyFactory {
                     cc = pool.makeClass(proxyName);
                     CtClass orig = pool.get(clazz.getName());
                     cc.setSuperclass(orig);
-                    cc.setInterfaces(new CtClass[]{pool.get(Externalizable.class.getName()), pool.get(NucleusProxy.class.getName())});
+                    cc.setInterfaces(new CtClass[]{pool.get(Externalizable.class.getName()), pool.get(Nucleus.NucleusProxy.class.getName())});
 
                     defineProxyFields(pool, cc);
                     defineProxyMethods(cc, orig);

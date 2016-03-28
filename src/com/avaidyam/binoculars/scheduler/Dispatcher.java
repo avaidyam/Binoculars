@@ -24,7 +24,6 @@ package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Exceptions;
 import com.avaidyam.binoculars.Nucleus;
-import com.binoculars.nuclei.*;
 import com.avaidyam.binoculars.management.DispatcherStatusMXBean;
 import com.avaidyam.binoculars.remoting.CallEntry;
 import com.avaidyam.binoculars.util.Log;
@@ -59,26 +58,76 @@ import java.util.concurrent.locks.LockSupport;
  */
 public class Dispatcher extends Thread {
 
-    public static boolean DUMP_EXCEPTIONS = true; // do a print stacktrace on uncatched exceptions put as a future's result
-    public static int SCHEDULE_TICK_NANOS = 1000 * 500; // how often balancing/profiling is done
-    public static int QUEUE_PERCENTAGE_TRIGGERING_REBALANCE = 50;      // if queue is X % full, consider rebalance
-    public static int MILLIS_AFTER_CREATION_BEFORE_REBALANCING = 2; // give caches a chance to get things going before rebalancing
+	/**
+     * Invokes printStackTrace() on any uncaught exceptions from a Future.
+     */
+    public static boolean DUMP_EXCEPTIONS = true;
 
+	/**
+	 * The duration specifying how often load profiling and balancing is done.
+     */
+    public static int SCHEDULE_TICK_NANOS = 1000 * 500;
+
+	/**
+	 * The threshold percentage for the queue to reach before it is considered
+	 * for rebalancing. That is, if the queue is X% full, it will be rebalanced.
+     */
+    public static int QUEUE_PERCENTAGE_TRIGGERING_REBALANCE = 50;
+
+	/**
+	 * Provides a leeway for caches to perform operations before a rebalance.
+     */
+    public static int MILLIS_AFTER_CREATION_BEFORE_REBALANCING = 2;
+
+	/**
+	 * The number of active Dispatchers present in the system.
+	 */
     public static AtomicInteger activeDispatchers = new AtomicInteger(0);
 
-    static AtomicInteger dtcount = new AtomicInteger(0);
+	/**
+	 * TODO: FIXME.
+	 */
+    /*package*/ static AtomicInteger dtcount = new AtomicInteger(0);
+
+	/**
+	 * The stack of Futures present in this Dispatcher.
+	 */
     public ArrayList<CompletableFuture> __stack = new ArrayList<>();
+
+	/**
+	 * Has the Dispatcher been shut down?
+	 */
     protected boolean shutDown = false;
 
-    ConcurrentLinkedQueue<Nucleus> toAdd = new ConcurrentLinkedQueue<>();
-    volatile boolean isIsolated = false;
+	/**
+	 * The queue of Nuclei to add to this Dispatcher.
+	 */
+	/*package*/ ConcurrentLinkedQueue<Nucleus> toAdd = new ConcurrentLinkedQueue<>();
+
+	/**
+	 * Is the Dispatcher isolated?
+	 */
+	/*package*/ volatile boolean isIsolated = false;
+
+	/**
+	 * Will the Dispatcher be shut down automatically?
+	 */
     private boolean autoShutdown = true;
 
-    int emptySinceLastCheck = 0; // incremented on sleep/allOf
-    // poll allOf actors in queue arr round robin
-    int count = 0;
-    // return true if log was avaiable
-    long created = System.currentTimeMillis();
+	/**
+	 * TODO: FIXME.
+	 */
+	/*package*/ int emptySinceLastCheck = 0;
+
+	/**
+	 * The polled count of nuclei in the round-robin queue.
+	 */
+    /*package*/ int count = 0;
+
+	/**
+	 * The time (in millis) when this Dispatcher was created.
+	 */
+    /*package*/ long created = System.currentTimeMillis();
 
     private Scheduler scheduler;
     private Nucleus nuclei[] = new Nucleus[0]; // always refs
@@ -497,6 +546,10 @@ public class Dispatcher extends Thread {
         return false;
     }
 
+	/**
+	 * Returns the MXBean for monitoring of this Dispatcher.
+	 * @return the MXBean for monitoring of this Dispatcher
+	 */
 	public DispatcherStatusMXBean dispatcherStatus() {
 		return new DispatcherStatusMXBean.DispatcherStatus(getName(), nuclei.length, getLoad(), getAccumulatedQSizes());
 	}
