@@ -11,61 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e091d3d-33a3-40b0-b537-a7db5a522861" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test.fasta" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSCache.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSCache.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSEntry.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSEntry.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSIncoming.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSIncoming.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSMessage.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSMessage.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSOutgoing.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSOutgoing.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSQuestion.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSQuestion.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSRecord.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSRecord.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSStatefulObject.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSStatefulObject.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSTaskStarter.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSTaskStarter.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/HostInfo.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/HostInfo.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ListenerStatus.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ListenerStatus.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NameRegister.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NameRegister.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyDiscovery.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyDiscovery.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyDiscoveryImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyDiscoveryImpl.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyEvent.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyEvent.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyEventImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyEventImpl.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceEvent.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceEvent.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceEventImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceEventImpl.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceInfo.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceInfo.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceInfoImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceInfoImpl.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceTypeListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceTypeListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/SocketListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/SocketListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ZeroConf.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ZeroConf.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ZeroConfMulti.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ZeroConfMulti.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ZeroConfMultiImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ZeroConfMultiImpl.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSConstants.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSConstants.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSLabel.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSLabel.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSOperationCode.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSOperationCode.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSOptionCode.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSOptionCode.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSRecordClass.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordClass.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSRecordType.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordType.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSResultCode.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSResultCode.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSState.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSState.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/DNSTask.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/DNSTask.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/RecordReaper.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/RecordReaper.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/Responder.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/Responder.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/DNSResolverTask.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/DNSResolverTask.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/ServiceInfoResolver.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/ServiceInfoResolver.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/ServiceResolver.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/ServiceResolver.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/TypeResolver.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/TypeResolver.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Announcer.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Announcer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Canceler.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Canceler.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/DNSStateTask.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/DNSStateTask.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Prober.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Prober.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Renewer.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Renewer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/Endpoint.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Cortex.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/util/Log.java" afterPath="$PROJECT_DIR$/src/com/binoculars/util/Log.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/Main.java" afterPath="$PROJECT_DIR$/src/org/kihara/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/PFPController.java" afterPath="$PROJECT_DIR$/src/org/kihara/PFPController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java" />
     </list>
     <ignored path="Demo.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -91,8 +37,8 @@
       <file leaf-file-name="Nucleus.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.36746988">
-              <caret line="69" column="63" selection-start-line="69" selection-start-column="63" selection-end-line="69" selection-end-column="63" />
+            <state vertical-scroll-proportion="0.27309236">
+              <caret line="138" column="7" selection-start-line="138" selection-start-column="7" selection-end-line="138" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -160,7 +106,6 @@
         <option value="$PROJECT_DIR$/src/com/binoculars/util/AbstractExecutor.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/util/WrapperExecutorService.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/asyncio/AsyncFile.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/Main.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/JavascriptEngine.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/future/FutureLatch.java" />
@@ -171,6 +116,7 @@
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/tcp/TCPNIOPublisher.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/future/TaskScheduler.java" />
+        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java" />
       </list>
     </option>
   </component>
@@ -927,13 +873,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/util/function/BiFunction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49497992">
-          <caret line="52" column="6" selection-start-line="52" selection-start-column="6" selection-end-line="52" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/binoculars/util/Eponym.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="1.5361446">
@@ -1325,10 +1264,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.01754386">
+          <caret line="1" column="4" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.36746988">
-          <caret line="69" column="63" selection-start-line="69" selection-start-column="63" selection-end-line="69" selection-end-column="63" />
+        <state vertical-scroll-proportion="0.27309236">
+          <caret line="138" column="7" selection-start-line="138" selection-start-column="7" selection-end-line="138" selection-end-column="7" />
           <folding />
         </state>
       </provider>

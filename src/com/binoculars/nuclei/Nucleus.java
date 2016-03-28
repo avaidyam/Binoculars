@@ -163,7 +163,9 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
      */
     @SuppressWarnings("unchecked")
     public static <T extends Nucleus> T of(Class<T> actorClazz, Scheduler scheduler, int qsize) {
-        return (T) instance.newProxy(actorClazz, scheduler, qsize);
+        T a = (T) instance.newProxy(actorClazz, scheduler, qsize);
+		a.onStart(); // queue a constructor call.
+		return a;
     }
 
 	public static <T extends Nucleus> ExecutorService toExecutor(final Nucleus<T> nucleus) {
@@ -401,8 +403,18 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
         __stop();
     }
 
-	protected void onStop() {
+	/**
+	 * Called upon construction of Nucleus, and should be used instead of a constructor.
+	 */
+	protected void onStart() {
+		// Unimplemented.
+	}
 
+	/**
+	 * Called upon destruction of a Nucleus, and should be used as a destructor.
+	 */
+	protected void onStop() {
+		// Unimplemented.
 	}
 
     @Domain.CallerSide
@@ -414,8 +426,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     public boolean isProxy() {
         return getNucleus() != this;
     }
-
-
 
     /**
      * @return current nuclei thread or throw an exception if not running inside an nuclei thread.
