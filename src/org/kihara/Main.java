@@ -22,7 +22,7 @@
 
 package org.kihara;
 
-import com.binoculars.nuclei.Endpoint;
+import com.binoculars.nuclei.Cortex;
 import com.binoculars.util.Log;
 import com.binoculars.util.ParameterFilter;
 import com.sun.net.httpserver.HttpContext;
@@ -45,15 +45,15 @@ import java.util.function.Supplier;
 public class Main {
 
     /**
-     * Initialize the Endpoint, and start the HTTP server and shell.
+     * Initialize the Cortex, and start the HTTP server and shell.
      */
     public static void main(String[] args) {
         Log.get().setSeverity(Log.Severity.DEBUG);
-        Endpoint<PFPController> endpoint = Endpoint.of(PFPController.class);
+        Cortex<PFPController> cortex = Cortex.of(PFPController.class);
         try {
-            PFPController main = endpoint.getNodes().get(0);
+            PFPController main = cortex.getNodes().get(0);
             startHTTP(8080, main);
-            startShell(endpoint.getNodes());
+            startShell(cortex.getNodes());
         } catch (Exception e) {
             Log.e("Main", "Could not begin application.", e);
         }
@@ -93,7 +93,7 @@ public class Main {
 
             // Begin the PFP processing from HTTP.
             if (params.get("data") != null)
-                Endpoint.of(PFPController.class)
+                Cortex.of(PFPController.class)
                         .getNodes().get(0)
                         .beginPFP(params.get("data"));
         });

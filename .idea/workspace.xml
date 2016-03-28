@@ -11,53 +11,61 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e091d3d-33a3-40b0-b537-a7db5a522861" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Domain.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Exceptions.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/binoculars/util/WrapperExecutorService.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/Stream.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/NucleusExecutorService.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/annotation/CallerSideMethod.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/annotation/InThread.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/annotation/Local.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/annotation/SignalPriority.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/exception/InternalNucleusStoppedException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/exception/MustBeRunFromNucleusThreadException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/exception/NucleusBlockedException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/exception/NucleusStoppedException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/stream/CancelException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/stream/EventSink.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/stream/KxPublisher.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/stream/KxPublisherNucleus.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/stream/KxReactiveStreams.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/stream/KxSubscriber.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/binoculars/stream/SyncProcessor.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test/Java8Streams.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/system/Endpoint.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Endpoint.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/system/Heartbeat.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/system/JavascriptEngine.java" afterPath="$PROJECT_DIR$/src/org/kihara/JavascriptEngine.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/system/PFPController.java" afterPath="$PROJECT_DIR$/src/org/kihara/PFPController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Binoculars.jar" afterPath="$PROJECT_DIR$/Binoculars.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test.fasta" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSCache.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSCache.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSEntry.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSEntry.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSIncoming.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSIncoming.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSListener.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSMessage.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSMessage.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSOutgoing.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSOutgoing.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSQuestion.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSQuestion.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSRecord.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSRecord.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSStatefulObject.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSStatefulObject.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/DNSTaskStarter.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/DNSTaskStarter.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/HostInfo.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/HostInfo.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ListenerStatus.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ListenerStatus.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NameRegister.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NameRegister.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyDiscovery.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyDiscovery.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyDiscoveryImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyDiscoveryImpl.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyEvent.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyEvent.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyEventImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyEventImpl.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/NetworkTopologyListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/NetworkTopologyListener.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceEvent.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceEvent.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceEventImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceEventImpl.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceInfo.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceInfo.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceInfoImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceInfoImpl.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceListener.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ServiceTypeListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ServiceTypeListener.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/SocketListener.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/SocketListener.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ZeroConf.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ZeroConf.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ZeroConfMulti.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ZeroConfMulti.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/ZeroConfMultiImpl.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/ZeroConfMultiImpl.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSConstants.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSConstants.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSLabel.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSLabel.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSOperationCode.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSOperationCode.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSOptionCode.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSOptionCode.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSRecordClass.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordClass.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSRecordType.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordType.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSResultCode.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSResultCode.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/constants/DNSState.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSState.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/DNSTask.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/DNSTask.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/RecordReaper.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/RecordReaper.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/Responder.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/Responder.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/DNSResolverTask.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/DNSResolverTask.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/ServiceInfoResolver.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/ServiceInfoResolver.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/ServiceResolver.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/ServiceResolver.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/resolver/TypeResolver.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/resolver/TypeResolver.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Announcer.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Announcer.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Canceler.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Canceler.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/DNSStateTask.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/DNSStateTask.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Prober.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Prober.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/discovery/tasks/state/Renewer.java" afterPath="$PROJECT_DIR$/src/external/zeroconf/discovery/tasks/state/Renewer.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/Endpoint.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Cortex.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/asyncio/AsyncFile.java" afterPath="$PROJECT_DIR$/src/com/binoculars/asyncio/AsyncFile.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/future/FutureLatch.java" afterPath="$PROJECT_DIR$/src/com/binoculars/future/FutureLatch.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/Message.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Message.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/NucleusProxy.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/NucleusProxy.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/RemotableNucleus.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/RemotableNucleus.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/RemoteConnection.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/RemoteConnection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/management/DispatcherStatusMXBean.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/management/DispatcherStatusMXBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/management/NucleusStatusMXBean.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/management/NucleusStatusMXBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/management/SchedulerStatusMXBean.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/management/SchedulerStatusMXBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/NucleusProxyFactory.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/NucleusProxyFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/base/RemoteRegistry.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/base/RemoteRegistry.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/scheduler/Dispatcher.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/scheduler/Dispatcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/scheduler/ElasticScheduler.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/scheduler/ElasticScheduler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/scheduler/SimpleScheduler.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/scheduler/SimpleScheduler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" afterPath="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/binoculars/util/Log.java" afterPath="$PROJECT_DIR$/src/com/binoculars/util/Log.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/Main.java" afterPath="$PROJECT_DIR$/src/org/kihara/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/PiCalc.java" afterPath="$PROJECT_DIR$/src/test/PiCalc.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/ShowcaseNucleus.java" afterPath="$PROJECT_DIR$/src/test/ShowcaseNucleus.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/PFPController.java" afterPath="$PROJECT_DIR$/src/org/kihara/PFPController.java" />
     </list>
     <ignored path="Demo.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -79,7 +87,18 @@
     <favorites_list name="Demo" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Nucleus.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.36746988">
+              <caret line="69" column="63" selection-start-line="69" selection-start-column="63" selection-end-line="69" selection-end-column="63" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -101,10 +120,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/encoding/NucleusSerializer.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/encoding/CallbackRefSerializer.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/encoding/SignalSerializer.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/encoding/SporeRefSerializer.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/encoding/SporeSerializer.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/base/RemoteRefPolling.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/base/RemotePolling.java" />
@@ -123,7 +138,6 @@
         <option value="$PROJECT_DIR$/src/com/binoculars/future/CompletableFuture.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/system/PFPController.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/NucleusProxyFactory.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/util/Log.java" />
         <option value="$PROJECT_DIR$/src/test/PiCalc.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/annotation/CallerSideMethod.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Ignore.java" />
@@ -149,9 +163,14 @@
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/Main.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/JavascriptEngine.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/future/FutureLatch.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Endpoint.java" />
+        <option value="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordType.java" />
+        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Cortex.java" />
+        <option value="$PROJECT_DIR$/src/com/binoculars/util/Log.java" />
+        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/tcp/TCPNIOPublisher.java" />
+        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java" />
+        <option value="$PROJECT_DIR$/src/com/binoculars/future/TaskScheduler.java" />
       </list>
     </option>
   </component>
@@ -339,28 +358,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Binoculars" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Binoculars" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="binoculars" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="future" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -410,11 +407,11 @@
       <recent name="Network" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="external.zeroconf" />
       <recent name="com.binoculars.nuclei" />
       <recent name="org" />
       <recent name="com.binoculars.actor.monitoring" />
       <recent name="external" />
-      <recent name="com.binoculars.external" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Aditya\Desktop\Binoculars" />
@@ -878,7 +875,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -889,7 +886,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.48033127" sideWeight="0.5078125" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15654762" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18392856" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.328125" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24948241" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -930,55 +927,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/nio/file/TempFileHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="96" column="0" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/util/regex/Matcher.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="621" column="19" selection-start-line="621" selection-start-column="19" selection-end-line="621" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/DiningPhilosophers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.0331326">
-          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/nio/file/StandardOpenOption.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="58" column="22" selection-start-line="58" selection-start-column="22" selection-end-line="58" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/rt.jar!/java/util/regex/UnicodeProp.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/nio/ByteBuffer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.9146587">
-          <caret line="313" column="0" selection-start-line="313" selection-start-column="0" selection-end-line="313" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/binoculars/discovery/ZeroConf.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35140562">
-          <caret line="2091" column="13" selection-start-line="2091" selection-start-column="9" selection-end-line="2091" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/util/function/BiFunction.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.49497992">
@@ -1035,14 +983,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.8192771">
           <caret line="75" column="24" selection-start-line="75" selection-start-column="24" selection-end-line="75" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/binoculars/util/Log.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="11" column="16" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
           <folding />
         </state>
       </provider>
@@ -1183,14 +1123,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Message.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/util/concurrent/ExecutorService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.47791165">
@@ -1203,14 +1135,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.15361446">
           <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/META-INF/MANIFEST.MF">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.05120482">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1247,14 +1171,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.085341364">
-          <caret line="44" column="0" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.06827309">
@@ -1287,26 +1203,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.11947791">
-          <caret line="28" column="8" selection-start-line="28" selection-start-column="8" selection-end-line="28" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/binoculars/future/Future.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.2560241">
           <caret line="18" column="14" selection-start-line="18" selection-start-column="14" selection-end-line="18" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Endpoint.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.11947791">
-          <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1318,6 +1218,118 @@
           <folding>
             <element signature="e#5072#5102#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/util/Log.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.085341364">
+          <caret line="11" column="46" selection-start-line="11" selection-start-column="46" selection-end-line="11" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/tcp/NIOServerConnector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.45381525">
+          <caret line="78" column="0" selection-start-line="78" selection-start-column="0" selection-end-line="78" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Heartbeat.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.085341364">
+          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.3212852">
+          <caret line="138" column="7" selection-start-line="138" selection-start-column="7" selection-end-line="138" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/encoding/Coding.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.13654618">
+          <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/tcp/TCPNIOPublisher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.085341364">
+          <caret line="12" column="3" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Cortex.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.11947791">
+          <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/future/TaskScheduler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.13654618">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test3.fasta">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.085341364">
+          <caret line="5" column="22" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/visualizer.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.385567">
+          <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/META-INF/MANIFEST.MF">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.05120482">
+          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/io/Serializable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.4748995">
+          <caret line="168" column="17" selection-start-line="168" selection-start-column="17" selection-end-line="168" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Message.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.11947791">
+          <caret line="28" column="23" selection-start-line="28" selection-start-column="23" selection-end-line="28" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/binoculars/nuclei/Nucleus.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.36746988">
+          <caret line="69" column="63" selection-start-line="69" selection-start-column="63" selection-end-line="69" selection-end-column="63" />
+          <folding />
         </state>
       </provider>
     </entry>

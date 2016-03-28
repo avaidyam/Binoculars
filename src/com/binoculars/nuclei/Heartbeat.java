@@ -26,10 +26,37 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * TODO:
- *  - Do more with Health (task-related status)
+ * A heartbeat for two nodes of a cluster to understand each other's state.
  */
-public class Heartbeat implements Serializable {
+public enum Heartbeat implements Serializable {
+
+	/**
+	 * The node sending the heartbeat is currently active.
+	 */
+	ACTIVE,
+
+	/**
+	 * The node sending the heartbeat is currently inactive.
+	 */
+	INACTIVE;
+
+	/**
+	 * A listener protocol for an entity that can understand heartbeats.
+	 */
+	public interface HeartbeatListener {
+
+		/**
+		 * Receives a heartbeat from a source.
+		 *
+		 * @param source the origin of the heartbeat
+		 * @param state the heartbeat from the source
+		 */
+		void heartbeat(Object /* TODO */ source, Heartbeat state);
+	}
+
+	/**
+	 * The timestamp that this heartbeat was taken.
+	 */
     public final long timestamp = System.currentTimeMillis();
 
     @Override

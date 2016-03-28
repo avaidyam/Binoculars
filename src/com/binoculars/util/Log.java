@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.function.Supplier;
 
 /**
- * A wrapper for logging + metrics.
+ * A wrapper for structured logging + metrics.
  */
 public class Log extends Nucleus<Log> {
 

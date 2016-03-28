@@ -24,7 +24,7 @@ package org.kihara;
 
 import com.binoculars.nuclei.*;
 import com.binoculars.future.*;
-import com.binoculars.nuclei.Endpoint;
+import com.binoculars.nuclei.Cortex;
 import com.binoculars.util.Eponym;
 import com.binoculars.util.Log;
 import com.binoculars.util.SeekableFile;
@@ -92,9 +92,9 @@ public class PFPController extends Nucleus<PFPController> {
 	// --------------------------------------------------------------------
 
 	// --------------------------------------------------------------------
-	// Handy JS function to begin PFP without messing with Endpoint.
+	// Handy JS function to begin PFP without messing with Cortex.
 	public static void go(String filename) throws Exception {
-		Endpoint.of(PFPController.class)
+		Cortex.of(PFPController.class)
 				.getNodes().get(0)
 				.beginPFP(SeekableFile.fromFile(filename));
 	}
@@ -151,7 +151,7 @@ public class PFPController extends Nucleus<PFPController> {
 			return;
 
         Log.i(TAG, "Assigning subsequences via segmented distribution.");
-        List<PFPController> pfp = Endpoint.of(PFPController.class).getNodes();
+        List<PFPController> pfp = Cortex.of(PFPController.class).getNodes();
         HashMap<Integer, List<Integer>> div = _distributePFP(pfp.size(), count);
         Log.d(TAG, "Distribution: " + count + " -> " + div);
 
@@ -289,7 +289,7 @@ public class PFPController extends Nucleus<PFPController> {
 		// Once the XML file has been written, signal completion.
 		self().processScripts(name + "_" + i, temp.toAbsolutePath().toString()).onResult(n -> {
 			//self().receive(i, temp).then(promise);
-			List<PFPController> pfp = Endpoint.of(PFPController.class).getNodes();
+			List<PFPController> pfp = Cortex.of(PFPController.class).getNodes();
 			pfp.stream().forEach(c -> {
 				//
 				c.receiveResults(i, temp.toAbsolutePath().toString());
