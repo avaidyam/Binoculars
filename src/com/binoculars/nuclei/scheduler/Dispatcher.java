@@ -1,7 +1,7 @@
 package com.binoculars.nuclei.scheduler;
 
 import com.binoculars.nuclei.*;
-import com.binoculars.nuclei.exception.InternalNucleusStoppedException;
+import com.binoculars.nuclei.Exceptions;
 import com.binoculars.nuclei.management.DispatcherStatusMXBean;
 import com.binoculars.nuclei.remoting.CallEntry;
 import com.binoculars.util.Log;
@@ -283,7 +283,7 @@ public class Dispatcher extends Thread {
                 }
                 return true;
             } catch (Throwable e) {
-                if (e instanceof InvocationTargetException && ((InvocationTargetException) e).getTargetException() == InternalNucleusStoppedException.INSTANCE) {
+                if (e instanceof InvocationTargetException && ((InvocationTargetException) e).getTargetException() == Exceptions.InternalNucleusStoppedException.INSTANCE) {
                     // fixme: rare classcast exception with elasticscheduler seen here when $stop is called from a callback ..
                     Nucleus nucleus = (Nucleus) callEntry.getTarget();
                     nucleus.__stopped = true;

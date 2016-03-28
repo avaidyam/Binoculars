@@ -1,7 +1,7 @@
 package com.binoculars.util;
 
+import com.binoculars.nuclei.Domain;
 import com.binoculars.nuclei.Nucleus;
-import com.binoculars.nuclei.annotation.CallerSideMethod;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,42 +13,39 @@ import java.util.function.Supplier;
  */
 public class Log extends Nucleus<Log> {
 
-	/** LOGGER SEVERITY CONSTANTS */
-
-	public static final int VERBOSE = 0; // --> Log.v()
-	public static final int DEBUG = 1; // --> Log.d()
-    public static final int INFO = 2; // --> Log.i()
-    public static final int WARN = 3; // --> Log.w()
-    public static final int ERROR = 4; // --> Log.e()
-    public static final int ASSERT = 5; // --> Log.wtf()
-
 	/**
-	 * Convert a severity level to a string identifier.
-	 *
-	 * @param severity the severity level to convert
-	 * @return the severity as a string
+	 * Logger Severity levels.
 	 */
-	public static String severityToString(int severity) {
-		switch (severity) {
-			case VERBOSE:
-				return "V";
-			case DEBUG:
-				return "D";
-			case INFO:
-				return "I";
-			case WARN:
-				return "W";
-			case ERROR:
-				return "E";
-			case ASSERT:
-				return "WTF";
-			default:
-				return " ";
+	public enum Severity {
+		VERBOSE, // --> Log.v()
+		DEBUG, // --> Log.d()
+		INFO, // --> Log.i()
+		WARN, // --> Log.w()
+		ERROR, // --> Log.e()
+		ASSERT; // --> Log.wtf()
+
+		/**
+		 * Returns a short string representation of the Severity.
+		 *
+		 * @return a short string representation of the Severity
+		 */
+		@Override
+		public String toString() {
+			switch (this) {
+				case VERBOSE: return "V";
+				case DEBUG: return "D";
+				case INFO: return "I";
+				case WARN: return "W";
+				case ERROR: return "E";
+				case ASSERT: return "WTF";
+				default: return "???";
+			}
 		}
 	}
 
-	/** DEFAULT LOGGER IMPLEMENTATION */
-
+	/**
+	 * Logger interface to plug into another logging system.
+	 */
 	@FunctionalInterface
 	public interface Logger {
 
@@ -61,7 +58,7 @@ public class Log extends Nucleus<Log> {
 		 * @param msg the message to log
 		 * @param exception an optional exception to log
 		 */
-		void log(Thread thread, int severity, String tag, String msg, Throwable exception);
+		void log(Thread thread, Severity severity, String tag, String msg, Throwable exception);
 	}
 
 	/**
@@ -79,12 +76,12 @@ public class Log extends Nucleus<Log> {
 	 */
 	private static final Supplier<Logger> defaultLogger = () -> (t, sev, tag, msg, ex) -> {
 		System.out.println("[" + formatter.format(new Date()) + "] " +
-				severityToString(sev) + "/" + (tag == null ? "-" : tag) +
+				sev + "/" + (tag == null ? "-" : tag) +
 				" <" + (t == null ? "-" : t.getName()) + ">: " + msg);
 
 		if (ex == null)
 			return;
-		if (sev < ERROR)
+		if (sev.ordinal() < Severity.ERROR.ordinal())
 			System.out.println(ex.toString());
 		else ex.printStackTrace(System.out);
 	};
@@ -152,34 +149,34 @@ public class Log extends Nucleus<Log> {
 
 	/** INTERNAL LOGGING DELEGATION */
 
-	@CallerSideMethod
+	@Domain.CallerSide
 	public void verbose(String tag, String msg, Throwable ex) {
-		self().println(Thread.currentThread(), VERBOSE, tag, msg, ex);
+		self().println(Thread.currentThread(), Severity.VERBOSE, tag, msg, ex);
 	}
 
-	@CallerSideMethod
+	@Domain.CallerSide
 	public void debug(String tag, String msg, Throwable ex) {
-		self().println(Thread.currentThread(), DEBUG, tag, msg, ex);
+		self().println(Thread.currentThread(), Severity.DEBUG, tag, msg, ex);
 	}
 
-	@CallerSideMethod
+	@Domain.CallerSide
     public void info(String tag, String msg, Throwable ex) {
-        self().println(Thread.currentThread(), INFO, tag, msg, ex);
+        self().println(Thread.currentThread(), Severity.INFO, tag, msg, ex);
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public void warn(String tag, String msg, Throwable ex) {
-        self().println(Thread.currentThread(), WARN, tag, msg, ex);
+        self().println(Thread.currentThread(), Severity.WARN, tag, msg, ex);
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public void error(String tag, String msg, Throwable ex) {
-        self().println(Thread.currentThread(), ERROR, tag, msg, ex);
+        self().println(Thread.currentThread(), Severity.ERROR, tag, msg, ex);
     }
 
-	@CallerSideMethod
+	@Domain.CallerSide
 	public void $assert(String tag, String msg, Throwable ex) {
-		self().println(Thread.currentThread(), ASSERT, tag, msg, ex);
+		self().println(Thread.currentThread(), Severity.ASSERT, tag, msg, ex);
 
 		// Forcibly flush buffers and halt the Java Runtime.
 		System.out.flush();
@@ -188,7 +185,7 @@ public class Log extends Nucleus<Log> {
 
 	/** CONFIGURATION */
 
-	private volatile int severity = 0;
+	private volatile Severity severity = Severity.INFO;
 	private Logger logger = defaultLogger.get();
 
 	/**
@@ -196,7 +193,7 @@ public class Log extends Nucleus<Log> {
 	 *
 	 * @param severity the severity to assume
 	 */
-	public void setSeverity(int severity) {
+	public void setSeverity(Severity severity) {
 		getNucleus().severity = severity;
 	}
 
@@ -205,8 +202,8 @@ public class Log extends Nucleus<Log> {
 	 *
 	 * @return the current severity
 	 */
-	@CallerSideMethod
-	public int getSeverity() {
+	@Domain.CallerSide
+	public Severity getSeverity() {
 		return getNucleus().severity;
 	}
 
@@ -222,12 +219,10 @@ public class Log extends Nucleus<Log> {
 	/**
 	 * Resets the current Logger to the default Logger implementation.
 	 */
-	@CallerSideMethod
+	@Domain.CallerSide
 	public void resetLogger() {
 		this.logger = defaultLogger.get();
 	}
-
-	/** ASYNC DELEGATE FACILITY */
 
 	/**
 	 * Delegate async function that invokes the current Logger.
@@ -239,8 +234,8 @@ public class Log extends Nucleus<Log> {
 	 * @param msg the message to log
 	 * @param ex an optional exception to log
 	 */
-    public void println(Thread thread, int severity, String tag, String msg, Throwable ex) {
-	    if (this.severity <= severity)
+    public void println(Thread thread, Severity severity, String tag, String msg, Throwable ex) {
+	    if (this.severity.ordinal() <= severity.ordinal())
 		    logger.log(thread, severity, tag, msg, ex);
     }
 }

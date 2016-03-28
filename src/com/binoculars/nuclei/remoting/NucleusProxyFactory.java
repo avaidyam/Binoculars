@@ -1,11 +1,10 @@
 package com.binoculars.nuclei.remoting;
 
+import com.binoculars.nuclei.Domain;
 import com.binoculars.nuclei.Nucleus;
 import com.binoculars.nuclei.NucleusProxy;
 import com.binoculars.future.Signal;
 import com.binoculars.future.Future;
-import com.binoculars.nuclei.annotation.SignalPriority;
-import com.binoculars.nuclei.annotation.CallerSideMethod;
 import com.binoculars.util.Log;
 import javassist.*; // FIXME: Switch to ByteBuddy
 import javassist.bytecode.AccessFlag; // FIXME: Switch to ByteBuddy
@@ -162,7 +161,7 @@ public class NucleusProxyFactory {
 
             CtClass returnType = method.getReturnType();
             boolean isCallerSide = // don't touch
-                    originalMethod.getAnnotation(CallerSideMethod.class) != null ||
+                    originalMethod.getAnnotation(Domain.CallerSide.class) != null ||
                             (originalMethod.getName().equals("self"));// || originalMethod.getName().equals("future")); ??
 
 
@@ -175,7 +174,7 @@ public class NucleusProxyFactory {
                     if ( availableParameterAnnotation.length > 0 ) {
                         for (int k = 0; k < availableParameterAnnotation.length; k++) {
                             Object annot = availableParameterAnnotation[k];
-                            if ( annot.toString().indexOf("com.binoculars.nuclei.annotation.InThread") > 0 ) {
+                            if ( annot.toString().indexOf("com.binoculars.nuclei.Domain.InThread") > 0 ) {
                                 throw new RuntimeException("cannot combine @CallerSide and @InThread, manually wrap callback using inThread(). method:"+originalMethod+" clz:"+orig);
                             }
                         }
@@ -215,7 +214,7 @@ public class NucleusProxyFactory {
 
             if (allowed) {
                 boolean isVoid = returnType == CtPrimitiveType.voidType;
-                boolean isCallbackCall = originalMethod.getAnnotation(SignalPriority.class) != null;
+                boolean isCallbackCall = originalMethod.getAnnotation(Domain.SignalPriority.class) != null;
                 if (returnType != CtPrimitiveType.voidType && !returnType.getName().equals(Future.class.getName()) ) {
                     throw new RuntimeException("only void methods or methods returning Future allowed problematic method:"+originalMethod );
                 }

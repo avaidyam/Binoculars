@@ -1,14 +1,32 @@
 package com.binoculars.nuclei.management;
 
+/**
+ *
+ */
 public interface SchedulerStatusMXBean {
 
+	/**
+	 *
+	 * @return
+	 */
 	int getNumberOfDispatchers();
 
+	/**
+	 *
+	 * @return
+	 */
 	int getDefQueueSize();
 
+	/**
+	 *
+	 * @return
+	 */
 	int getIsolatedThreadCount();
 
-	class SchedulerStatus implements SchedulerStatusMXBean {
+	/**
+	 * A concrete implementation of SchedulerStatusMXBean.
+	 */
+	final class SchedulerStatus implements SchedulerStatusMXBean {
 
 		private int _numberOfDispatchers;
 		private int _defQueueSize;
@@ -20,15 +38,15 @@ public interface SchedulerStatusMXBean {
 			this._isolatedThreadCount = isolatedThreadCount;
 		}
 
-		public int getNumberOfDispatchers() {
+		public final int getNumberOfDispatchers() {
 			return _numberOfDispatchers;
 		}
 
-		public int getDefQueueSize() {
+		public final int getDefQueueSize() {
 			return _defQueueSize;
 		}
 
-		public int getIsolatedThreadCount() {
+		public final int getIsolatedThreadCount() {
 			return _isolatedThreadCount;
 		}
 	}

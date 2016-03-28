@@ -1,11 +1,10 @@
 package com.binoculars.nuclei.remoting.base;
 
 import com.binoculars.nuclei.*;
-import com.binoculars.nuclei.exception.InternalNucleusStoppedException;
+import com.binoculars.nuclei.Exceptions;
 import com.binoculars.nuclei.scheduler.*;
 import com.binoculars.nuclei.remoting.CallEntry;
 import com.binoculars.nuclei.remoting.encoding.*;
-import com.binoculars.nuclei.annotation.Local;
 import com.binoculars.future.*;
 import com.binoculars.util.Log;
 import org.nustaq.serialization.FSTConfiguration;
@@ -54,7 +53,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	protected BiFunction<Nucleus,String,Boolean> remoteCallInterceptor =
 			(a,methodName) -> {
 				Method method = a.__getCachedMethod(methodName, a);
-				if ( method == null || method.getAnnotation(Local.class) != null ) {
+				if ( method == null || method.getAnnotation(Domain.Local.class) != null ) {
 					return false;
 				}
 				return true;
@@ -224,7 +223,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 		remoteNuclei.remove(act);
 		try {
 			act.__stop();
-		} catch (InternalNucleusStoppedException ase) {}
+		} catch (Exceptions.InternalNucleusStoppedException ase) {}
 	}
 	
 	/**
@@ -286,7 +285,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 			}
 			if (targetNucleus.isStopped() || targetNucleus.getScheduler() == null ) {
 				Log.e(this.toString(), "nuclei found for key " + read + " is stopped and/or has no scheduler set");
-				receiveCBResult(objSocket, read.getFutureKey(), null, InternalNucleusStoppedException.INSTANCE);
+				receiveCBResult(objSocket, read.getFutureKey(), null, Exceptions.InternalNucleusStoppedException.INSTANCE);
 				return true;
 			}
 			if (remoteCallInterceptor != null && !remoteCallInterceptor.apply(targetNucleus,read.getMethod())) {
@@ -327,7 +326,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 		} else if (read.getQueue() == read.CBQ) {
 			Signal publishedSignal = getPublishedCallback(read.getReceiverKey());
 			if ( publishedSignal == null ) {
-				if ( read.getArgs() != null && read.getArgs().length == 2 && read.getArgs()[1] instanceof InternalNucleusStoppedException) {
+				if ( read.getArgs() != null && read.getArgs().length == 2 && read.getArgs()[1] instanceof Exceptions.InternalNucleusStoppedException) {
 					// FIXME: this might happen frequently as messages are in flight.
 					// FIXME: need a better way to handle this. Frequently it is not an error.
 					Log.w(this.toString(), "call to stopped remote nuclei");

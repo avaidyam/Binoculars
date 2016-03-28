@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2016 Aditya Vaidyam
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.binoculars.future;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,21 +36,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The future bound to the latch will only be signaled when the count
  * reaches zero (by calling {@link #countDown countDown}. The future
  * will also be signaled with the result and error provided by the
- * most recent call to {@link #countDown(Object, Object)} countDown}.
+ * most recent call to {@link #countDown(Object, Throwable)} countDown}.
  *
  * The {@code FutureLatch} is most usually used for pure signalling, so
  * the result and error signaled will be null. To predefine the result
- * and/or error to signal, call {@link #preset(Object, Object)}.
+ * and/or error to signal, call {@link #obtrude(Object, Throwable)}.
  *
  */
-public class FutureLatch<T> {
+public final class FutureLatch<T> {
 
-    protected Future<T> future;
-    protected AtomicInteger count;
-
-    // For presetting the future signal when the count reaches zero.
-    protected T _result = null;
-    protected Object _error = null;
+    private Future<T> future;
+	private AtomicInteger count;
+	private T _result = null;
+	private Throwable _error = null;
 
     /**
      * Constructs a {@code FutureLatch} initialized with the given count and future.
@@ -71,7 +91,7 @@ public class FutureLatch<T> {
      * @param result the result to be signaled to the future
      * @param error the error to be signaled to the future
      */
-    public void preset(T result, Object error) {
+    public void obtrude(T result, Throwable error) {
         this._result = result;
         this._error = error;
     }
@@ -112,9 +132,17 @@ public class FutureLatch<T> {
      * @param error the error to be signaled to the future
      */
     @SuppressWarnings("unchecked")
-    public void countDown(T result, Object error) {
+    public void countDown(T result, Throwable error) {
         if (count.decrementAndGet() == 0)
             future.complete(result, error);
+
+        /*
+        if (error != null) {
+            future.completeExceptionally(error);
+            count.set(-1);
+            return;
+        }
+         */
     }
 
     /**

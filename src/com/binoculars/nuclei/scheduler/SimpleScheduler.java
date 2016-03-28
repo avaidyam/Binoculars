@@ -1,8 +1,7 @@
 package com.binoculars.nuclei.scheduler;
 
 import com.binoculars.nuclei.Nucleus;
-import com.binoculars.nuclei.exception.NucleusBlockedException;
-import com.binoculars.nuclei.exception.NucleusStoppedException;
+import com.binoculars.nuclei.Exceptions;
 import com.binoculars.nuclei.management.SchedulerStatusMXBean;
 import com.binoculars.nuclei.remoting.CallEntry;
 import com.binoculars.nuclei.remoting.base.RemoteRegistry;
@@ -85,10 +84,10 @@ public class SimpleScheduler implements Scheduler {
 					}
 					if(sendingNucleus != null)
 						sendingNucleus.__addDeadLetter((Nucleus) receiver, dl);
-					throw new NucleusStoppedException(dl);
+					throw new Exceptions.NucleusStoppedException(dl);
 				}
 				if(sendingNucleus != null && sendingNucleus.__throwExAtBlock)
-					throw NucleusBlockedException.INSTANCE;
+					throw Exceptions.NucleusBlockedException.INSTANCE;
 				if(backOffStrategy.isSleeping(count)) {
 					if(sleepStart == 0) {
 						sleepStart = System.currentTimeMillis();

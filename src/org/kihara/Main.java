@@ -1,11 +1,30 @@
+/*
+ * Copyright (c) 2016 Aditya Vaidyam
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.kihara;
 
-import com.binoculars.system.Endpoint;
-import com.binoculars.system.JavascriptEngine;
-import com.binoculars.system.PFPController;
+import com.binoculars.nuclei.Endpoint;
 import com.binoculars.util.Log;
 import com.binoculars.util.ParameterFilter;
-import com.sun.deploy.net.HttpResponse;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 
@@ -21,86 +40,15 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * TODO: virus protocol:
- * - snapshot of node state
- * - for any N endpoints
- * - acknowledge receipt
- * - no ACK = node lost
- * - synchronized timestamp
- * - vector clock
- * - includes cpu coefficient
- * - openjdk benchmarking
- * - includes current load info
- * - part of snapshot
-
- * TODO: nucleus additions:
- * - startup() upon system start
- * - shutdown() upon system shutdown
- * - start() upon alloc + proxy
- * - could be spawn()
- * - stop() upon deproxy + GC
- * - could be destroy()
-
- * TODO: future modifications:
- * - then: apply, compose, combine
- * - accept(both, either)
-
- * TODO: uncategorized issues:
- * - Tasks[] per node
- * - Task progress (Queue, InProgress, Success, Failure)
- * - Task progress listener ^^
- * - Turn endpoint into an nuclei
- * - endpoint can do heartbeat
- * - endpoint registers allOf "plugins"
- * - vends services to other endpoints connected
- * - Guava ServiceManager + Service
- * - ALSO ALLOW HTTP SERVER!! -- com.sun.net.httpserver
- * - see vert.x eventbus (send/recv)
- * - vert.x deploymentoptions, vertxoptions
- * - pfp should fix distribution
- * - use round robbin setup
- * - factor cpu strength
-
- * TODO: actor spawning modifications:
- * - .Unique, .PerCPU, .PerCore values
- * - select between Elastic or Simple based on this
-
- * TODO: visual output:
- * - show subsequences upon submission
- * - show more info upon completion
- * - allow output xml download
- * - show xml data summary
- * - show output visualizer
- * - test results with samples
- * - Arabidopsis Thalania
- * - Yeast
+ * Entry point for the sample application (PFP).
  */
-
-/// scp Binoculars.jar dragon:.
-
-/*
-    // Imports Arrays and Collectors, and aliases the Arrays.stream() function.
-    var Arrays = Java.type("java.util.Arrays")
-    var Collectors = Java.type("java.util.stream.Collectors")
-    var ArrayStream = Arrays["stream(java.lang.Object[])"]
-
-    // Use cURL to download OpenFDA Adverse Events for "Morphine" as JSON.
-    var drugs = JSON.parse(`curl -k https://api.fda.gov/drug/event.json?skip=0&limit=5&search=morphine`)
-    drugs = ArrayStream(drugs.results)
-
-    // Map each event to all the medicinal products involved and collect as a string.
-    drugs = drugs.flatMap(function(a) ArrayStream(a.patient.drug))
-    drugs = drugs.map(function(a) a.medicinalproduct)
-    drugs = drugs.collect(Collectors.joining("\n"))
-*/
-
 public class Main {
 
     /**
      * Initialize the Endpoint, and start the HTTP server and shell.
      */
     public static void main(String[] args) {
-        Log.get().setSeverity(Log.DEBUG);
+        Log.get().setSeverity(Log.Severity.DEBUG);
         Endpoint<PFPController> endpoint = Endpoint.of(PFPController.class);
         try {
             PFPController main = endpoint.getNodes().get(0);
@@ -109,7 +57,6 @@ public class Main {
         } catch (Exception e) {
             Log.e("Main", "Could not begin application.", e);
         }
-
     }
 
     /**
@@ -178,7 +125,7 @@ public class Main {
             bindings.put("info", (Consumer)(s) -> System.err.println("Command Info: " + s));
             bindings.put("time", (Supplier) System::currentTimeMillis);
         };
-        JavascriptEngine.script = () -> "var PFP = Java.type(\"com.binoculars.system.PFPController\")\n";
+        JavascriptEngine.script = () -> "var PFP = Java.type(\"org.kihara.PFPController\")\n";
         JavascriptEngine.shell(System.in, System.out, System.err);
     }
 }

@@ -1,16 +1,38 @@
 package com.binoculars.nuclei.management;
 
+/**
+ *
+ */
 public interface DispatcherStatusMXBean {
 
+	/**
+	 *
+	 * @return
+	 */
 	String getName();
 
+	/**
+	 *
+	 * @return
+	 */
 	int getNumberOfNuclei();
 
+	/**
+	 *
+	 * @return
+	 */
 	int getLoadPerc();
 
+	/**
+	 *
+	 * @return
+	 */
 	int getQueueSize();
 
-	class DispatcherStatus implements DispatcherStatusMXBean {
+	/**
+	 * A concrete implementation of DispatcherStatusMXBean.
+	 */
+	final class DispatcherStatus implements DispatcherStatusMXBean {
 
 		private String _name;
 		private int _numberOfNuclei;
@@ -24,19 +46,19 @@ public interface DispatcherStatusMXBean {
 			this._queueSize = queueSize;
 		}
 
-		public String getName() {
+		public final String getName() {
 			return _name;
 		}
 
-		public int getNumberOfNuclei() {
+		public final int getNumberOfNuclei() {
 			return _numberOfNuclei;
 		}
 
-		public int getLoadPerc() {
+		public final int getLoadPerc() {
 			return _loadPerc;
 		}
 
-		public int getQueueSize() {
+		public final int getQueueSize() {
 			return _queueSize;
 		}
 	}

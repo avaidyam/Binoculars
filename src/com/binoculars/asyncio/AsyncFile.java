@@ -2,7 +2,6 @@
 package com.binoculars.asyncio;
 
 import com.binoculars.nuclei.Nucleus;
-import com.binoculars.nuclei.NucleusExecutorService;
 import com.binoculars.future.CompletableFuture;
 import com.binoculars.future.Future;
 import org.nustaq.serialization.util.FSTUtil;
@@ -154,7 +153,7 @@ public class AsyncFile {
         Nucleus sender = Nucleus.current();
         Set<OpenOption> set = new HashSet<OpenOption>(options.length);
         Collections.addAll(set, options);
-        fileChannel = AsynchronousFileChannel.open(file, set, new NucleusExecutorService(sender), NO_ATTRIBUTES);
+        fileChannel = AsynchronousFileChannel.open(file, set, Nucleus.toExecutor(sender), NO_ATTRIBUTES);
     }
 
     public long length() {

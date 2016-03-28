@@ -1,19 +1,38 @@
+/*
+ * Copyright (c) 2016 Aditya Vaidyam
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.binoculars.nuclei;
 
-import com.binoculars.nuclei.exception.InternalNucleusStoppedException;
-import com.binoculars.nuclei.exception.MustBeRunFromNucleusThreadException;
 import com.binoculars.nuclei.management.NucleusStatusMXBean;
 import com.binoculars.nuclei.scheduler.*;
 import com.binoculars.nuclei.remoting.NucleusProxyFactory;
 import com.binoculars.nuclei.remoting.base.RemoteRegistry;
-import com.binoculars.nuclei.annotation.CallerSideMethod;
-import com.binoculars.nuclei.annotation.Local;
 import com.binoculars.future.TicketMachine;
 import com.binoculars.future.Signal;
 import com.binoculars.future.CompletableFuture;
 import com.binoculars.future.Future;
 import com.binoculars.future.Spore;
 import com.binoculars.util.Log;
+import com.binoculars.util.WrapperExecutorService;
 import external.jaq.mpsc.MpscConcurrentQueue;
 
 import java.io.Serializable;
@@ -146,6 +165,15 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     public static <T extends Nucleus> T of(Class<T> actorClazz, Scheduler scheduler, int qsize) {
         return (T) instance.newProxy(actorClazz, scheduler, qsize);
     }
+
+	public static <T extends Nucleus> ExecutorService toExecutor(final Nucleus<T> nucleus) {
+		return new WrapperExecutorService() {
+			final Nucleus _this = nucleus;
+			@Override public void execute(Runnable command) {
+				this._this.self().execute(command);
+			}
+		};
+	}
 
     public static void submitDelayed(long millis, final Runnable task) {
         Nucleus.delayedCalls.schedule(new TimerTask() {
@@ -358,7 +386,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
      * $$stop receiving events. If there are no actors left on the underlying dispatcher,
      * the dispatching thread will be terminated.
      */
-    @CallerSideMethod
+    @Domain.CallerSide
     public void stop() {
         if(isRemote())
             throw new RuntimeException("Cannot stop a remote nuclei!");
@@ -367,38 +395,27 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 
 	// internal. tweak to check for remote ref before sending
     // Don't actually use!
-    @Local
+    @Domain.Local
     public void asyncStop() {
+		onStop();
         __stop();
     }
 
-    @CallerSideMethod
+	protected void onStop() {
+
+	}
+
+    @Domain.CallerSide
     public boolean isStopped() {
         return __stopped;
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public boolean isProxy() {
         return getNucleus() != this;
     }
 
-	/**
-	 * generic method for untyped messages.
-	 *
-	 * @return
-	 */
-	public Future ask(Object ... args) {
-		return new CompletableFuture<>(null);
-	}
 
-	/**
-	 * generic method for untyped messages.
-	 *
-	 * @return
-	 */
-	public void tell(Object ... args) {
-
-	}
 
     /**
      * @return current nuclei thread or throw an exception if not running inside an nuclei thread.
@@ -406,7 +423,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     public static Nucleus current() {
         Nucleus nucleus = sender.get();
         if ( nucleus == null )
-            throw new MustBeRunFromNucleusThreadException();
+            throw new Exceptions.MustBeRunFromNucleusThreadException();
         return nucleus;
     }
 
@@ -419,7 +436,9 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 	 *
 	 * @param command
 	 */
-	@CallerSideMethod @Local @Override
+	@Domain.CallerSide
+	@Domain.Local
+	@Override
 	public void execute(Runnable command) {
 		self().__submit(command);
 	}
@@ -461,9 +480,9 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 	 * can be used to wait for all messages having been processed and get a signal from the returned future once this is complete
 	 * @return
 	 */
-	@Local
-	public Future ping() {
-		return new CompletableFuture<>("pong");
+	@Domain.Local
+	public Future<Void> ping() {
+		return new CompletableFuture<>();
 	}
 
     /**
@@ -482,7 +501,8 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
      * typical use case:
      * delayed( 100, () -> { self().doAction( x, y,  ); } );
      */
-    @CallerSideMethod @Local
+    @Domain.CallerSide
+	@Domain.Local
     public void delayed(long millis, final Runnable toRun) {
         __scheduler.delayedCall(millis, inThread(self(), toRun));
     }
@@ -490,17 +510,17 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     /**
      * @return true if mailbox fill size is ~half capacity
      */
-    @CallerSideMethod
+    @Domain.CallerSide
     public boolean isMailboxPressured() {
         return __mailbox.size() * 2 > __mbCapacity;
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public Scheduler getScheduler() {
         return __scheduler;
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public boolean isCallbackQPressured() {
         return __cbQueue.size() * 2 > __mbCapacity;
     }
@@ -508,12 +528,12 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     /**
      * @return an estimation on the queued up entries in the mailbox. Can be used for bogus flow control
      */
-    @CallerSideMethod
+    @Domain.CallerSide
     public int getMailboxSize() {
         return __mailbox.size();
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public int getQSizes() {
         return getCallbackSize() + getMailboxSize();
     }
@@ -521,7 +541,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     /**
      * @return an estimation on the queued up callback entries. Can be used for bogus flow control.
      */
-    @CallerSideMethod
+    @Domain.CallerSide
     public int getCallbackSize() {
         return __cbQueue.size();
     }
@@ -537,17 +557,17 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 	 * @param <T>
 	 * @return
 	 */
-    @CallerSideMethod
+    @Domain.CallerSide
     protected <T> T inThread(Nucleus proxy, T cbInterface) {
         return __scheduler.inThread(proxy, cbInterface);
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public Nucleus getNucleusRef() {
         return __self;
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public boolean isRemote() {
         return __remoteId != 0;
     }
@@ -576,7 +596,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 	 * Close refers to "unmapping" the nuclei, underlying network connections will not be
 	 * closed (else server down on single client disconnect)
 	 */
-	@Local
+	@Domain.Local
     public void close() {
         if (__connections != null) {
             final ConcurrentLinkedQueue<RemoteConnection> prevCon = getNucleusRef().__connections;
@@ -600,7 +620,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     /**
      * avoids exception when closing an nuclei after stop has been called.
      */
-    @CallerSideMethod
+    @Domain.CallerSide
     public void stopSafeClose() {
         if (isStopped()) {
             getNucleus().close(); // is threadsafe
@@ -609,7 +629,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
         }
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public boolean isPublished() {
         return __connections != null && __connections.peek() != null;
     }
@@ -637,7 +657,8 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
         });
     }
 
-	@CallerSideMethod @Local
+	@Domain.CallerSide
+	@Domain.Local
 	public Dispatcher getCurrentDispatcher() {
 		return (Dispatcher) __currentDispatcher;
 	}
@@ -660,14 +681,14 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
      * @param b
      * @return
      */
-    @CallerSideMethod
+    @Domain.CallerSide
     public SELF setThrowExWhenBlocked(boolean b) {
         getNucleusRef().__throwExAtBlock = b;
         getNucleus().__throwExAtBlock = b;
         return (SELF) this;
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public void __addStopHandler(Signal<SELF> cb) {
         if (__stopHandlers == null) {
             getNucleusRef().__stopHandlers = new ConcurrentLinkedQueue();
@@ -678,7 +699,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
             __stopHandlers.add(cb);
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public void __addRemoteConnection(RemoteConnection con) {
         if (__connections == null) {
             getNucleusRef().__connections = new ConcurrentLinkedQueue<RemoteConnection>();
@@ -689,14 +710,14 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 	    }
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public void __removeRemoteConnection(RemoteConnection con) {
         if (__connections != null) {
             __connections.remove(con);
         }
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public void __stop() {
 	    Log.d(this.toString(), "stopping nuclei " + getClass().getSimpleName());
         Nucleus self = __self;
@@ -719,11 +740,11 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
         //} catch (IllegalAccessException | NoSuchFieldException e) {
         //    e.printStackTrace();
         //}
-        throw InternalNucleusStoppedException.INSTANCE;
+        throw Exceptions.InternalNucleusStoppedException.INSTANCE;
     }
 
     // dispatch an outgoing call to the target nuclei queue. Runs in Caller Thread
-    @CallerSideMethod
+    @Domain.CallerSide
     public Object __enqueueCall(Nucleus receiver, String methodName, Object args[], boolean isCB) {
         if (__stopped) {
             if (methodName.equals("$stop")) // ignore double stop
@@ -734,7 +755,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
         return __scheduler.enqueueCall(sender.get(), receiver, methodName, args, isCB);
     }
 
-    @CallerSideMethod
+    @Domain.CallerSide
     public void __addDeadLetter(Nucleus receiver, String methodName) {
         String senderString = sender.get() == null ? "null" : sender.get().getClass().getName();
         String s = "DEAD LETTER: sender:" + senderString + " receiver::msg:" + receiver.getClass().getSimpleName() + "::" + methodName;
@@ -744,7 +765,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 
     // FIXME: would be much better to do lookup at method invoke time INSIDE nuclei thread instead of doing it on callside (contended)
     ConcurrentHashMap<String, Method> methodCache;
-    @CallerSideMethod
+    @Domain.CallerSide
     public Method __getCachedMethod(String methodName, Nucleus nucleus) {
 	    if ( methodCache == null ) {
 		    methodCache = new ConcurrentHashMap<>(7);

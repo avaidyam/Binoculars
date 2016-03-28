@@ -1,8 +1,7 @@
 package test;
 
+import com.binoculars.nuclei.Domain;
 import com.binoculars.nuclei.Nucleus;
-import com.binoculars.nuclei.annotation.CallerSideMethod;
-import com.binoculars.nuclei.annotation.Local;
 import com.binoculars.future.Signal;
 import com.binoculars.future.CompletableFuture;
 import com.binoculars.future.Future;
@@ -156,8 +155,8 @@ public class ShowcaseNucleus extends Nucleus<ShowcaseNucleus> {
     // synchronous access, threading trickery
     //
 
-    @CallerSideMethod
-    @Local
+    @Domain.CallerSide
+    @Domain.Local
     public int getSyncState() {
         return getNucleus().syncState;
     }

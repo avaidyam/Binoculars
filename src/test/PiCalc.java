@@ -47,7 +47,7 @@ public class PiCalc {
         }
 
         // trigger latch once all actors have finished
-        CompletableFuture.allOf(pies.stream().map(Nucleus::ask)
+        CompletableFuture.allOf(pies.stream().map(Nucleus::ping)
 		        .toArray(CompletableFuture[]::new))
 		        .then((r, e) -> latch.countDown());
         latch.await();
@@ -68,7 +68,7 @@ public class PiCalc {
         final int MAX_ACT = 8;
         String results[] = new String[MAX_ACT];
 
-        Log.get().setSeverity(Log.ERROR);
+        Log.get().setSeverity(Log.Severity.ERROR);
         ElasticScheduler.DEFQSIZE = 60000;
 
         for (int numNuclei = 1; numNuclei <= MAX_ACT; numNuclei += 1) {

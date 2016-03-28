@@ -1,14 +1,32 @@
 package com.binoculars.nuclei.management;
 
+/**
+ *
+ */
 public interface NucleusStatusMXBean {
 
+	/**
+	 *
+	 * @return
+	 */
 	String getNucleusClass();
 
+	/**
+	 *
+	 * @return
+	 */
 	int getMessageQueueSize();
 
+	/**
+	 *
+	 * @return
+	 */
 	int getCallbackQueueSize();
 
-	class NucleusStatus implements NucleusStatusMXBean {
+	/**
+	 * A concrete implementation of NucleusStatusMXBean.
+	 */
+	final class NucleusStatus implements NucleusStatusMXBean {
 
 		private String _nucleusClass;
 		private int _messageQueueSize;
@@ -20,15 +38,15 @@ public interface NucleusStatusMXBean {
 			this._callbackQueueSize = callbackQueueSize;
 		}
 
-		public String getNucleusClass() {
+		public final String getNucleusClass() {
 			return _nucleusClass;
 		}
 
-		public int getMessageQueueSize() {
+		public final int getMessageQueueSize() {
 			return _messageQueueSize;
 		}
 
-		public int getCallbackQueueSize() {
+		public final int getCallbackQueueSize() {
 			return _callbackQueueSize;
 		}
 	}
