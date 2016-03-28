@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2016 Aditya Vaidyam
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.binoculars.util;
 
 import java.io.File;
@@ -14,15 +36,15 @@ public class Metrics implements Serializable {
         // CPU_NICE
         // CPU_WAIT_IO
 
-        //public final int cores = os().getAvailableProcessors();
-        //public final String arch = os().getArch();
-        //public final String kernel = os().getVersion();
+        public final int CORES = os().getAvailableProcessors();
+        public final String ARCH = os().getArch();
+        public final String KERNEL = os().getVersion();
 
         public static Metrics.CPU measure() {
             return new Metrics.CPU();
         }
         public String toString() {
-            return "CPU{}";
+            return "CPU{" + "CORES=" + CORES + ", ARCH=" + ARCH + ", KERNEL=" + KERNEL + "}";
         }
     }
 
@@ -67,6 +89,7 @@ public class Metrics implements Serializable {
         // BYTES_OUT
         // PACKETS_IN
         // PACKETS_OUT
+
         public static Metrics.Network measure() {
             return new Metrics.Network();
         }
@@ -78,6 +101,7 @@ public class Metrics implements Serializable {
     public static class Process extends Metrics {
         // TOTAL_PROCESSES
         // RUNNING_PROCESSES
+
         public static Metrics.Process measure() {
             return new Metrics.Process();
         }

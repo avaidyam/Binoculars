@@ -27,7 +27,7 @@ import com.binoculars.future.*;
 import com.binoculars.nuclei.Cortex;
 import com.binoculars.util.Eponym;
 import com.binoculars.util.Log;
-import com.binoculars.util.SeekableFile;
+import org.kihara.util.SeekableFile;
 
 import java.io.*;
 import java.nio.file.*;

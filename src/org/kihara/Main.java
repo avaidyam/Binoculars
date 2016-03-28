@@ -24,9 +24,9 @@ package org.kihara;
 
 import com.binoculars.nuclei.Cortex;
 import com.binoculars.util.Log;
-import com.binoculars.util.ParameterFilter;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
+import org.kihara.util.ParameterFilter;
 
 import java.io.File;
 import java.io.IOException;

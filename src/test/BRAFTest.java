@@ -1,11 +1,7 @@
 package test;
 
-import com.binoculars.util.SeekableFile;
+import org.kihara.util.SeekableFile;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
