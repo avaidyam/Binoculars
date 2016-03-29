@@ -23,10 +23,9 @@
 
 package com.avaidyam.binoculars.remoting.tcp;
 
-import com.avaidyam.binoculars.remoting.base.NucleusClientConnector;
-import com.avaidyam.binoculars.remoting.base.ObjectSink;
+import com.avaidyam.binoculars.remoting.base.ConnectibleNucleus;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.base.ObjectSocket;
+import com.avaidyam.binoculars.remoting.base.ObjectFlow;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
@@ -43,7 +42,12 @@ import java.util.function.Function;
 /**
  *
  */
-public class TCPClientConnector implements NucleusClientConnector {
+public class TCPClientConnector implements ConnectibleNucleus.NucleusClientConnector {
+
+    /**
+     * used in most client and server connector implementations
+     */
+    static int OBJECT_MAX_BATCH_SIZE = 100;
 
     public static class RemotingHelper extends Nucleus<RemotingHelper> {}
     protected static AtomicReference<RemotingHelper> singleton =  new AtomicReference<>();
@@ -63,20 +67,20 @@ public class TCPClientConnector implements NucleusClientConnector {
 
     protected int port;
     protected String host;
-    protected MyTCPSocket socket;
-    protected Signal<NucleusClientConnector> disconnectSignal;
+    protected MyTCPSource socket;
+    protected Signal<ConnectibleNucleus.NucleusClientConnector> disconnectSignal;
 
-    public TCPClientConnector(int port, String host, Signal<NucleusClientConnector> disconnectSignal) {
+    public TCPClientConnector(int port, String host, Signal<ConnectibleNucleus.NucleusClientConnector> disconnectSignal) {
         this.port = port;
         this.host = host;
         this.disconnectSignal = disconnectSignal;
     }
 
     @Override
-    public Future connect(Function<ObjectSocket, ObjectSink> factory) throws Exception {
+    public Future connect(Function<ObjectFlow.Source, ObjectFlow.Sink> factory) throws Exception {
         CompletableFuture res = new CompletableFuture();
-        socket = new MyTCPSocket(host,port);
-        ObjectSink sink = factory.apply(socket);
+        socket = new MyTCPSource(host,port);
+        ObjectFlow.Sink sink = factory.apply(socket);
         new Thread(() -> {
             res.complete();
             while (!socket.isClosed()) {
@@ -104,8 +108,8 @@ public class TCPClientConnector implements NucleusClientConnector {
         return res;
     }
 
-    @Override
-    public Future closeClient() {
+	@Override
+    public Future disconnect() {
         try {
             socket.close();
         } catch (IOException e) {
@@ -115,11 +119,11 @@ public class TCPClientConnector implements NucleusClientConnector {
         return new CompletableFuture<>();
     }
 
-    static class MyTCPSocket extends TCPObjectSocket implements ObjectSocket {
+    static class MyTCPSource extends TCPObjectSocket implements ObjectFlow.Source {
 
         ArrayList objects = new ArrayList();
 
-        public MyTCPSocket(String host, int port) throws IOException {
+        public MyTCPSource(String host, int port) throws IOException {
             super(host, port);
         }
 

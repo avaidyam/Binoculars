@@ -1,8 +1,8 @@
 package test;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.base.ConnectableNucleus;
-import com.avaidyam.binoculars.remoting.tcp.TCPConnectable;
+import com.avaidyam.binoculars.remoting.base.ConnectibleNucleus;
+import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
 import com.avaidyam.binoculars.remoting.tcp.TCPPublisher;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
@@ -10,7 +10,7 @@ import com.avaidyam.binoculars.future.Future;
 public class RefChain {
 	
 	public static class A extends Nucleus<A> {
-		public Future showChain( ConnectableNucleus b ) {
+		public Future showChain( ConnectibleNucleus b ) {
 			B bref = (B) b.connect().await();
 			C cref = bref.getC().await();
 			String pok = cref.hello("POK").await();
@@ -21,8 +21,8 @@ public class RefChain {
 	
 	public static class B extends Nucleus<A> {
 		C c;
-		public void init(ConnectableNucleus connectable) {
-			connectable.connect().then((Object c) -> this.c = (C)c);
+		public void init(ConnectibleNucleus connectable) {
+			connectable.connect().then((Nucleus c) -> this.c = (C)c);
 		}
 		public Future<C> getC() {
 			return new CompletableFuture<>(c);
@@ -46,8 +46,8 @@ public class RefChain {
 		new TCPPublisher(b, 4002).publish();
 		new TCPPublisher(c, 4003).publish();
 		
-		ConnectableNucleus cConnect = new TCPConnectable(C.class, "localhost", 4003);
-		ConnectableNucleus bConnect = new TCPConnectable(B.class, "localhost", 4002);
+		ConnectibleNucleus cConnect = new TCPConnectible(C.class, "localhost", 4003);
+		ConnectibleNucleus bConnect = new TCPConnectible(B.class, "localhost", 4002);
 		
 		b.init(cConnect);
 		Thread.sleep(500); // don't program like this, init should return promise ..

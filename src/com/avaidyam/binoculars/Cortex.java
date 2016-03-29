@@ -22,7 +22,7 @@
 
 package com.avaidyam.binoculars;
 
-import com.avaidyam.binoculars.remoting.tcp.TCPConnectable;
+import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
 import org.kihara.tasks.TaskScheduler;
 import com.avaidyam.binoculars.remoting.tcp.TCPPublisher;
 import com.avaidyam.binoculars.util.Eponym;
@@ -153,7 +153,7 @@ public class Cortex<T extends Nucleus> {
             publish();
             discover((h, p) -> {
                 try {
-	                new TCPConnectable(this.actorClass, h, p).connect().then((node, error) -> {
+	                new TCPConnectible(this.actorClass, h, p).connect().then((node, error) -> {
 	                    this.nodes.add((T)node);
                     });
                 } catch (Exception e) {

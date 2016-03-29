@@ -40,9 +40,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by moelrue on 5/4/15.
- */
 public class AsyncFile {
 
     AsynchronousFileChannel fileChannel;

@@ -78,7 +78,7 @@ public class NucleusServer {
 	
 	public void start(Consumer<Nucleus> disconnectHandler) throws Exception {
 		connector.connect(facade, writesocket -> {
-			AtomicReference<ObjectSocket> socketRef = new AtomicReference<>(writesocket);
+			AtomicReference<ObjectFlow.Source> socketRef = new AtomicReference<>(writesocket);
 			RemoteRegistry reg = new RemoteRegistry( conf.deriveConfiguration(), coding) {
 				@Override
 				public Nucleus getFacadeProxy() {
@@ -86,7 +86,7 @@ public class NucleusServer {
 				}
 				
 				@Override
-				public AtomicReference<ObjectSocket> getWriteObjectSocket() {
+				public AtomicReference<ObjectFlow.Source> getWriteObjectSocket() {
 					return socketRef;
 				}
 			};
@@ -98,10 +98,10 @@ public class NucleusServer {
 			reg.publishNucleus(facade);
 			reg.setServer(this);
 			Log.i(this.toString(), "connected a client with registry " + System.identityHashCode(reg));
-			return new ObjectSink() {
+			return new ObjectFlow.Sink() {
 				
 				@Override
-				public void receiveObject(ObjectSink sink, Object received, List<Future> createdFutures) {
+				public void receiveObject(ObjectFlow.Sink sink, Object received, List<Future> createdFutures) {
 					try {
 						reg.receiveObject(socketRef.get(), sink, received, createdFutures);
 					} catch (Exception e) {

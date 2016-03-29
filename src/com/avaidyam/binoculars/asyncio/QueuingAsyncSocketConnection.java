@@ -37,8 +37,6 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * Created by moelrue on 5/5/15.
- *
  * A server socket connection which buffers incoming/outgoing data in a binary queue so
  * an application can easily parse and process data async in chunks without having
  * to maintain complex state machines.

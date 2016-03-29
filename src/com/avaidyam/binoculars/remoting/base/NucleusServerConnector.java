@@ -33,6 +33,6 @@ import java.util.function.Function;
  */
 public interface NucleusServerConnector {
 
-	void connect(Nucleus facade, Function<ObjectSocket, ObjectSink> factory) throws Exception;
+	void connect(Nucleus facade, Function<ObjectFlow.Source, ObjectFlow.Sink> factory) throws Exception;
 	Future closeServer();
 }

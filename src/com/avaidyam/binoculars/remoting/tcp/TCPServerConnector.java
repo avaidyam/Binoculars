@@ -25,11 +25,8 @@ package com.avaidyam.binoculars.remoting.tcp;
 
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
-import com.avaidyam.binoculars.remoting.base.NucleusServer;
-import com.avaidyam.binoculars.remoting.base.NucleusServerConnector;
-import com.avaidyam.binoculars.remoting.base.ObjectSink;
+import com.avaidyam.binoculars.remoting.base.*;
 import com.avaidyam.binoculars.remoting.encoding.Coding;
-import com.avaidyam.binoculars.remoting.base.ObjectSocket;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.util.Log;
 
@@ -86,13 +83,13 @@ public class TCPServerConnector implements NucleusServerConnector {
     }
 
     @Override
-    public void connect(Nucleus facade, Function<ObjectSocket, ObjectSink> factory) throws Exception {
+    public void connect(Nucleus facade, Function<ObjectFlow.Source, ObjectFlow.Sink> factory) throws Exception {
         CompletableFuture p = new CompletableFuture();
         new Thread( () -> acceptLoop(facade,port,factory,p), "acceptor thread "+port ).start();
         p.await();
     }
 
-    protected CompletableFuture acceptLoop(Nucleus facade, int port, Function<ObjectSocket, ObjectSink> factory, CompletableFuture p) {
+    protected CompletableFuture acceptLoop(Nucleus facade, int port, Function<ObjectFlow.Source, ObjectFlow.Sink> factory, CompletableFuture p) {
         try {
             numberOfThreads.incrementAndGet();
             acceptSocket = new ServerSocket(port);
@@ -100,9 +97,9 @@ public class TCPServerConnector implements NucleusServerConnector {
             while (!acceptSocket.isClosed()) {
                 Socket clientSocket = acceptSocket.accept();
                 clientSockets.add(clientSocket);
-                MyTCPSocket objectSocket = new MyTCPSocket(clientSocket);
+                MyTCPSource objectSocket = new MyTCPSource(clientSocket);
                 facade.execute(() -> {
-                    ObjectSink sink = factory.apply(objectSocket);
+                    ObjectFlow.Sink sink = factory.apply(objectSocket);
                     new Thread(() -> {
                         try {
                             numberOfThreads.incrementAndGet();
@@ -166,9 +163,9 @@ public class TCPServerConnector implements NucleusServerConnector {
         return new CompletableFuture<>(null);
     }
 
-    static class MyTCPSocket extends TCPObjectSocket implements ObjectSocket {
+    static class MyTCPSource extends TCPObjectSocket implements ObjectFlow.Source {
 
-        public MyTCPSocket(Socket socket) throws IOException {
+        public MyTCPSource(Socket socket) throws IOException {
             super(socket,null);
         }
 

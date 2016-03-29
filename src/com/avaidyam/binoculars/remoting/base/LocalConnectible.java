@@ -22,26 +22,49 @@
 
 package com.avaidyam.binoculars.remoting.base;
 
+import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
- * an object able to process decoded incoming messages
+ *
+ * A connectable simply connecting to a local nuclei. A close connection event will never happen (FIXME: send on stop instead)
+ *
  */
-public interface ObjectSink {
-	
-	/**
-	 * @param sink - usually this or a wrapper of this
-	 * @param received - decoded object(s)
-	 * @param createdFutures - list of futures/callbacks contained in the decoded object remote calls (unused)
-	 */
-	void receiveObject(ObjectSink sink, Object received, List<Future> createdFutures);
-	default void receiveObject(Object received, List<Future> createdFutures) {
-		receiveObject(this,received,createdFutures);
+public class LocalConnectible implements ConnectibleNucleus {
+
+	Nucleus nucleus;
+
+	public LocalConnectible(Nucleus nucleus) {
+		this.nucleus = nucleus;
 	}
-	void sinkClosed();
-	
+
+	/**
+	 * disconnect callback will never be called (local nuclei connection)
+	 * @param <T>
+	 * @param disconnectSignal
+	 * @param actorDisconnecCB
+	 * @return
+	 */
+	@Override
+	public <T extends Nucleus> Future<T> connect(Signal<NucleusClientConnector> disconnectSignal, Consumer<Nucleus> actorDisconnecCB) {
+		return new CompletableFuture<>((T) nucleus);
+	}
+
+	public ConnectibleNucleus withNucleusClass(Class nucleusClz) {
+		if (!nucleusClz.isAssignableFrom(nucleus.getClass()))
+			throw new RuntimeException("nuclei class mismatch");
+		return this;
+	}
+
+	public ConnectibleNucleus withInboundQueueSize(int inboundQueueSize) {
+		return this;
+	}
+
+	public Nucleus getNucleus() {
+		return nucleus;
+	}
 }
-
-

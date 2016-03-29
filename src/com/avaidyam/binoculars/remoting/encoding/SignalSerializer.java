@@ -22,7 +22,7 @@
 
 package com.avaidyam.binoculars.remoting.encoding;
 
-import com.avaidyam.binoculars.remoting.base.ObjectSocket;
+import com.avaidyam.binoculars.remoting.base.ObjectFlow;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.remoting.base.RemotedCallback;
 import com.avaidyam.binoculars.future.Signal;
@@ -55,10 +55,10 @@ public class SignalSerializer extends FSTBasicObjectSerializer {
 	}
 
 	public class MyRemotedSignal implements Signal, RemotedCallback {
-		AtomicReference<ObjectSocket> chan;
+		AtomicReference<ObjectFlow.Source> chan;
 		int id;
 
-		public MyRemotedSignal(AtomicReference<ObjectSocket> chan, int id) {
+		public MyRemotedSignal(AtomicReference<ObjectFlow.Source> chan, int id) {
 			this.chan = chan;
 			this.id = id;
 		}
@@ -90,7 +90,7 @@ public class SignalSerializer extends FSTBasicObjectSerializer {
 	public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPositioin) throws IOException {
 		// fixme: detect local actors returned from foreign
 		int id = in.readInt();
-		AtomicReference<ObjectSocket> chan = reg.getWriteObjectSocket();
+		AtomicReference<ObjectFlow.Source> chan = reg.getWriteObjectSocket();
 		MyRemotedSignal cb = new MyRemotedSignal(chan, id);
 		in.registerObject(cb, streamPositioin, serializationInfo, referencee);
 		return cb;

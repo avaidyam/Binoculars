@@ -24,7 +24,7 @@
 package com.avaidyam.binoculars.asyncio;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.base.ObjectSocket;
+import com.avaidyam.binoculars.remoting.base.ObjectFlow;
 import com.avaidyam.binoculars.util.Log;
 import org.nustaq.offheap.BinaryQueue;
 import org.nustaq.serialization.FSTConfiguration;
@@ -35,20 +35,17 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
-/**
- * Created by moelrue on 5/7/15.
- */
-public abstract class ObjectAsyncSocketConnection extends QueuingAsyncSocketConnection implements ObjectSocket {
+public abstract class ObjectAsyncSourceConnection extends QueuingAsyncSocketConnection implements ObjectFlow.Source {
 
     FSTConfiguration conf;
     Throwable lastError;
     ArrayList objects = new ArrayList();
 
-    public ObjectAsyncSocketConnection(SelectionKey key, SocketChannel chan) {
+    public ObjectAsyncSourceConnection(SelectionKey key, SocketChannel chan) {
         super(key, chan);
     }
 
-    public ObjectAsyncSocketConnection(FSTConfiguration conf, SelectionKey key, SocketChannel chan) {
+    public ObjectAsyncSourceConnection(FSTConfiguration conf, SelectionKey key, SocketChannel chan) {
         super(key, chan);
         setConf(conf);
     }

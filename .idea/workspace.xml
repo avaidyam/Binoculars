@@ -11,19 +11,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e091d3d-33a3-40b0-b537-a7db5a522861" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/NucleusProxy.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/RemotableNucleus.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/RemotableNucleus.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/RemoteConnection.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/RemoteConnection.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/HeapMessageStore.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/MessageStore.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusClientConnector.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectSink.java" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/ObjectAsyncSocketConnection.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/ObjectAsyncSourceConnection.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ConnectableNucleus.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ConnectibleNucleus.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/LocalConnectable.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/LocalConnectible.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectSocket.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectFlow.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPConnectable.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPConnectible.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Binoculars.jar" afterPath="$PROJECT_DIR$/Binoculars.jar" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/Nucleus.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/Nucleus.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/future/CompletableFuture.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/future/CompletableFuture.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/NucleusProxyFactory.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/NucleusProxyFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/Cortex.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/Cortex.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFile.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFile.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFileIOEvent.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFileIOEvent.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/QueuingAsyncSocketConnection.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/QueuingAsyncSocketConnection.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusClient.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusPublisher.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusPublisher.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusServer.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusServer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusServerConnector.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusServerConnector.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/RemoteRegistry.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/RemoteRegistry.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Dispatcher.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Dispatcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/ElasticScheduler.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/ElasticScheduler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/RemoteScheduler.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/RemoteScheduler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/PFPController.java" afterPath="$PROJECT_DIR$/src/org/kihara/PFPController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/encoding/SignalSerializer.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/encoding/SignalSerializer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/NIOServerConnector.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/NIOServerConnector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPClientConnector.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPClientConnector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPServerConnector.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPServerConnector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Scheduler.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Scheduler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/DiningPhilosophers.java" afterPath="$PROJECT_DIR$/src/test/DiningPhilosophers.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/RefChain.java" afterPath="$PROJECT_DIR$/src/test/RefChain.java" />
     </list>
     <ignored path="Demo.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -45,110 +59,7 @@
     <favorites_list name="Demo" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Dispatcher.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Dispatcher.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-14.481482">
-              <caret line="58" column="40" selection-start-line="58" selection-start-column="40" selection-end-line="58" selection-end-column="40" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ElasticScheduler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/ElasticScheduler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CompletableFuture.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/CompletableFuture.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.085341364">
-              <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Future.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/Future.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="32" column="37" selection-start-line="32" selection-start-column="37" selection-end-line="32" selection-end-column="37" />
-              <folding>
-                <element signature="e#0#4374#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Signal.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/Signal.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="53" column="35" selection-start-line="53" selection-start-column="35" selection-end-line="53" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PFPController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RemoteScheduler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/RemoteScheduler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="45" column="25" selection-start-line="45" selection-start-column="25" selection-end-line="45" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NucleusClient.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusClient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="59" column="23" selection-start-line="59" selection-start-column="23" selection-end-line="59" selection-end-column="23" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RemoteRegistry.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/RemoteRegistry.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SimpleScheduler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/SimpleScheduler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="42" column="13" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -170,22 +81,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/exception/Exceptions.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/management/DispatcherStatusMXBean.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/management/NucleusStatusMXBean.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/management/SchedulerStatusMXBean.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Exceptions.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Domain.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Message.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/NucleusProxy.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/RemotableNucleus.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/RemoteConnection.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/NucleusExecutorService.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/util/AbstractExecutor.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/util/WrapperExecutorService.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/asyncio/AsyncFile.java" />
-        <option value="$PROJECT_DIR$/src/org/kihara/Main.java" />
-        <option value="$PROJECT_DIR$/src/org/kihara/JavascriptEngine.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/future/FutureLatch.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/Endpoint.java" />
         <option value="$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordType.java" />
@@ -221,6 +116,22 @@
         <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/ElasticScheduler.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/PFPController.java" />
         <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/future/CompletableFuture.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Scheduler.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ConnectableNucleus.java" />
+        <option value="$PROJECT_DIR$/src/test/RefChain.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/LocalConnectible.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPConnectible.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusClientConnector.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectSocket.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectSource.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectSink.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectFlow.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ConnectibleNucleus.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPClientConnector.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFile.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/ObjectAsyncSourceConnection.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/QueuingAsyncSocketConnection.java" />
+        <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFileIOEvent.java" />
       </list>
     </option>
   </component>
@@ -1125,7 +1036,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -1134,14 +1045,16 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3647566" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293556" sideWeight="0.4921875" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.48033127" sideWeight="0.5078125" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18392856" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18392856" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.328125" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24948241" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1149,10 +1062,8 @@
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299279" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39974618" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293556" sideWeight="0.4921875" order="6" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -1177,91 +1088,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/NIOServerConnector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.45381525">
-          <caret line="78" column="0" selection-start-line="78" selection-start-column="0" selection-end-line="78" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/external/zeroconf/discovery/constants/DNSRecordType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.3212852">
-          <caret line="138" column="7" selection-start-line="138" selection-start-column="7" selection-end-line="138" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/encoding/Coding.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.13654618">
-          <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPNIOPublisher.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.085341364">
-          <caret line="12" column="3" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/Cortex.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.11947791">
-          <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test3.fasta">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.085341364">
-          <caret line="5" column="22" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/visualizer.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.385567">
-          <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/META-INF/MANIFEST.MF">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.05120482">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/io/Serializable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.4748995">
-          <caret line="168" column="17" selection-start-line="168" selection-start-column="17" selection-end-line="168" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.01754386">
-          <caret line="1" column="4" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/lang/management/OperatingSystemMXBean.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5050201">
-          <caret line="119" column="0" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/util/Eponym.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.034136545">
@@ -1416,26 +1242,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPClientConnector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.06827309">
-          <caret line="4" column="30" selection-start-line="4" selection-start-column="30" selection-end-line="4" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/kihara/tasks/TaskScheduler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.13654618">
           <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/_AsyncClientSocket.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.10240964">
-          <caret line="21" column="2" selection-start-line="21" selection-start-column="2" selection-end-line="21" selection-end-column="2" />
           <folding />
         </state>
       </provider>
@@ -1467,21 +1277,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/Nucleus.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.06827309">
-          <caret line="46" column="35" selection-start-line="46" selection-start-column="35" selection-end-line="46" selection-end-column="35" />
-          <folding>
-            <element signature="e#5920#5950#0" expanded="true" />
-            <element signature="e#6419#6449#0" expanded="true" />
-            <element signature="e#6896#6926#0" expanded="true" />
-            <element signature="e#7246#7276#0" expanded="true" />
-            <element signature="e#7590#7620#0" expanded="true" />
-            <element signature="e#10331#10361#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/RemoteConnection.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.10240964">
@@ -1502,38 +1297,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Scheduler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/BackOffStrategy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="33" column="13" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/SimpleScheduler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="42" column="13" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="59" column="23" selection-start-line="59" selection-start-column="23" selection-end-line="59" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/RemoteScheduler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1542,41 +1305,65 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Dispatcher.java">
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/Nucleus.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-14.481482">
-          <caret line="58" column="40" selection-start-line="58" selection-start-column="40" selection-end-line="58" selection-end-column="40" />
+        <state vertical-scroll-proportion="0.4869478">
+          <caret line="345" column="30" selection-start-line="345" selection-start-column="30" selection-end-line="345" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/RemoteRegistry.java">
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/BackOffStrategy.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+        <state vertical-scroll-proportion="0.09538153">
+          <caret line="46" column="31" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/SimpleScheduler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.43674698">
+          <caret line="112" column="40" selection-start-line="112" selection-start-column="40" selection-end-line="112" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/CompletableFuture.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.18775101">
+          <caret line="44" column="7" selection-start-line="44" selection-start-column="7" selection-end-line="44" selection-end-column="7" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/ElasticScheduler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+        <state vertical-scroll-proportion="0.52911645">
+          <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Scheduler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+        <state vertical-scroll-proportion="0.11947791">
+          <caret line="33" column="41" selection-start-line="33" selection-start-column="41" selection-end-line="33" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Dispatcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.06827309">
+          <caret line="39" column="46" selection-start-line="39" selection-start-column="46" selection-end-line="39" selection-end-column="46" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/Future.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="0.49497992">
           <caret line="32" column="37" selection-start-line="32" selection-start-column="37" selection-end-line="32" selection-end-column="37" />
           <folding>
             <element signature="e#0#4374#0" expanded="true" />
@@ -1586,17 +1373,141 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/Signal.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="0.39156628">
           <caret line="53" column="35" selection-start-line="53" selection-start-column="35" selection-end-line="53" selection-end-column="35" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/CompletableFuture.java">
+    <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.06827309">
+          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/RemoteRegistry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.06827309">
+          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/RefChain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.07727273">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/encoding/SerializerType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.22188754">
+          <caret line="33" column="16" selection-start-line="33" selection-start-column="16" selection-end-line="33" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/encoding/Coding.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.17068273">
+          <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPConnectible.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.31578946">
+          <caret line="38" column="3" selection-start-line="38" selection-start-column="3" selection-end-line="38" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/LocalConnectible.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.27878788">
+          <caret line="47" column="30" selection-start-line="47" selection-start-column="30" selection-end-line="47" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ConnectibleNucleus.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.48939395">
+          <caret line="45" column="28" selection-start-line="45" selection-start-column="28" selection-end-line="45" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFileIOEvent.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.085341364">
-          <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+          <caret line="25" column="27" selection-start-line="25" selection-start-column="27" selection-end-line="25" selection-end-column="27" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/_AsyncClientSocket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.50401604">
+          <caret line="48" column="13" selection-start-line="48" selection-start-column="13" selection-end-line="48" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#7287#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/NucleusClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.27309236">
+          <caret line="46" column="9" selection-start-line="46" selection-start-column="9" selection-end-line="46" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFile.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.10240964">
+          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/ObjectAsyncSourceConnection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.10240964">
+          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/QueuingAsyncSocketConnection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.11947791">
+          <caret line="38" column="3" selection-start-line="38" selection-start-column="3" selection-end-line="38" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/ObjectFlow.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.60742974">
+          <caret line="111" column="11" selection-start-line="111" selection-start-column="11" selection-end-line="111" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/tcp/TCPClientConnector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.20481928">
+          <caret line="54" column="7" selection-start-line="54" selection-start-column="7" selection-end-line="54" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#5442#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

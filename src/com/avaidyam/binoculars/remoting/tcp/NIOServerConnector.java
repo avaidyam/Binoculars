@@ -24,11 +24,8 @@
 package com.avaidyam.binoculars.remoting.tcp;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.asyncio.ObjectAsyncSocketConnection;
-import com.avaidyam.binoculars.remoting.base.NucleusServer;
-import com.avaidyam.binoculars.remoting.base.ObjectSink;
-import com.avaidyam.binoculars.remoting.base.NucleusServerConnector;
-import com.avaidyam.binoculars.remoting.base.ObjectSocket;
+import com.avaidyam.binoculars.asyncio.ObjectAsyncSourceConnection;
+import com.avaidyam.binoculars.remoting.base.*;
 import com.avaidyam.binoculars.remoting.encoding.Coding;
 import com.avaidyam.binoculars.asyncio.AsyncServerSocket;
 import com.avaidyam.binoculars.future.CompletableFuture;
@@ -80,10 +77,10 @@ public class NIOServerConnector extends AsyncServerSocket implements NucleusServ
     }
 
     @Override
-    public void connect(Nucleus facade, Function<ObjectSocket, ObjectSink> factory) throws Exception {
+    public void connect(Nucleus facade, Function<ObjectFlow.Source, ObjectFlow.Sink> factory) throws Exception {
         connect( port, (key,channel) -> {
-            MyObjectAsyncSocketConnection sc = new MyObjectAsyncSocketConnection(key,channel);
-            ObjectSink sink = factory.apply(sc);
+            MyObjectAsyncSourceConnection sc = new MyObjectAsyncSourceConnection(key,channel);
+            ObjectFlow.Sink sink = factory.apply(sc);
             sc.init(sink);
             return sc;
         });
@@ -99,15 +96,15 @@ public class NIOServerConnector extends AsyncServerSocket implements NucleusServ
         return new CompletableFuture<>(null);
     }
 
-    static class MyObjectAsyncSocketConnection extends ObjectAsyncSocketConnection {
+    static class MyObjectAsyncSourceConnection extends ObjectAsyncSourceConnection {
 
-        ObjectSink sink;
+        ObjectFlow.Sink sink;
 
-        public MyObjectAsyncSocketConnection(SelectionKey key, SocketChannel chan) {
+        public MyObjectAsyncSourceConnection(SelectionKey key, SocketChannel chan) {
             super(key, chan);
         }
 
-        public void init( ObjectSink sink ) { this.sink = sink; }
+        public void init( ObjectFlow.Sink sink ) { this.sink = sink; }
 
         @Override public void receivedObject(Object o) { sink.receiveObject(o, null); }
 

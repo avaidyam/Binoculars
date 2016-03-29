@@ -35,6 +35,10 @@ import java.util.concurrent.Callable;
  */
 public interface Scheduler {
 
+	/**
+     *
+     * @return
+     */
     int getDefaultQSize();
 
     // yield during polling/spinlooping

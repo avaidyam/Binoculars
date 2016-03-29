@@ -25,9 +25,6 @@ package com.avaidyam.binoculars.asyncio;
 
 import java.nio.ByteBuffer;
 
-/**
- * Created by moelrue on 5/4/15.
- */
 public class AsyncFileIOEvent {
 
     int read;

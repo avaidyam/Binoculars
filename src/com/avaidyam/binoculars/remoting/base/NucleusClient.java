@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 
 public class NucleusClient<T extends Nucleus> {
 
-	protected NucleusClientConnector client;
+	protected ConnectibleNucleus.NucleusClientConnector client;
 	protected Class<T> facadeClass;
 	protected Coding coding;
 
@@ -47,7 +47,7 @@ public class NucleusClient<T extends Nucleus> {
 		}
 	};
 
-	public NucleusClient(NucleusClientConnector client, Class<T> facadeClass, Coding coding) {
+	public NucleusClient(ConnectibleNucleus.NucleusClientConnector client, Class<T> facadeClass, Coding coding) {
 		this.facadeClass = facadeClass;
 		this.client = client;
 		this.coding = coding;
@@ -71,7 +71,7 @@ public class NucleusClient<T extends Nucleus> {
 				Nucleus facadeProxy = Nucleus.of(facadeClass, new RemoteScheduler(qsiz));
 				facadeProxy.__remoteId = 1;
 
-				AtomicReference<ObjectSocket> socketRef = new AtomicReference<>(writesocket);
+				AtomicReference<ObjectFlow.Source> socketRef = new AtomicReference<>(writesocket);
 				RemoteRegistry reg = new RemoteRegistry(coding) {
 					@Override
 					public Nucleus getFacadeProxy() {
@@ -79,7 +79,7 @@ public class NucleusClient<T extends Nucleus> {
 					}
 
 					@Override
-					public AtomicReference<ObjectSocket> getWriteObjectSocket() {
+					public AtomicReference<ObjectFlow.Source> getWriteObjectSocket() {
 						return socketRef;
 					}
 				};
@@ -90,9 +90,9 @@ public class NucleusClient<T extends Nucleus> {
 
 				Nucleus.current(); // ensure running in nuclei thread
 
-				ObjectSink objectSink = new ObjectSink() {
+				ObjectFlow.Sink objectSink = new ObjectFlow.Sink() {
 					@Override
-					public void receiveObject(ObjectSink sink, Object received, List<Future> createdFutures) {
+					public void receiveObject(ObjectFlow.Sink sink, Object received, List<Future> createdFutures) {
 						try {
 							reg.receiveObject(socketRef.get(), sink, received, createdFutures);
 						} catch(Exception e) {

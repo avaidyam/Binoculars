@@ -28,7 +28,7 @@ import com.avaidyam.binoculars.future.Future;
 import java.util.function.Consumer;
 
 /**
- * Configuration object to publish an nuclei to network. Serverside aequivalent to ConnectableNucleus
+ * Configuration object to publish an nuclei to network. Serverside aequivalent to ConnectibleNucleus
  */
 public interface NucleusPublisher {
 	

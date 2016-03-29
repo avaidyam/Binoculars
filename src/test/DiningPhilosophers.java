@@ -1,7 +1,7 @@
 package test;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.tcp.TCPConnectable;
+import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
 import com.avaidyam.binoculars.remoting.tcp.TCPServerConnector;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.CompletableFuture;
@@ -102,7 +102,7 @@ public class DiningPhilosophers {
 	}
 
 	static void runClient() throws Exception {
-		new TCPConnectable(Table.class, "localhost", 6789)
+		new TCPConnectible(Table.class, "localhost", 6789)
 				.connect()
 				.then((table, error) -> {
 					if (table != null) { // connection failure

@@ -259,7 +259,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean receiveObject(ObjectSocket responseChannel, ObjectSink receiver, Object response, List<Future>
+	public boolean receiveObject(ObjectFlow.Source responseChannel, ObjectFlow.Sink receiver, Object response, List<Future>
 			createdFutures) throws Exception {
 		if ( response == RemoteRegistry.OUT_OF_ORDER_SEQ )
 			return false;
@@ -295,7 +295,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	}
 	
 	// dispatch incoming remotecalls
-	protected boolean processRemoteCallEntry(ObjectSocket objSocket, RemoteCallEntry response, List<Future> createdFutures
+	protected boolean processRemoteCallEntry(ObjectFlow.Source objSocket, RemoteCallEntry response, List<Future> createdFutures
 	) throws Exception {
 		RemoteCallEntry read = response;
 		boolean isContinue = read.getArgs().length > 1 && Signal.CONT.equals(read.getArgs()[1]);
@@ -379,7 +379,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 		getFacadeProxy().__removeRemoteConnection(this);
 	}
 	
-	protected void closeRef(CallEntry ce, ObjectSocket chan) throws IOException {
+	protected void closeRef(CallEntry ce, ObjectFlow.Source chan) throws IOException {
 		if (ce.getTargetNucleus().getNucleusRef() == getFacadeProxy().getNucleusRef() ) {
 			// invalidating connections should cleanup all refs
 			chan.close();
@@ -388,7 +388,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 		}
 	}
 	
-	protected void writeObject(ObjectSocket chan, RemoteCallEntry rce) throws Exception {
+	protected void writeObject(ObjectFlow.Source chan, RemoteCallEntry rce) throws Exception {
 		try {
 			chan.writeObject(rce);
 		} catch (Exception e) {
@@ -398,7 +398,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 		}
 	}
 	
-	public void receiveCBResult(ObjectSocket chan, int id, Object result, Object error) throws Exception {
+	public void receiveCBResult(ObjectFlow.Source chan, int id, Object result, Object error) throws Exception {
 		if (facadeNucleus !=null) {
 			Thread debug = facadeNucleus.getCurrentDispatcher();
 			if ( Thread.currentThread() != facadeNucleus.getCurrentDispatcher() ) {
@@ -455,8 +455,8 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	 * poll remote nuclei proxies and send. return true if there was at least one message
 	 * @param chanHolder
 	 */
-	public boolean pollAndSend2Remote(AtomicReference<ObjectSocket> chanHolder) throws Exception {
-		ObjectSocket chan = chanHolder.get();
+	public boolean pollAndSend2Remote(AtomicReference<ObjectFlow.Source> chanHolder) throws Exception {
+		ObjectFlow.Source chan = chanHolder.get();
 		if ( chan == null || ! chan.canWrite() )
 			return false;
 		boolean hadAnyMsg = false;
@@ -511,7 +511,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 		return hadAnyMsg;
 	}
 	
-	public abstract AtomicReference<ObjectSocket> getWriteObjectSocket();
+	public abstract AtomicReference<ObjectFlow.Source> getWriteObjectSocket();
 	
 	public boolean isObsolete() {
 		return isObsolete;
