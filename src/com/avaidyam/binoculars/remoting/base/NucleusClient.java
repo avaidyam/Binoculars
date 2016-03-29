@@ -64,7 +64,7 @@ public class NucleusClient<T extends Nucleus> {
 		return connect(qsiz, null);
 	}
 
-	public Future<T> connect(int qsiz, Consumer<Nucleus> discon) {
+	public Future<T> connect(int qsiz, Consumer<T> discon) {
 		CompletableFuture<T> result = new CompletableFuture<>();
 		try {
 			client.connect(writesocket -> {
@@ -83,7 +83,7 @@ public class NucleusClient<T extends Nucleus> {
 						return socketRef;
 					}
 				};
-				reg.setDisconnectHandler(discon);
+				reg.setDisconnectHandler((Consumer<Nucleus>)discon);
 				if(coding.getCrossPlatformShortClazzNames() != null)
 					reg.getConf().registerCrossPlatformClassMappingUseSimpleName(coding.getCrossPlatformShortClazzNames());
 				writesocket.setConf(reg.getConf());

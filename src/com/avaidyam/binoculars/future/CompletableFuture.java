@@ -84,7 +84,7 @@ public class CompletableFuture<T> implements Future<T> {
 
     // Main components of Future.
     protected T result = null;
-    protected Object error = null;
+    protected Throwable error = null;
 
     String id;
     Future nextFuture;
@@ -225,7 +225,7 @@ public class CompletableFuture<T> implements Future<T> {
      * @param result
      * @param error
      */
-    public CompletableFuture(T result, Object error) {
+    public CompletableFuture(T result, Throwable error) {
         this.result = result;
         this.error = error;
         hadResult = true;
@@ -277,7 +277,7 @@ public class CompletableFuture<T> implements Future<T> {
     }
 
     @Override
-    public Future<T> onError(Consumer<Object> errorHandler) {
+    public Future<T> onError(Consumer<Throwable> errorHandler) {
         return then((r, e) -> {
             if (e != null && e != CompletableFuture.Timeout.INSTANCE)
                 errorHandler.accept(e);
@@ -285,7 +285,7 @@ public class CompletableFuture<T> implements Future<T> {
     }
 
     @Override
-    public Future<T> onTimeout(Consumer<Object> timeoutHandler) {
+    public Future<T> onTimeout(Consumer<Throwable> timeoutHandler) {
         return then((r, e) -> {
             if (e == CompletableFuture.Timeout.INSTANCE)
                 timeoutHandler.accept(e);
@@ -331,7 +331,7 @@ public class CompletableFuture<T> implements Future<T> {
     }
 
     @Override
-    public <OUT> Future<OUT> catchError(final Function<Object, Future<OUT>> function) {
+    public <OUT> Future<OUT> catchError(final Function<Throwable, Future<OUT>> function) {
         CompletableFuture<OUT> res = new CompletableFuture<>();
         then((r, e) -> {
             if (!Signal.isError(e))
@@ -342,7 +342,7 @@ public class CompletableFuture<T> implements Future<T> {
     }
 
     @Override
-    public <OUT> Future<OUT> catchError(Consumer<Object> function) {
+    public <OUT> Future<OUT> catchError(Consumer<Throwable> function) {
         CompletableFuture<OUT> res = new CompletableFuture<>();
         then((r, e) -> {
             if (!Signal.isError(e))
@@ -458,9 +458,9 @@ public class CompletableFuture<T> implements Future<T> {
      * @param error
      */
     @Override
-    public final void complete(T res, Object error) {
+    public final void complete(T res, Throwable error) {
 	    this.result = res;
-        Object prevErr = this.error;
+        Throwable prevErr = this.error;
         this.error = error;
 
         while (!lock.compareAndSet(false, true));
@@ -503,7 +503,7 @@ public class CompletableFuture<T> implements Future<T> {
      * @param result
      * @param error
      */
-    public final void obtrude(T result, Object error) {
+    public final void obtrude(T result, Throwable error) {
         this.result = result;
         this.error = error;
     }
@@ -606,7 +606,7 @@ public class CompletableFuture<T> implements Future<T> {
         return this;
     }
 
-    public Object getError() {
+    public Throwable getError() {
         return error;
     }
 
@@ -643,7 +643,7 @@ public class CompletableFuture<T> implements Future<T> {
     /**
      * A dummy class only used to signal a TimeoutException
      */
-    public static final class Timeout {
+    public static final class Timeout extends Throwable {
         public static Timeout INSTANCE = new Timeout();
         private Timeout() {}
     }

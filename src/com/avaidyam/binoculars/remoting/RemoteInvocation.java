@@ -29,18 +29,19 @@ import com.avaidyam.binoculars.future.Future;
 
 import java.lang.reflect.Method;
 
-public class CallEntry<T> implements Message<T> {
+public class RemoteInvocation<T> implements Message<T> {
 
     final private Method method;
     final private Object[] args;
     private Future futureCB;
+
     transient final private T target;    // target and target nuclei are not necessary equal. E.g. target can be callback, but calls are put onto sendingNucleus Q
     transient private Nucleus sendingNucleus; // defines the sender of this message. null in case of outside call
     transient private Nucleus targetNucleus;  // defines nuclei assignment in case target is callback
     transient private boolean onCBQueue;  // determines queue used
     transient private RemoteRegistry remoteRegistry; // remote connection call came from
 
-    public CallEntry(T target, Method method, Object[] args, Nucleus sender, Nucleus targetNucleus, boolean isCB) {
+    public RemoteInvocation(T target, Method method, Object[] args, Nucleus sender, Nucleus targetNucleus, boolean isCB) {
         this.target = target;
         this.method = method;
         this.args = args;
@@ -95,9 +96,9 @@ public class CallEntry<T> implements Message<T> {
 //        if ( copyArgs ) {
 //            Object argCopy[] = new Object[args.length];
 //            System.arraycopy(args, 0, argCopy, 0, args.length);
-//            return new CallEntry(newTarget, method, argCopy, targetNucleus);
+//            return new RemoteInvocation(newTarget, method, argCopy, targetNucleus);
 //        } else {
-//            return new CallEntry(newTarget, method, args, targetNucleus);
+//            return new RemoteInvocation(newTarget, method, args, targetNucleus);
 //        }
 //    }
 
@@ -115,7 +116,7 @@ public class CallEntry<T> implements Message<T> {
 
     @Override
     public String toString() {
-        return "CallEntry{" +
+        return "RemoteInvocation{" +
                 "method=" + method.getName() +
 //                   ", args=" + Arrays.toString(args) +
                 ", futureCB=" + futureCB +

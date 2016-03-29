@@ -21,7 +21,7 @@ public class RefChain {
 	
 	public static class B extends Nucleus<A> {
 		C c;
-		public void init(ConnectibleNucleus connectable) {
+		public void init(ConnectibleNucleus<Nucleus> connectable) {
 			connectable.connect().then((Nucleus c) -> this.c = (C)c);
 		}
 		public Future<C> getC() {

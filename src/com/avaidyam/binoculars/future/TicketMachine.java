@@ -65,17 +65,13 @@ public class TicketMachine {
 //        System.out.println("get ticket "+ticket+" "+Thread.currentThread().getName());
 
         final List<Ticket> finalFutures = futures;
-        signalFin.then(new Signal() {
-            @Override
-            public void complete(Object result, Object error) {
+        signalFin.then((Signal<Object>) (result, error) -> {
 //                System.out.println("rec "+channelKey+" do remove+checknext");
-                boolean remove = finalFutures.remove(ticket);
-                if (!remove)
-                    System.err.println("Error failed to remove " + channelKey);
-                checkNext(channelKey, finalFutures, ticket);
-            }
-
-        });
+			boolean remove = finalFutures.remove(ticket);
+			if (!remove)
+				System.err.println("Error failed to remove " + channelKey);
+			checkNext(channelKey, finalFutures, ticket);
+		});
         if (futures.size() == 1) { // this is the one and only call, start immediately
             signalStart.complete(signalFin, null);
         }

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2016 Aditya Vaidyam
  *
@@ -40,7 +39,6 @@ import java.util.concurrent.locks.LockSupport;
  * A server socket connection which buffers incoming/outgoing data in a binary queue so
  * an application can easily parse and process data async in chunks without having
  * to maintain complex state machines.
- *
  */
 public abstract class QueuingAsyncSocketConnection extends AsyncSocketConnection {
 

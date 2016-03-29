@@ -67,7 +67,7 @@ public class Exceptions {
 	 */
 	public static class MustBeRunFromNucleusThreadException extends RuntimeException {
 		public MustBeRunFromNucleusThreadException() {
-			super("Invocation must occur in an Nucleus thread.");
+			super("RemoteInvocation must occur in an Nucleus thread.");
 		}
 	}
 

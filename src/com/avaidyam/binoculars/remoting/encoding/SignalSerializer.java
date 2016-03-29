@@ -64,7 +64,7 @@ public class SignalSerializer extends FSTBasicObjectSerializer {
 		}
 
 		@Override
-		public void complete(Object result, Object error) {
+		public void complete(Object result, Throwable error) {
 			try {
 				reg.receiveCBResult(chan.get(),id,result,error);
 			} catch (Exception e) {

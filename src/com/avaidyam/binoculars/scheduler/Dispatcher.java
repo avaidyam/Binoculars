@@ -25,7 +25,7 @@ package com.avaidyam.binoculars.scheduler;
 import com.avaidyam.binoculars.Exceptions;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.management.DispatcherStatusMXBean;
-import com.avaidyam.binoculars.remoting.CallEntry;
+import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.util.Log;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.CompletableFuture;
@@ -264,11 +264,11 @@ public class Dispatcher extends Thread {
 
     // poll all actors in queue arr round robin
     int currentPolledNucleus = 0;
-    protected CallEntry pollQueues(Nucleus[] nuclei) {
+    protected RemoteInvocation pollQueues(Nucleus[] nuclei) {
         if ( nuclei.length == 0 ) {
             return null;
         }
-        CallEntry res = null;
+        RemoteInvocation res = null;
         int alen  = nuclei.length;
         int count = 0;
         while( res == null && count < alen ) {
@@ -276,9 +276,9 @@ public class Dispatcher extends Thread {
                 currentPolledNucleus = 0;
             }
             Nucleus nucleus2Poll = nuclei[currentPolledNucleus];
-            res = (CallEntry) nucleus2Poll.__cbQueue.poll();
+            res = (RemoteInvocation) nucleus2Poll.__cbQueue.poll();
             if ( res == null )
-                res = (CallEntry) nucleus2Poll.__mailbox.poll();
+                res = (RemoteInvocation) nucleus2Poll.__mailbox.poll();
             currentPolledNucleus++;
             count++;
         }
@@ -296,28 +296,28 @@ public class Dispatcher extends Thread {
      * @return false if no message could be polled
      */
     public boolean pollQs(Nucleus nuclei[]) {
-        CallEntry callEntry = pollQueues(nuclei);
-        if (callEntry != null) {
+        RemoteInvocation invocation = pollQueues(nuclei);
+        if (invocation != null) {
             try {
                 // before calling the nuclei method, set current sender
                 // to target, so for each method/callback invoked by the nuclei method,
                 // sender has correct value
-                Nucleus targetNucleus = callEntry.getTargetNucleus();
+                Nucleus targetNucleus = invocation.getTargetNucleus();
                 Nucleus.sender.set(targetNucleus);
-                Nucleus.connection.set(callEntry.getRemoteRegistry());
+                Nucleus.connection.set(invocation.getRemoteRegistry());
                 if (targetNucleus.__stopped) {
-                    targetNucleus.__addDeadLetter(targetNucleus,callEntry.getMethod().getName());
+                    targetNucleus.__addDeadLetter(targetNucleus, invocation.getMethod().getName());
                     return true;
                 }
 
 
                 Object invoke = null;
                 try {
-                    invoke = invoke(callEntry);
+                    invoke = invoke(invocation);
                 } catch (IllegalArgumentException iae) {
                     // FIXME: boolean is translated wrong by minbin .. this fix is expensive
-                    final Class<?>[] parameterTypes = callEntry.getMethod().getParameterTypes();
-                    final Object[] args = callEntry.getArgs();
+                    final Class<?>[] parameterTypes = invocation.getMethod().getParameterTypes();
+                    final Object[] args = invocation.getArgs();
                     if (args.length == parameterTypes.length) {
                         for (int i = 0; i < args.length; i++) {
                             Object arg = args[i];
@@ -326,47 +326,38 @@ public class Dispatcher extends Thread {
                                 args[i] = ((Byte) arg).intValue() != 0;
                             }
                         }
-                        invoke = invoke(callEntry);
+                        invoke = invoke(invocation);
                     } else {
-                        System.out.println("mismatch when invoking method " + callEntry);
-                        for (int i = 0; i < callEntry.getArgs().length; i++) {
-                            Object o = callEntry.getArgs()[i];
+                        System.out.println("mismatch when invoking method " + invocation);
+                        for (int i = 0; i < invocation.getArgs().length; i++) {
+                            Object o = invocation.getArgs()[i];
                             System.out.println("arg " + i + " " + o + (o != null ? " " + o.getClass().getSimpleName() : "") + ",");
                         }
                         System.out.println();
                         throw iae;
                     }
                 }
-                if (callEntry.getFutureCB() != null) {
-                    final Future futureCB = callEntry.getFutureCB();   // the future of caller side
-                    final CompletableFuture invokeResult = (CompletableFuture) invoke;  // the future returned sync from call
+                if (invocation.getFutureCB() != null) {
+                    final Future futureCB = invocation.getFutureCB();   // the future of caller side
+                    final CompletableFuture<Object> invokeResult = (CompletableFuture<Object>)invoke;  // the future returned sync from call
                     if(invokeResult != null) { //if return null instead a promise, method is handled like void
-
-                        // FIXME: lambdas here...
-                        invokeResult.then(
-                                new Signal() {
-                                    @Override
-                                    public void complete(Object result, Object error) {
-                                        futureCB.complete(result, error);
-                                    }
-                                }
-                        );
+                        invokeResult.then((Signal<Object>)futureCB::complete);
                     }
                 }
                 return true;
             } catch (Throwable e) {
                 if (e instanceof InvocationTargetException && ((InvocationTargetException) e).getTargetException() == Exceptions.InternalNucleusStoppedException.INSTANCE) {
                     // fixme: rare classcast exception with elasticscheduler seen here when $stop is called from a callback ..
-                    Nucleus nucleus = (Nucleus) callEntry.getTarget();
+                    Nucleus nucleus = (Nucleus) invocation.getTarget();
                     nucleus.__stopped = true;
                     removeNucleusImmediate(nucleus.getNucleusRef());
 // FIXME: Many Testcases fail if uncommented. Rethink
-//                    if (callEntry.getFutureCB() != null)
-//                        callEntry.getFutureCB().complete(null, e);
+//                    if (invocation.getFutureCB() != null)
+//                        invocation.getFutureCB().complete(null, e);
 //                    else
 //                        Log.Warn(this,e,"");
-//                    if (callEntry.getFutureCB() != null)
-//                        callEntry.getFutureCB().complete(null, e);
+//                    if (invocation.getFutureCB() != null)
+//                        invocation.getFutureCB().complete(null, e);
 //                    else
 //                        Log.Warn(this,e,"");
                     return true;
@@ -374,19 +365,19 @@ public class Dispatcher extends Thread {
                 if (e instanceof InvocationTargetException) {
                     e = e.getCause();
                 }
-                if (callEntry.getFutureCB() != null) {
-                    Log.w(this.toString(), "Unhandled exception in message: " + callEntry + ".\nReturned caught exception to Future.\nEnable DispatcherThread.DUMP_EXCEPTIONS to dump stacktrace.", e);
+                if (invocation.getFutureCB() != null) {
+                    Log.w(this.toString(), "Unhandled exception in message: " + invocation + ".\nReturned caught exception to Future.\nEnable DispatcherThread.DUMP_EXCEPTIONS to dump stacktrace.", e);
                     if (DUMP_EXCEPTIONS)
                         e.printStackTrace();
-                    callEntry.getFutureCB().complete(null, e);
+                    invocation.getFutureCB().complete(null, e);
                 } else
-                    Log.w(this.toString(), "" + callEntry + Arrays.toString(callEntry.getArgs()), e);
+                    Log.w(this.toString(), "" + invocation + Arrays.toString(invocation.getArgs()), e);
             }
         }
         return false;
     }
 
-    private Object invoke(CallEntry poll) throws IllegalAccessException, InvocationTargetException {
+    private Object invoke(RemoteInvocation poll) throws IllegalAccessException, InvocationTargetException {
         final Object target = poll.getTarget();
         //RemoteRegistry remoteRefRegistry = poll.getRemoteRegistry();
         //Nucleus.registry.set(remoteRefRegistry);

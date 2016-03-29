@@ -21,9 +21,11 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars.asyncio;
+package org.kihara.util;
 
 import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.asyncio.AsyncSocketConnection;
+import com.avaidyam.binoculars.asyncio.QueuingAsyncSocketConnection;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.util.Log;
@@ -100,7 +102,7 @@ public class _AsyncClientSocket implements Runnable {
                                 iterator.remove();
                                 key.cancel();
                                 // closed
-                                con.writeFinished("disconnected");
+                                con.writeFinished(new IOException("disconnected"));
                             } else
                             if ( writingBuffer.remaining() == 0) {
                                 wrote = true;

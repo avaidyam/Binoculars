@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2016 Aditya Vaidyam
  *
@@ -40,23 +39,108 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ *
+ */
 public class AsyncFile {
 
+	/**
+	 *
+	 */
+	public static class IOEvent {
+
+		int read;
+		long nextPosition;
+		ByteBuffer buffer;
+
+		public IOEvent(long position, int read, ByteBuffer buffer) {
+			this.nextPosition = position;
+			this.buffer = buffer;
+			this.read = read;
+		}
+
+		public long getNextPosition() {
+			return nextPosition;
+		}
+
+		public ByteBuffer getBuffer() {
+			return buffer;
+		}
+
+		public byte[] copyBytes() {
+			byte b[] = new byte[buffer.limit() - buffer.position()];
+			buffer.get(b);
+			return b;
+		}
+
+		public int getRead() {
+			return read;
+		}
+
+		@Override
+		public String toString() {
+			return "IOEvent{" +
+					"read=" + read +
+					", nextPosition=" + nextPosition +
+					", buffer=" + buffer +
+					'}';
+		}
+
+
+		public void reset() {
+			buffer.position(0);
+			buffer.limit(buffer.capacity());
+		}
+	}
+
+	private static FileAttribute[] NO_ATTRIBUTES = new FileAttribute[0];
+
+	byte tmp[];
+
     AsynchronousFileChannel fileChannel;
-    AsyncFileIOEvent event = null;
+
+    IOEvent event = null;
 
     /**
      * create an unitialized AsyncFile. Use open to actually open a file
      */
-    public AsyncFile() {
-    }
+    public AsyncFile() {}
 
-    byte tmp[];
-    /*
+	/**
+	 * create an async file and open for read
+	 * @param file
+	 * @throws IOException
+	 */
+	public AsyncFile(String file) throws IOException {
+		open(Paths.get(file), StandardOpenOption.READ);
+	}
+
+	/**
+	 * create an async file and open with given options (e.g. StandardOptions.READ or 'StandardOpenOption.WRITE, StandardOpenOption.CREATE')
+	 * @param file
+	 * @throws IOException
+	 */
+	public AsyncFile(String file, OpenOption... options) throws IOException {
+		open(Paths.get(file), options);
+	}
+
+	/**
+	 *
+	 * @param file
+	 * @param options
+	 * @throws IOException
+	 */
+	public AsyncFile(Path file, OpenOption... options) throws IOException {
+		open(file, options);
+	}
+
+    /**
      * return a pseudo-blocking input stream. Note: due to limitations of the current await implementation (stack based),
      * when reading many files concurrently from a single nuclei thread don't mix high latency file locations (e.g. remote file systems vs. local)
      * with low latency ones. If this is required, fall back to the more basic read/write methods returning futures.
-     */
+     *
+	 * @return
+	 */
     public InputStream asInputStream() {
 
         if ( tmp != null )
@@ -83,7 +167,7 @@ public class AsyncFile {
             @Override
             public int read(byte b[], int off, int len) throws IOException {
                 if ( event == null ) {
-                    event = new AsyncFileIOEvent(0,0, ByteBuffer.allocate(len));
+                    event = new IOEvent(0,0, ByteBuffer.allocate(len));
                 }
                 if ( event.getBuffer().capacity() < len ) {
                     event.buffer = ByteBuffer.allocate(len);
@@ -121,7 +205,7 @@ public class AsyncFile {
             @Override
             public void write(byte[] b, int off, int len) throws IOException {
                 if ( event == null ) {
-                    event = new AsyncFileIOEvent(0,0, ByteBuffer.allocate(len));
+                    event = new IOEvent(0,0, ByteBuffer.allocate(len));
                 }
                 if ( event.getBuffer().capacity() < len ) {
                     event.buffer = ByteBuffer.allocate(len);
@@ -143,38 +227,25 @@ public class AsyncFile {
         };
     }
 
-    /**
-     * create an async file and open for read
-     * @param file
-     * @throws IOException
-     */
-    public AsyncFile(String file) throws IOException {
-        open(Paths.get(file), StandardOpenOption.READ);
-    }
-
-    /**
-     * create an async file and open with given options (e.g. StandardOptions.READ or 'StandardOpenOption.WRITE, StandardOpenOption.CREATE')
-     * @param file
-     * @throws IOException
-     */
-    public AsyncFile(String file, OpenOption... options) throws IOException {
-        open(Paths.get(file), options);
-    }
-
-    public AsyncFile(Path file, OpenOption... options) throws IOException {
-        open(file, options);
-    }
-
-    static FileAttribute[] NO_ATTRIBUTES = new FileAttribute[0];
+	/**
+	 *
+	 * @param file
+	 * @param options
+	 * @throws IOException
+	 */
     public void open(Path file, OpenOption... options) throws IOException {
         if ( fileChannel != null )
             throw new RuntimeException("can only open once");
         Nucleus sender = Nucleus.current();
-        Set<OpenOption> set = new HashSet<OpenOption>(options.length);
+        Set<OpenOption> set = new HashSet<>(options.length);
         Collections.addAll(set, options);
         fileChannel = AsynchronousFileChannel.open(file, set, Nucleus.toExecutor(sender), NO_ATTRIBUTES);
     }
 
+	/**
+	 *
+	 * @return
+	 */
     public long length() {
         try {
             return fileChannel.size();
@@ -184,16 +255,27 @@ public class AsyncFile {
         return -1;
     }
 
-    public Future<AsyncFileIOEvent> readFully() {
+	/**
+	 *
+	 * @return
+	 */
+    public Future<IOEvent> readFully() {
         ByteBuffer buf = ByteBuffer.allocate((int) length());
-        AsyncFileIOEvent ev = new AsyncFileIOEvent(0,0,buf);
+        IOEvent ev = new IOEvent(0,0,buf);
         do {
             ev = read(ev.nextPosition, (int) ((int) length() - ev.nextPosition), buf).await();
         } while( buf.limit() != buf.capacity() && ev.getNextPosition() >= 0 );
         return new CompletableFuture<>(ev);
     }
 
-    public Future<AsyncFileIOEvent> read(long position, int chunkSize, ByteBuffer target) {
+	/**
+	 *
+	 * @param position
+	 * @param chunkSize
+	 * @param target
+	 * @return
+	 */
+    public Future<IOEvent> read(long position, int chunkSize, ByteBuffer target) {
         if (fileChannel == null)
             throw new RuntimeException("file not opened");
         Nucleus sender = Nucleus.current();
@@ -211,7 +293,7 @@ public class AsyncFile {
                 if (result < 0)
                     newPos = -1;
                 attachment.flip();
-                p.resolve(new AsyncFileIOEvent(newPos, result, finalTarget));
+                p.resolve(new IOEvent(newPos, result, finalTarget));
             }
 
             @Override
@@ -222,7 +304,13 @@ public class AsyncFile {
         return p;
     }
 
-    public Future<AsyncFileIOEvent> write(long filePosition, ByteBuffer source) {
+	/**
+	 *
+	 * @param filePosition
+	 * @param source
+	 * @return
+	 */
+    public Future<IOEvent> write(long filePosition, ByteBuffer source) {
         if (fileChannel == null)
             throw new RuntimeException("file not opened");
         Nucleus sender = Nucleus.current();
@@ -240,7 +328,7 @@ public class AsyncFile {
                     if (result < 0)
                         newPos = -1;
                     attachment.flip();
-                    p.resolve(new AsyncFileIOEvent(newPos, result, finalTarget));
+                    p.resolve(new IOEvent(newPos, result, finalTarget));
                 }
             }
 
@@ -252,6 +340,9 @@ public class AsyncFile {
         return p;
     }
 
+	/**
+	 *
+	 */
     public void close() {
         try {
             fileChannel.close();

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2016 Aditya Vaidyam
  *
@@ -29,6 +28,7 @@ import com.avaidyam.binoculars.remoting.tcp.TCPServerConnector;
 import com.avaidyam.binoculars.util.Log;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -39,39 +39,61 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
- *
- *
- * Implements NIO based TCP server
- *
+ * Implements NIO based TCP server.
  */
-public class AsyncServerSocket {
+public class AsyncServerSocket implements AutoCloseable {
 
+	/**
+	 *
+	 */
     ServerSocketChannel socket;
-    Selector selector;
-    SelectionKey serverkey;
-    BiFunction<SelectionKey,SocketChannel,AsyncSocketConnection> connectionFactory;
 
-    public void connect( int port, BiFunction<SelectionKey,SocketChannel,AsyncSocketConnection> connectionFactory ) throws IOException {
-        selector = Selector.open();
-        socket = ServerSocketChannel.open();
-        socket.configureBlocking(false);
-        socket.socket().bind(new java.net.InetSocketAddress(port));
-        serverkey = socket.register(selector, SelectionKey.OP_ACCEPT);
+	/**
+	 *
+	 */
+    Selector selector;
+
+	/**
+	 *
+	 */
+    SelectionKey serverkey;
+
+	/**
+	 *
+	 */
+    BiFunction<SelectionKey, SocketChannel, AsyncSocketConnection> connectionFactory;
+
+	/**
+	 *
+	 */
+	Thread localThread = null;
+
+	/**
+	 *
+	 * @param port
+	 * @param connectionFactory
+	 * @throws IOException
+	 */
+    public void connect(int port, BiFunction<SelectionKey, SocketChannel, AsyncSocketConnection> connectionFactory) throws IOException {
+        this.selector = Selector.open();
+        this.socket = ServerSocketChannel.open();
+        this.socket.configureBlocking(false);
+
+        this.socket.socket().bind(new InetSocketAddress(port));
+        this.serverkey = this.socket.register(selector, SelectionKey.OP_ACCEPT);
         this.connectionFactory = connectionFactory;
+
         receiveLoop();
     }
 
-    Thread t = null;
     public void receiveLoop() {
-        Nucleus nucleus = Nucleus.current();
-        if ( t == null )
-            t = Thread.currentThread();
-        else {
-            if ( t != Thread.currentThread() ) {
-                System.out.println("FATAL");
-                System.exit(-1);
-            }
-        }
+
+		// Get the right thread installed.
+        if (this.localThread == null)
+			this.localThread = Thread.currentThread();
+        else if (this.localThread != Thread.currentThread())
+			throw new IllegalThreadStateException();
+
         boolean hadStuff = false;
         int iterCount = 10;
         do {
@@ -106,7 +128,7 @@ public class AsyncServerSocket {
                                             iterator.remove();
                                             key.cancel();
                                             // closed
-                                            con.writeFinished("disconnected");
+                                            con.writeFinished(new IOException("disconnected"));
                                         } else if ( writingBuffer.remaining() == 0) {
                                             iterator.remove();
                                             con.writeFinished(null);
@@ -114,7 +136,7 @@ public class AsyncServerSocket {
                                     } catch (IOException ioe) {
                                         iterator.remove();
                                         key.cancel();
-                                        con.writeFinished("disconnected");
+                                        con.writeFinished(new IOException("disconnected"));
                                     }
                                 }
                             }
@@ -129,14 +151,13 @@ public class AsyncServerSocket {
                                         if ( ! con.readData() ) {
                                             // yield ?
                                         }
-                                    } catch (Exception ioe) {
-//                                        ioe.printStackTrace();
-                                        con.closed(ioe);
+                                    } catch (Exception e) {
+                                        con.closed(e);
                                         key.cancel();
                                         try {
                                             client.close();
-                                        } catch (IOException e) {
-                                            Log.w(this.toString(), "", e);
+                                        } catch (IOException ee) {
+                                            Log.w(this.toString(), "", ee);
                                         }
                                     }
                                 }
@@ -148,16 +169,19 @@ public class AsyncServerSocket {
                 }
             } catch (Throwable e) {
                 Log.w(this.toString(), "", e);
-	            new CompletableFuture<>(null, e); // FIXME: uh...
+	            //new CompletableFuture<>(null, e); // FIXME: uh...
             }
         } while (iterCount-- > 0 && hadStuff );
-        if ( ! isClosed() ) {
-            if ( hadStuff ) {
-                nucleus.execute( () -> receiveLoop() );
-            } else {
-                nucleus.delayed( 1, () -> receiveLoop() );
-            }
+
+        if (!isClosed()) {
+
+			//
+			Nucleus nucleus = Nucleus.current();
+            if (hadStuff)
+                nucleus.execute(this::receiveLoop);
+            else nucleus.delayed(1, this::receiveLoop);
         } else {
+
             // close open connections
             try {
                 selector.selectNow();
@@ -177,10 +201,18 @@ public class AsyncServerSocket {
         }
     }
 
+	/**
+	 *
+	 * @return
+	 */
     public boolean isClosed() {
         return !socket.isOpen();
     }
 
+	/**
+	 *
+	 * @throws IOException
+	 */
     public void close() throws IOException {
         socket.close();
     }

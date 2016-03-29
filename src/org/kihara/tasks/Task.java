@@ -414,7 +414,7 @@ public abstract class Task<I, O> extends Spore<I, O> implements Serializable {
 
     // get rid of these?
     private O result;
-    private Object error;
+    private Throwable error;
 
     /**
      * Allows the Task to have a friendly name identifiable to the user.
@@ -608,7 +608,7 @@ public abstract class Task<I, O> extends Spore<I, O> implements Serializable {
      * @param result the result to complete the Task with
      * @param error the error to complete the Task with
      */
-    public final void complete(O result, Object error) {
+    public final void complete(O result, Throwable error) {
         this.registerState(error != null ? State.FAILED : State.COMPLETED);
         if (result != null)
             stream((this.result = result));

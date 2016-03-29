@@ -23,8 +23,8 @@
 package com.avaidyam.binoculars.future;
 
 import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.util.Log;
-import com.avaidyam.binoculars.remoting.CallEntry;
 import com.avaidyam.binoculars.remoting.base.RemotedCallback;
 
 import java.io.Serializable;
@@ -61,7 +61,7 @@ public class SignalWrapper<T> implements Future<T>, Serializable {
     }
 
     @Override
-    public void complete(T result, Object error) {
+    public void complete(T result, Throwable error) {
         if (realSignal == null)
             return;
         if (targetNucleus == null) {
@@ -72,7 +72,7 @@ public class SignalWrapper<T> implements Future<T>, Serializable {
                 Log.w(this.toString(), "", e);
             }
         } else {
-            CallEntry ce = new CallEntry<>(realSignal, receiveRes, new Object[]{result, error},
+            RemoteInvocation ce = new RemoteInvocation<>(realSignal, receiveRes, new Object[]{result, error},
                                            Nucleus.sender.get(), targetNucleus, true);
             targetNucleus.__scheduler.put2QueuePolling(targetNucleus.__cbQueue, true, ce, targetNucleus);
         }
@@ -107,7 +107,7 @@ public class SignalWrapper<T> implements Future<T>, Serializable {
     }
 
     @Override
-    public Future<T> onError(Consumer<Object> errorHandler) {
+    public Future<T> onError(Consumer<Throwable> errorHandler) {
         if (!(realSignal instanceof Future))
             throw new RuntimeException("Cannot invoke Future method on non-Future CallbackWrapper.");
         else return ((Future<T>) realSignal).onError(errorHandler);
@@ -135,14 +135,14 @@ public class SignalWrapper<T> implements Future<T>, Serializable {
     }
 
     @Override
-    public <OUT> Future<OUT> catchError(Function<Object, Future<OUT>> function) {
+    public <OUT> Future<OUT> catchError(Function<Throwable, Future<OUT>> function) {
         if (!(realSignal instanceof Future))
             throw new RuntimeException("Cannot invoke Future method on non-Future CallbackWrapper.");
         else return ((Future<T>) realSignal).catchError(function);
     }
 
     @Override
-    public <OUT> Future<OUT> catchError(Consumer<Object> function) {
+    public <OUT> Future<OUT> catchError(Consumer<Throwable> function) {
         if (!(realSignal instanceof Future))
             throw new RuntimeException("Cannot invoke Future method on non-Future CallbackWrapper.");
         else return ((Future<T>) realSignal).catchError(function);
@@ -170,7 +170,7 @@ public class SignalWrapper<T> implements Future<T>, Serializable {
     }
 
     @Override
-    public Object getError() {
+    public Throwable getError() {
         if (!(realSignal instanceof Future))
             return null;
         else return ((Future<T>) realSignal).getError();

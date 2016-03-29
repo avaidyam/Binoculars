@@ -37,7 +37,7 @@ public interface Signal<T> extends Serializable {
     /**
      * use value as error to indicate more messages are to come (else remoting will close channel).
      */
-    String CONT = "CNT";
+	Error CONT = new Error("CNT");
 
 	public static boolean isComplete(Object error) {
 		return error == null;
@@ -55,7 +55,7 @@ public interface Signal<T> extends Serializable {
         return o != null && !CONT.equals(o);
     }
 
-    void complete(T result, Object error);
+    void complete(T result, Throwable error);
 
     default void complete() {
         complete(null, null);
@@ -69,7 +69,7 @@ public interface Signal<T> extends Serializable {
         complete(null, throwable);
     }
 
-    default void reject(Object error) {
+    default void reject(Throwable error) {
         complete(null, error);
     }
 

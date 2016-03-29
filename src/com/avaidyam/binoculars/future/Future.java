@@ -56,9 +56,9 @@ public interface Future<T> extends Signal<T> {
 
     <OUT> Future<OUT> then(final Consumer<T> function);
 
-    <OUT> Future<OUT> catchError(final Function<Object, Future<OUT>> function);
+    <OUT> Future<OUT> catchError(final Function<Throwable, Future<OUT>> function);
 
-    <OUT> Future<OUT> catchError(final Consumer<Object> function);
+    <OUT> Future<OUT> catchError(final Consumer<Throwable> function);
 
     /**
      * called when a valid result of a future becomes available.
@@ -76,7 +76,7 @@ public interface Future<T> extends Signal<T> {
      *
      * @return
      */
-    default Future<T> onError(Consumer<Object> errorHandler) {
+    default Future<T> onError(Consumer<Throwable> errorHandler) {
         return catchError(errorHandler);
     }
 
@@ -86,7 +86,7 @@ public interface Future<T> extends Signal<T> {
      * @param timeoutHandler
      * @return
      */
-    Future<T> onTimeout(Consumer<Object> timeoutHandler);
+    Future<T> onTimeout(Consumer<Throwable> timeoutHandler);
 
     /**
      * Warning: this is different to JDK's BLOCKING future
@@ -128,7 +128,7 @@ public interface Future<T> extends Signal<T> {
     /**
      * @return error if avaiable
      */
-    Object getError();
+    Throwable getError();
 
     /**
      * tell the future to call the onTimeout callback in N milliseconds if future is not settled until then

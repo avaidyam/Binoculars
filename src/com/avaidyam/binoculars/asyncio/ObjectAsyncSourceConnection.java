@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2016 Aditya Vaidyam
  *
@@ -35,6 +34,9 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
+/**
+ *
+ */
 public abstract class ObjectAsyncSourceConnection extends QueuingAsyncSocketConnection implements ObjectFlow.Source {
 
     FSTConfiguration conf;

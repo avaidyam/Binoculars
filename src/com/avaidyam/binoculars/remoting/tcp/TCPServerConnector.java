@@ -131,7 +131,7 @@ public class TCPServerConnector implements NucleusServerConnector {
                 p.reject(e);
         } finally {
             if ( ! p.isComplete() )
-                p.reject("conneciton failed");
+                p.reject(new ConnectException("connection failed"));
             try {
                 acceptSocket.close();
             } catch (IOException e) {

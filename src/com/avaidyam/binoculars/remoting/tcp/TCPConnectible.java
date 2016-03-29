@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 /**
  * Describes a ConnectibleNucleus over the TCP/IP protocol.
  */
-public class TCPConnectible implements ConnectibleNucleus {
+public class TCPConnectible<T extends Nucleus> implements ConnectibleNucleus<T> {
 
 	/**
 	 * The inbound queue size. (Default == ElasticScheduler.DEFQSIZE)
@@ -48,7 +48,7 @@ public class TCPConnectible implements ConnectibleNucleus {
 	/**
 	 * The ConnectibleNucleus class.
 	 */
-    /*package*/ Class nucleusClass = null;
+    /*package*/ Class<T> nucleusClass = null;
 
 	/**
 	 * The TCP/IP host address. (i.e. "10.0.0.5")
@@ -67,7 +67,7 @@ public class TCPConnectible implements ConnectibleNucleus {
      * @param host the TCP/IP host address
      * @param port the TCP/IP host port
      */
-    public <T extends Nucleus> TCPConnectible(Class<T> nucleusClass, String host, int port) {
+    public TCPConnectible(Class<T> nucleusClass, String host, int port) {
         this.host = host;
         this.port = port;
         this.nucleusClass = nucleusClass;
@@ -80,23 +80,21 @@ public class TCPConnectible implements ConnectibleNucleus {
 	 *
 	 * @param disconnectSignal called on disconnect
 	 * @param disconnectHandler called on disconnect, with the RemoteNucleus.
-	 * @param <T> the type of Nucleus class
 	 * @return a Future containing the Nucleus reference
 	 */
     @Override
-    public <T extends Nucleus> Future<T> connect(Signal<NucleusClientConnector> disconnectSignal, Consumer<Nucleus> disconnectHandler) {
-        CompletableFuture result = new CompletableFuture();
+    public Future<T> connect(Signal<NucleusClientConnector> disconnectSignal, Consumer<T> disconnectHandler) {
+        CompletableFuture<T> result = new CompletableFuture<>();
         Runnable connect = () -> {
             TCPClientConnector client = new TCPClientConnector(this.port, this.host, disconnectSignal);
             NucleusClient<T> connector = new NucleusClient(client, this.nucleusClass, new Coding(SerializerType.FSTSer));
             connector.connect(TCPConnectible.inboundQueueSize, disconnectHandler).then(result);
         };
-        if ( ! Nucleus.inside() ) {
+
+        if (!Nucleus.inside()) {
             TCPClientConnector.get().execute(() -> Thread.currentThread().setName("singleton remote client nuclei polling"));
             TCPClientConnector.get().execute(connect);
-        }
-        else
-            connect.run();
+        } else connect.run();
         return result;
     }
 
@@ -105,7 +103,7 @@ public class TCPConnectible implements ConnectibleNucleus {
 	 *
 	 * @return the Nucleus class
 	 */
-	public <T extends Nucleus> Class<T> getNucleusClass() {
+	public Class<T> getNucleusClass() {
 		return nucleusClass;
 	}
 
@@ -114,7 +112,7 @@ public class TCPConnectible implements ConnectibleNucleus {
 	 *
 	 * @param nucleusClass the Nucleus class
 	 */
-	public void setNucleusClass(Class nucleusClass) {
+	public void setNucleusClass(Class<T> nucleusClass) {
 		this.nucleusClass = nucleusClass;
 	}
 

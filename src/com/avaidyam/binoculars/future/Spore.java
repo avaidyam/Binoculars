@@ -121,7 +121,7 @@ public abstract class Spore<I, O> implements Serializable {
      *
      * @param err
      */
-    protected void streamError(Object err) {
+    protected void streamError(Throwable err) {
         wrapper.complete(null, err);
     }
 

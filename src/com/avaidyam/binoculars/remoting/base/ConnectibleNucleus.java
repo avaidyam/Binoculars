@@ -36,7 +36,7 @@ import java.util.function.Function;
  * Remote Nucleus references may be passed across the network for nuclei to be connected
  * directly.
  */
-public interface ConnectibleNucleus extends Serializable {
+public interface ConnectibleNucleus<T extends Nucleus> extends Serializable {
 
 	/**
 	 * Protocol which unifies Nucleus connectors translating local to remote async calls.
@@ -53,30 +53,26 @@ public interface ConnectibleNucleus extends Serializable {
 	 *
 	 * @param disconnectSignal called on disconnect
 	 * @param disconnectHandler called on disconnect, with the RemoteNucleus.
-	 * @param <T> the type of Nucleus class
 	 * @return a Future containing the Nucleus reference
 	 */
-	<T extends Nucleus> Future<T> connect(Signal<NucleusClientConnector> disconnectSignal,
-										  Consumer<Nucleus> disconnectHandler);
+	Future<T> connect(Signal<NucleusClientConnector> disconnectSignal, Consumer<T> disconnectHandler);
 
 	/**
 	 * Connects to the remote Nucleus with provided disconnection Signal.
 	 *
 	 * @param disconnectSignal called on disconnect
-	 * @param <T> the type of Nucleus class
 	 * @return a Future containing the Nucleus reference
 	 */
-	default <T extends Nucleus> Future<T> connect(Signal<NucleusClientConnector> disconnectSignal) {
+	default Future<T> connect(Signal<NucleusClientConnector> disconnectSignal) {
 		return this.connect(disconnectSignal, null);
 	}
 
 	/**
 	 * Connects to the remote Nucleus.
 	 *
-	 * @param <T> the type of Nucleus class
 	 * @return a Future containing the Nucleus reference
 	 */
-	default <T extends Nucleus> Future<T> connect() {
+	default Future<T> connect() {
 		return this.connect(null, null);
 	}
 }

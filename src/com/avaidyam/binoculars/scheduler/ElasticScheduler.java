@@ -29,7 +29,7 @@ import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.SignalWrapper;
 import com.avaidyam.binoculars.management.SchedulerStatusMXBean;
-import com.avaidyam.binoculars.remoting.CallEntry;
+import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.util.Log;
 
@@ -96,16 +96,11 @@ public class ElasticScheduler implements Scheduler {
     }
 
     //    @Override
-    public Future put2QueuePolling(CallEntry e) {
+    public Future put2QueuePolling(RemoteInvocation e) {
         final Future fut;
         if (e.hasFutureResult() && !(e.getFutureCB() instanceof SignalWrapper)) {
             fut = new CompletableFuture();
-            e.setFutureCB(new SignalWrapper(e.getSendingNucleus(), new Signal() {
-                @Override
-                public void complete(Object result, Object error) {
-                    fut.complete(result, error);
-                }
-            }));
+            e.setFutureCB(new SignalWrapper<>(e.getSendingNucleus(), (Signal<Object>) fut::complete));
         } else
             fut = null;
         Nucleus targetNucleus = e.getTargetNucleus();
@@ -156,8 +151,8 @@ public class ElasticScheduler implements Scheduler {
                 Nucleus sendingNucleus = Nucleus.sender.get();
                 if (receiver instanceof Nucleus && ((Nucleus) receiver).__stopped) {
                     String dl;
-                    if (o instanceof CallEntry) {
-                        dl = ((CallEntry) o).getMethod().getName();
+                    if (o instanceof RemoteInvocation) {
+                        dl = ((RemoteInvocation) o).getMethod().getName();
                     } else {
                         dl = "" + o;
                     }
@@ -237,7 +232,7 @@ public class ElasticScheduler implements Scheduler {
             }
         }
 
-        CallEntry<?> e = new CallEntry<>(
+        RemoteInvocation<?> e = new RemoteInvocation<>(
                 nucleus, // target
                 method,
                 args,
@@ -533,7 +528,7 @@ public class ElasticScheduler implements Scheduler {
             if (method.getDeclaringClass() == Object.class)
                 return method.invoke(proxy, args); // toString, hashCode etc. invoke sync (DANGER if hashcode accesses mutable local state)
             if (target != null) {
-                CallEntry ce = new CallEntry(target, method, args, Nucleus.sender.get(), targetNucleus, true);
+                RemoteInvocation ce = new RemoteInvocation(target, method, args, Nucleus.sender.get(), targetNucleus, true);
                 put2QueuePolling(targetNucleus.__cbQueue, true, ce, targetNucleus);
             }
             return null;

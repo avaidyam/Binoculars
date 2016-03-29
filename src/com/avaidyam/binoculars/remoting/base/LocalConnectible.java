@@ -30,40 +30,42 @@ import com.avaidyam.binoculars.future.Future;
 import java.util.function.Consumer;
 
 /**
+ * A ConnectibleNucleus for a locally available Nucleus.
  *
- * A connectable simply connecting to a local nuclei. A close connection event will never happen (FIXME: send on stop instead)
- *
+ * Note: cannot be disconnected, due to locality.
  */
-public class LocalConnectible implements ConnectibleNucleus {
+public class LocalConnectible<T extends Nucleus> implements ConnectibleNucleus<T> {
 
-	Nucleus nucleus;
+	/**
+	 * The internal Nucleus reference.
+	 */
+	private final T nucleus;
 
-	public LocalConnectible(Nucleus nucleus) {
+	/**
+	 * Create a new LocalConnectible for a Nucleus.
+	 * @param nucleus the Nucleus to serve through the Connectible
+	 */
+	public LocalConnectible(T nucleus) {
 		this.nucleus = nucleus;
 	}
 
 	/**
-	 * disconnect callback will never be called (local nuclei connection)
-	 * @param <T>
-	 * @param disconnectSignal
-	 * @param actorDisconnecCB
-	 * @return
+	 * Connects to the remote Nucleus with provided disconnection Signals.
+	 *
+	 * @param disconnectSignal called on disconnect
+	 * @param disconnectHandler ignore; will not be called
+	 * @return a Future containing the Nucleus reference
 	 */
 	@Override
-	public <T extends Nucleus> Future<T> connect(Signal<NucleusClientConnector> disconnectSignal, Consumer<Nucleus> actorDisconnecCB) {
-		return new CompletableFuture<>((T) nucleus);
+	public Future<T> connect(Signal<NucleusClientConnector> disconnectSignal, Consumer<T> disconnectHandler) {
+		return new CompletableFuture<T>(nucleus);
 	}
 
-	public ConnectibleNucleus withNucleusClass(Class nucleusClz) {
-		if (!nucleusClz.isAssignableFrom(nucleus.getClass()))
-			throw new RuntimeException("nuclei class mismatch");
-		return this;
-	}
-
-	public ConnectibleNucleus withInboundQueueSize(int inboundQueueSize) {
-		return this;
-	}
-
+	/**
+	 * Returns the internal Nucleus reference.
+	 *
+	 * @return the internal Nucleus reference
+	 */
 	public Nucleus getNucleus() {
 		return nucleus;
 	}

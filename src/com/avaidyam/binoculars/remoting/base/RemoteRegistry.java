@@ -25,11 +25,11 @@ package com.avaidyam.binoculars.remoting.base;
 import com.avaidyam.binoculars.Domain;
 import com.avaidyam.binoculars.Exceptions;
 import com.avaidyam.binoculars.Nucleus;
+import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.remoting.RemoteConnection;
 import com.avaidyam.binoculars.future.*;
 import com.avaidyam.binoculars.remoting.encoding.*;
 import com.avaidyam.binoculars.scheduler.RemoteScheduler;
-import com.avaidyam.binoculars.remoting.CallEntry;
 import com.avaidyam.binoculars.util.Log;
 import org.nustaq.serialization.FSTConfiguration;
 import org.nustaq.serialization.util.FSTUtil;
@@ -358,7 +358,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 					Log.w(this.toString(),
 							"Publisher already deregistered, set error to 'Nucleus.CONT' in order to signal more messages will be sent");
 			} else {
-				publishedSignal.complete(read.getArgs()[0], read.getArgs()[1]); // is a wrapper enqueuing in caller
+				publishedSignal.complete(read.getArgs()[0], (Throwable)read.getArgs()[1]); // is a wrapper enqueuing in caller
 				if (!isContinue)
 					removePublishedObject(read.getReceiverKey());
 			}
@@ -379,7 +379,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 		getFacadeProxy().__removeRemoteConnection(this);
 	}
 	
-	protected void closeRef(CallEntry ce, ObjectFlow.Source chan) throws IOException {
+	protected void closeRef(RemoteInvocation ce, ObjectFlow.Source chan) throws IOException {
 		if (ce.getTargetNucleus().getNucleusRef() == getFacadeProxy().getNucleusRef() ) {
 			// invalidating connections should cleanup all refs
 			chan.close();
@@ -468,10 +468,10 @@ public abstract class RemoteRegistry implements RemoteConnection {
 			for (Iterator<Nucleus> iterator = remoteNuclei.iterator(); iterator.hasNext(); ) {
 				Nucleus remoteNucleus = iterator.next();
 				boolean cb = false; // true; FIXME
-				CallEntry ce = (CallEntry) remoteNucleus.__cbQueue.poll();
+				RemoteInvocation ce = (RemoteInvocation) remoteNucleus.__cbQueue.poll();
 				if ( ce == null ) {
 					cb = false;
-					ce = (CallEntry) remoteNucleus.__mailbox.poll();
+					ce = (RemoteInvocation) remoteNucleus.__mailbox.poll();
 				}
 				if ( ce != null) {
 					if ( ce.getMethod().getName().equals("close") ) {
@@ -552,7 +552,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 			return server.close();
 		else {
 			Log.w(null, "failed closing underlying network connection as server is null");
-			return new CompletableFuture<>(null,"server is null");
+			return new CompletableFuture<>(null, new NullPointerException());
 		}
 	}
 }

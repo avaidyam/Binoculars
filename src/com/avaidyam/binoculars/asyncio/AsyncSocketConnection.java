@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2016 Aditya Vaidyam
  *
@@ -70,7 +69,7 @@ public abstract class AsyncSocketConnection {
      * @return wether more reads are to expect
      * @throws IOException
      */
-    boolean readData() throws IOException {
+    public boolean readData() throws IOException {
         checkThread();
         readBuf.position(0); readBuf.limit(readBuf.capacity());
         int read = chan.read(readBuf);
@@ -131,7 +130,7 @@ public abstract class AsyncSocketConnection {
         return res;
     }
 
-    ByteBuffer getWritingBuffer() {
+    public ByteBuffer getWritingBuffer() {
         return writingBuffer;
     }
 
@@ -141,7 +140,7 @@ public abstract class AsyncSocketConnection {
 
 
     // error = null => ok
-    void writeFinished(Object error) {
+    public void writeFinished(Throwable error) {
         checkThread();
         writingBuffer = null;
         CompletableFuture wp = this.writeCompletableFuture;
