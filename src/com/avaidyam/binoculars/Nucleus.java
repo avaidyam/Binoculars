@@ -780,7 +780,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     @Domain.CallerSide
     public Object __enqueueCall(Nucleus receiver, String methodName, Object args[], boolean isCB) {
         if (__stopped) {
-            if (methodName.equals("$stop")) // ignore double stop
+            if (methodName.equals("stop")) // ignore double stop
                 return null;
             __addDeadLetter(receiver, methodName);
             //throw new RuntimeException("Nucleus " + this + " received message after being stopped " + methodName);

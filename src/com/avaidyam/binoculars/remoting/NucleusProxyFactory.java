@@ -45,10 +45,9 @@ import java.util.HashSet;
  */
 public class NucleusProxyFactory {
 
-    HashMap<Class,Class> generatedProxyClasses = new HashMap<Class, Class>();
+    HashMap<Class, Class> generatedProxyClasses = new HashMap<>();
 
-    public NucleusProxyFactory() {
-    }
+    public NucleusProxyFactory() {}
 
     public <T> T instantiateProxy(Nucleus target) {
         try {
@@ -270,6 +269,7 @@ public class NucleusProxyFactory {
                         call+
                         "}";
                 method.setBody(body);
+				System.err.println(body);
                 cc.addMethod(method);
             } else if ( (method.getModifiers() & (AccessFlag.NATIVE|AccessFlag.FINAL|AccessFlag.STATIC)) == 0 )
             {
@@ -333,7 +333,7 @@ public class NucleusProxyFactory {
 //        return true;
 //    }
 
-    public String toString(Method m) {
+    public static String toString(Method m) {
         try {
             StringBuilder sb = new StringBuilder();
             int mod = m.getModifiers() & java.lang.reflect.Modifier.methodModifiers();

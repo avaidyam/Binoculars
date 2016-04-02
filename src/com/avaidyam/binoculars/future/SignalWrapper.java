@@ -42,7 +42,7 @@ public class SignalWrapper<T> implements Future<T>, Serializable {
     static Method receiveRes;
     static {
         try {
-            receiveRes = Signal.class.getMethod("complete", Object.class, Object.class);
+            receiveRes = Signal.class.getMethod("complete", Object.class, Throwable.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

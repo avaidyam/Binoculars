@@ -58,7 +58,7 @@ public class LocalConnectible<T extends Nucleus> implements ConnectibleNucleus<T
 	 */
 	@Override
 	public Future<T> connect(Signal<NucleusClientConnector> disconnectSignal, Consumer<T> disconnectHandler) {
-		return new CompletableFuture<T>(nucleus);
+		return new CompletableFuture<>(nucleus);
 	}
 
 	/**

@@ -42,7 +42,21 @@ public interface ConnectibleNucleus<T extends Nucleus> extends Serializable {
 	 * Protocol which unifies Nucleus connectors translating local to remote async calls.
 	 */
 	interface NucleusClientConnector {
+
+		/**
+		 * Configure a Source --> Sink flow and connect with a NucleusClient.
+		 *
+		 * @param factory the lambda that configures the Flow
+		 * @return a Future containing the Nucleus reference
+		 * @throws Exception if factory fails
+		 */
 		Future connect(Function<ObjectFlow.Source, ObjectFlow.Sink> factory) throws Exception;
+
+		/**
+		 * Disconnect from the remote end.
+		 *
+		 * @return A Future returned when disconnection is complete
+		 */
 		Future disconnect();
 	}
 
