@@ -163,7 +163,8 @@ public final class JavascriptEngine {
 
         // TODO: JDK 1.8u60 method only. Will invoke old call if fails.
         try {
-            ((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"), scriptContext);
+            // ((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"), scriptContext);
+            ((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"));
         } catch (NoSuchMethodError e) {
             ((Global)global).setScriptContext(scriptContext);
         }
@@ -253,11 +254,16 @@ public final class JavascriptEngine {
                     return COMPILATION_ERROR;
                 }
 
-                new Compiler(context,
+                /* new Compiler(context,
                         env,
                         null, //null - pass no code installer - this is compile only
                         functionNode.getSource(),
                         context.getErrorManager(),
+                        env._strict | functionNode.isStrict()).
+                        compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL); */
+
+                Compiler.forNoInstallerCompilation(context,
+                        functionNode.getSource(),
                         env._strict | functionNode.isStrict()).
                         compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL);
 

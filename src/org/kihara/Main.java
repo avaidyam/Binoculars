@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -80,9 +81,21 @@ public class Main {
             @SuppressWarnings("unchecked")
 			Map<String, String> params = (Map<String, String>)exchange.getAttribute("parameters");
 
+            String responseURI = exchange.getRequestURI().toString();
+            if (responseURI.startsWith("/")) {
+                responseURI = responseURI.substring(1);
+            }
+
             String response = "";
-            if (!params.containsKey("data") || params.get("data") == null)
-                response = new String(Files.readAllBytes(new File("index.html").toPath()));
+            if (!params.containsKey("data") || params.get("data") == null) {
+                Path p = new File(responseURI).toPath();
+                if (responseURI.length() == 0)
+                    response = new String(Files.readAllBytes(new File("index.html").toPath()));
+                else if (Files.exists(p))
+                    response = new String(Files.readAllBytes(p));
+                else
+                    response = new String(Files.readAllBytes(new File("404.html").toPath()));
+            }
             else
                 response = "FASTA input received.";
 
