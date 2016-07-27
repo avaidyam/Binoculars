@@ -22,39 +22,29 @@
 
 package org.kihara;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-// Internal Nashorn Environment
-import jdk.nashorn.api.scripting.*;
+import jdk.nashorn.api.scripting.ClassFilter;
+import jdk.nashorn.api.scripting.NashornException;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.internal.codegen.Compiler;
 import jdk.nashorn.internal.ir.FunctionNode;
 import jdk.nashorn.internal.ir.debug.ASTWriter;
 import jdk.nashorn.internal.ir.debug.PrintVisitor;
 import jdk.nashorn.internal.objects.Global;
 import jdk.nashorn.internal.parser.Parser;
-import jdk.nashorn.internal.runtime.Context;
-import jdk.nashorn.internal.runtime.ErrorManager;
-import jdk.nashorn.internal.runtime.JSType;
-import jdk.nashorn.internal.runtime.Property;
-import jdk.nashorn.internal.runtime.ScriptEnvironment;
-import jdk.nashorn.internal.runtime.ScriptFunction;
-import jdk.nashorn.internal.runtime.ScriptObject;
-import jdk.nashorn.internal.runtime.ScriptRuntime;
-import jdk.nashorn.internal.runtime.Source;
+import jdk.nashorn.internal.runtime.*;
 import jdk.nashorn.internal.runtime.options.Options;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngineManager;
+import javax.script.SimpleScriptContext;
+import java.io.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+// Internal Nashorn Environment
 
 /**
  * Command line Shell for processing JavaScript files.
@@ -164,6 +154,7 @@ public final class JavascriptEngine {
         // TODO: JDK 1.8u60 method only. Will invoke old call if fails.
         try {
             ((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"), scriptContext);
+            //((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"));
         } catch (NoSuchMethodError e) {
             ((Global)global).setScriptContext(scriptContext);
         }
@@ -259,7 +250,14 @@ public final class JavascriptEngine {
                         functionNode.getSource(),
                         context.getErrorManager(),
                         env._strict | functionNode.isStrict()).
+                        compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL); //*/
+
+                /*
+                Compiler.forNoInstallerCompilation(context,
+                        functionNode.getSource(),
+                        env._strict | functionNode.isStrict()).
                         compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL);
+                //*/
 
                 if (env._print_ast) {
                     context.getErr().println(new ASTWriter(functionNode));

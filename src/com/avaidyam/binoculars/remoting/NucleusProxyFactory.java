@@ -269,7 +269,7 @@ public class NucleusProxyFactory {
                         call+
                         "}";
                 method.setBody(body);
-				System.err.println(body);
+                //System.err.println(body);
                 cc.addMethod(method);
             } else if ( (method.getModifiers() & (AccessFlag.NATIVE|AccessFlag.FINAL|AccessFlag.STATIC)) == 0 )
             {
