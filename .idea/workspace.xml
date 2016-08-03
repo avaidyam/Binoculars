@@ -11,8 +11,103 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e091d3d-33a3-40b0-b537-a7db5a522861" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Binoculars.jar" afterPath="$PROJECT_DIR$/Binoculars.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/GETPOINTS_binary" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/LZD32" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/LZerD" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/PDBGEN" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/checkalign.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/gh.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/main.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/mark_sur" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/matrix.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/options.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/ptalign.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/read.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/score.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/align.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/contact.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/lzerd_capri_stats" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/main.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/read.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/rmsd.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/utils.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/utils.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/zd.o" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/Makefile" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/MersenneTwister.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/basis.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/bvertex.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/checkalign.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/checkalign.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/constants.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/cp.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/docksolution.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/Makefile" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/MersenneTwister.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/classes.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/constants.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/cp.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/cp.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/curvature.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/implicit.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/main.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/options.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/options.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/output.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/output.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/read.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/read.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/sas.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/sasdata.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/shape_dist.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/spin.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/surface.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/getpoints/surface.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/gh.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/gh.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/gh.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/main.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/main.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/matrix.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/matrix.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/options.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/options.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/options.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/pdb.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/ptalign.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/ptalign.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/ptalign.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/read.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/read.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/read.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/runvdock.sh" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/score.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/score.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/Makefile" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/align.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/align.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/align.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/contact.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/contact.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/contact.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/main.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/main.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/pdb.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/read.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/read.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/read.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/rmsd.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/rmsd.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/utils.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/utils.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/stats/utils.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/uniCHARMM" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/utils.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/utils.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/utils.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/zd.cc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/external/LZerD-src/zd.d" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/kihara/lzerd/LZerDWrapper.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Demo.iws" />
@@ -35,12 +130,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/index.html">
+      <file leaf-file-name="PFPController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
-              <folding />
+            <state relative-caret-position="-4989">
+              <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -55,83 +152,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JavascriptEngine.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/kihara/JavascriptEngine.java">
+      <file leaf-file-name="LZerDWrapper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/kihara/lzerd/LZerDWrapper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1020">
-              <caret line="120" column="7" selection-start-line="120" selection-start-column="7" selection-end-line="120" selection-end-column="7" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Compiler.class" pinned="false" current-in-tab="false">
-        <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_101.jdk/Contents/Home/jre/lib/ext/nashorn.jar!/jdk/nashorn/internal/codegen/Compiler.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="780">
-              <caret line="99" column="12" selection-start-line="99" selection-start-column="12" selection-end-line="99" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Domain.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/Domain.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="39" column="18" selection-start-line="39" selection-start-column="18" selection-end-line="39" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Scheduler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/Scheduler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="48" column="11" selection-start-line="48" selection-start-column="11" selection-end-line="48" selection-end-column="11" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ElasticScheduler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/ElasticScheduler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="61" column="51" selection-start-line="61" selection-start-column="51" selection-end-line="61" selection-end-column="51" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BackOffStrategy.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/scheduler/BackOffStrategy.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="825">
-              <caret line="79" column="35" selection-start-line="79" selection-start-column="35" selection-end-line="79" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PFPController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1530">
-              <caret line="146" column="16" selection-start-line="146" selection-start-column="16" selection-end-line="146" selection-end-column="16" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Cortex.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/Cortex.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="37" column="13" selection-start-line="37" selection-start-column="13" selection-end-line="37" selection-end-column="13" />
+            <state relative-caret-position="105">
+              <caret line="27" column="25" selection-start-line="27" selection-start-column="25" selection-end-line="27" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -159,7 +184,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/binoculars/future/CollectionProxy.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/tasks/Source.java" />
         <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/NucleusProxyFactory.java" />
         <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/RemoteConnection.java" />
@@ -210,6 +234,7 @@
         <option value="$PROJECT_DIR$/404.html" />
         <option value="$PROJECT_DIR$/src/org/kihara/Main.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/org/kihara/lzerd/LZerDWrapper.java" />
       </list>
     </option>
   </component>
@@ -370,6 +395,46 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="kihara" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Binoculars" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Binoculars" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kihara" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lzerd" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Binoculars" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Binoculars" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="external" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -878,7 +943,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -888,7 +953,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="5.952381E-4" sideWeight="0.51171875" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18333334" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18333334" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24948241" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -934,7 +999,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/nio/file/Path.java" />
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/io/File.java" />
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/asyncio/AsyncFile.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1218,10 +1282,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
+    <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1530">
-          <caret line="146" column="16" selection-start-line="146" selection-start-column="16" selection-end-line="146" selection-end-column="16" />
+        <state relative-caret-position="195">
+          <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
           <folding />
         </state>
       </provider>
@@ -1234,10 +1298,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
+    <entry file="file://$PROJECT_DIR$/src/org/kihara/PFPController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
+        <state relative-caret-position="-4989">
+          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/kihara/lzerd/LZerDWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="27" column="25" selection-start-line="27" selection-start-column="25" selection-end-line="27" selection-end-column="25" />
           <folding />
         </state>
       </provider>
