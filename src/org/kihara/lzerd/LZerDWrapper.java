@@ -26,4 +26,29 @@ package org.kihara.lzerd;
  * Created by andrew on 8/3/16.
  */
 public class LZerDWrapper {
+
+    static { System.loadLibrary("LZerD"); }
+
+    public native void callLZerD(String rec, String lig, String rzec, String zlig,
+                                 String prec, String plig, String irec, String ilig,
+                                 double corr, double rfmin, double rfmax, double rfdist,
+                                 double dcut, int votes, double nrad, boolean applyrandommotion,
+                                 String output_filename);
+
+    public static void runLZerD(String rec, String lig, String rzec, String zlig,
+                                String prec, String plig, String irec, String ilig,
+                                double corr, double rfmin, double rfmax, double rfdist,
+                                double dcut, int votes, double nrad, boolean applyrandommotion,
+                                String output_filename) {
+
+        LZerDWrapper wrapper = new LZerDWrapper();
+
+        wrapper.callLZerD(rec, lig, rzec, zlig,
+                prec, plig, irec, ilig,
+                corr, rfmin, rfmax, rfdist,
+                dcut, votes, nrad, applyrandommotion,
+                output_filename);
+
+    }
+
 }
