@@ -27,7 +27,10 @@ package org.kihara.lzerd;
  */
 public class LZerDWrapper {
 
-    static { System.loadLibrary("LZerD"); }
+    static {
+        System.setProperty("java.library.path", "/lib");
+        System.loadLibrary("LZerD");
+    }
 
     public native void callLZerD(String rec, String lig, String rzec, String zlig,
                                  String prec, String plig, String irec, String ilig,
