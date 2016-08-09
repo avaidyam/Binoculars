@@ -27,7 +27,6 @@ import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.ParameterFilter;
-import org.kihara.lzerd.LZerDWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,11 +49,6 @@ public class Main {
      * Initialize the Cortex, and start the HTTP server and shell.
      */
     public static void main(String[] args) {
-	LZerDWrapper.runLZerD("rec", "lig", "rzec", "zlig", 
-		"prec", "plig", "irec", "ilig",
-		12, 13, 14, 15,
-		16, 17, 18, true,
-		"output_filename");
         Log.get().setSeverity(Log.Severity.DEBUG);
         Cortex<PFPController> cortex = Cortex.of(PFPController.class);
         try {
