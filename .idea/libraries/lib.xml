@@ -5,9 +5,6 @@
       <root url="jar://$PROJECT_DIR$/lib/reactivestreams.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <NATIVE>
-      <root url="file://$PROJECT_DIR$/lib" />
-    </NATIVE>
     <SOURCES />
   </library>
 </component>

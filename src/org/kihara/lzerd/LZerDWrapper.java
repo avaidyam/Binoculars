@@ -28,7 +28,6 @@ package org.kihara.lzerd;
 public class LZerDWrapper {
 
     static {
-        System.setProperty("java.library.path", "./lib");
         System.loadLibrary("LZerDWrapper");
     }
 
