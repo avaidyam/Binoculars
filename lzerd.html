@@ -72,9 +72,119 @@
                 margin-bottom: 40px;
                 z-index: 900;
             }
-        </style>
+    </style>
+    <script type="text/javascript">
+        var fileInputs = [];
+
+        function generateForm() {
+            var form = document.getElementById("form");
+
+            var receptorLigandInputs = [
+                ["Critical Point File", "cp", "file"],
+                ["PDB File", "pdb", "file"],
+                ["Interface Residues File", "ir", "file"],
+                ["Zernike Invariants File", "zi", "file"]
+            ];
+
+            var otherInputs = [
+                ["Minimum Reference Frame Point Distance", "minimum-rfpd", "text"],
+                ["Maximum Reference Frame Point Distance", "maximum-rfpd", "text"],
+                ["Zernike Correlation Cutoff", "zernike-corr-cutoff", "text"],
+                ["Distance Cutoff (Comparable Distance)", "comp-distance-cutoff", "text"],
+                ["Distance Cutoff (Fourth Point)", "fourth-distance-cutoff", "text"],
+                ["Vote Threshold", "vote-threshold", "text"],
+                ["Neighbourhood Radius", "neighbourhood-radius", "text"],
+                ["Randomize", "randomize", "checkbox"]
+            ];
+
+            var table = document.createElement("table");
+
+            for (i in receptorLigandInputs) {
+                var tr = document.createElement("tr");
+
+                var th = document.createElement("th");
+                th.innerHTML = receptorLigandInputs[i][0];
+                tr.appendChild(th);
+
+                var td = document.createElement("td");
+                var input = document.createElement("input");
+                var id = "receptor-" + receptorLigandInputs[i][1];
+                input.setAttribute("id", id);
+                input.setAttribute("name", id);
+                input.setAttribute("type", receptorLigandInputs[i][2]);
+                if (receptorLigandInputs[i][2] == "file") fileInputs.push(input);
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("input");
+                id = "ligand-" + receptorLigandInputs[i][1];
+                input.setAttribute("id", id);
+                input.setAttribute("name", id);
+                input.setAttribute("type", receptorLigandInputs[i][2]);
+                if (receptorLigandInputs[i][2] == "file") fileInputs.push(input);
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                table.appendChild(tr);
+            }
+
+            form.appendChild(table);
+            table = document.createElement("table");
+
+            for (i in otherInputs) {
+                var tr = document.createElement("tr");
+
+                var th = document.createElement("th");
+                th.innerHTML = otherInputs[i][0];
+                tr.appendChild(th);
+
+                var td = document.createElement("td");
+                var input = document.createElement("input");
+                input.setAttribute("id", otherInputs[i][1]);
+                input.setAttribute("name", otherInputs[i][1]);
+                input.setAttribute("type", otherInputs[i][2]);
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                table.appendChild(tr);
+            }
+
+            form.appendChild(table);
+            var submit = document.createElement("input");
+            submit.setAttribute("type", "submit");
+            submit.setAttribute("class", "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast");
+            submit.setAttribute("value", "Submit");
+            form.appendChild(submit);
+        }
+
+
+
+        function processForm(frm)
+        {
+
+            var fileList = [];
+            for (i in fileInputs) {
+                var filename = fileInputs[i].value;
+                if (filename) {
+                    if (filename.length > 0) {
+                        filename = filename.substring(filename.lastIndexOf("\\")+1);
+                        fileList.push(filename);
+                    }
+                }
+            }
+
+            var allFiles = fileList.join(",");
+            alert("You selected " + allFiles);
+
+
+            frm.action = "http://localhost:8080/fileupload?files="+allFiles;
+            return true;
+        }
+
+    </script>
 </head>
-<body>
+<body onload="generateForm();">
 <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
     <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
         <div class="mdl-layout__header-row">
@@ -87,9 +197,8 @@
         <div class="demo-container mdl-grid">
             <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
             <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
-                <form method="POST">
-                    <input type="file" />
-                    <button type="submit" target="_blank" id="a" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">Submit</button>
+                <form id="form" method="POST" enctype="multipart/form-data" onsubmit="processForm(this);">
+
                 </form>
             </div>
         </div>

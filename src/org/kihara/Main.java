@@ -25,18 +25,25 @@ package org.kihara;
 import com.avaidyam.binoculars.Cortex;
 import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.RequestContext;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.kihara.util.ParameterFilter;
 import org.kihara.lzerd.LZerDWrapper;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -62,9 +69,83 @@ public class Main {
     }
 
     /**
+     * Custom handler for file upload.
+     */
+    static class UploadHandler implements HttpHandler {
+        @Override
+        public void handle(final HttpExchange t) throws IOException {
+
+            for(Map.Entry<String, List<String>> header : t.getRequestHeaders().entrySet()) {
+                System.err.println(header.getKey() + ":");
+                for (String value : header.getValue()) {
+                    System.err.println(value);
+                }
+            }
+
+            DiskFileItemFactory d = new DiskFileItemFactory();
+
+            try {
+                ServletFileUpload up = new ServletFileUpload(d);
+                new ServletFileUpload();
+                List<FileItem> result = up.parseRequest(new RequestContext() {
+
+                    @Override
+                    public String getCharacterEncoding() {
+                        return "UTF-8";
+                    }
+
+                    @Override
+                    public int getContentLength() {
+                        return 0; //tested to work with 0 as return
+                    }
+
+                    @Override
+                    public String getContentType() {
+                        return t.getRequestHeaders().getFirst("Content-type");
+                    }
+
+                    @Override
+                    public InputStream getInputStream() throws IOException {
+                        return t.getRequestBody();
+                    }
+
+                });
+                t.getResponseHeaders().add("Content-type", "text/plain");
+                t.sendResponseHeaders(200, 0);
+
+                String uploadedFolder = System.getProperty("user.dir") + "/uploaded";
+                new File(uploadedFolder).mkdir();
+
+                OutputStream os = t.getResponseBody();
+                for(FileItem fi : result) {
+                    try {
+                        if (fi.getSize() > 0) {
+                            File path = new File(uploadedFolder + "/" + fi.getName());
+                            fi.write(path);
+                        }
+                        os.write(fi.getName().getBytes());
+                        os.write("\r\n".getBytes());
+                        System.out.println("File-Item: " + fi.getFieldName() + " = " + fi.getName());
+                        System.out.println("Contents:");
+                        System.out.println(fi.getString());
+                    }
+                    catch (NullPointerException e) {
+                        continue;
+                    }
+                }
+                os.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Jumpstart a quick HTTPServer atop the PFPController
      * Yes! We can turn the PFPController into an Executor,
      * and then apply parallelism or any API onto it.
+     *
+     * http://stackoverflow.com/questions/33732110/file-upload-using-httphandler
 	 *
      * @param port
      *
@@ -112,6 +193,7 @@ public class Main {
                         .beginPFP(params.get("data"));
         });
         context.getFilters().add(new ParameterFilter());
+        server.createContext("/fileupload", new UploadHandler());
         server.setExecutor(executor);
         server.start();
     }
