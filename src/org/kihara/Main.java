@@ -113,15 +113,18 @@ public class Main {
                 t.getResponseHeaders().add("Content-type", "text/plain");
                 t.sendResponseHeaders(200, 0);
 
-                String uploadedFolder = System.getProperty("user.dir") + "/uploaded";
-                new File(uploadedFolder).mkdir();
-
                 OutputStream os = t.getResponseBody();
                 for(FileItem fi : result) {
                     try {
                         if (fi.getSize() > 0) {
-                            File path = new File(uploadedFolder + "/" + fi.getName());
-                            fi.write(path);
+                            String fileName = fi.getName();
+                            int dotIndex = fileName.indexOf(".");
+                            String prefix = fileName.substring(0, dotIndex);
+                            String suffix = fileName.substring(dotIndex);
+                            File temp = File.createTempFile(prefix, suffix);
+                            temp.deleteOnExit();
+                            fi.write(temp);
+                            System.out.println("Temp file path: " + temp.getAbsolutePath());
                         }
                         os.write(fi.getName().getBytes());
                         os.write("\r\n".getBytes());
