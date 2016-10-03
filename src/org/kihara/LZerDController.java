@@ -181,7 +181,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                         try {
                             runLzd32(gpo.get("cp-txt")).then((lzo, lze) -> {
                                 outputFiles.put("lzd32", lzo);
-                                promise.complete();
+                                promise.complete(outputFiles);
                             });
                         } catch (IOException | InterruptedException e) {
                             promise.completeExceptionally(e);
