@@ -119,7 +119,8 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs mark_sur
     // Returns output file abs. path as String
-    public String runMarkSur(String inputFile) throws IOException, InterruptedException {
+    public Future<String> runMarkSur(String inputFile) throws IOException, InterruptedException {
+        CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
         _lzerd.apply(new String[]{"echo", "test1"})
                 .start().waitFor();
@@ -129,26 +130,29 @@ public class LZerDController extends Nucleus<LZerDController> {
                 .start().waitFor();
         _lzerd.apply(new String[]{"echo", "test4"})
                 .start().waitFor();
-
-        return "";
+        promise.complete("");
+        return promise;
     }
 
     // Runs GETPOINTS
     // Returns output file abs. path as String
-    public HashMap<String, String> runGetPoints(String inputFile) throws IOException, InterruptedException {
+    public Future<HashMap<String, String>> runGetPoints(String inputFile) throws IOException, InterruptedException {
+        CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 2: Running GETPOINTS.");
         HashMap<String, String> outputFiles = new HashMap<>();
         outputFiles.put("cp-txt", "");
         outputFiles.put("gts", "");
-        return outputFiles;
+        promise.complete(outputFiles);
+        return promise;
     }
 
     // Runs LZD32
     // Returns output file abs. path as String
-    public String runLzd32(String inputFile) throws IOException, InterruptedException {
+    public Future<String> runLzd32(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 3: Running LZD32.");
-        return "";
+        promise.complete("");
+        return promise;
     }
 
     // Runs LZerD
@@ -164,21 +168,29 @@ public class LZerDController extends Nucleus<LZerDController> {
         CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
 
         try {
-
             Log.i(TAG, "Initiating file preparation.");
 
             HashMap<String, String> outputFiles = new HashMap<>();
 
-            String mso = runMarkSur(inputFile);
-            outputFiles.put("mark_sur", mso);
-
-            HashMap<String, String> gpo = runGetPoints(mso);
-            outputFiles.put("getpoints-cp-txt", gpo.get("cp-txt"));
-            outputFiles.put("getpoints-gts", gpo.get("gts"));
-
-            String lzo = runLzd32(gpo.get("cp-txt"));
-            outputFiles.put("lzd32", lzo);
-            promise.complete();
+            runMarkSur(inputFile).then((mso, mse) -> {
+                outputFiles.put("mark_sur", mso);
+                try {
+                    runGetPoints(mso).then((gpo, gpe) -> {
+                        outputFiles.put("getpoints-cp-txt", gpo.get("cp-txt"));
+                        outputFiles.put("getpoints-gts", gpo.get("gts"));
+                        try {
+                            runLzd32(gpo.get("cp-txt")).then((lzo, lze) -> {
+                                outputFiles.put("lzd32", lzo);
+                                promise.complete();
+                            });
+                        } catch (IOException | InterruptedException e) {
+                            promise.completeExceptionally(e);
+                        }
+                    });
+                } catch (IOException | InterruptedException e) {
+                    promise.completeExceptionally(e);
+                }
+            });
         } catch (IOException | InterruptedException e) {
             promise.completeExceptionally(e);
         }
