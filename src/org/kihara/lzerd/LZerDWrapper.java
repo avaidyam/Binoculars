@@ -22,6 +22,9 @@
 
 package org.kihara.lzerd;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 /**
  * Created by andrew on 8/3/16.
  */
@@ -37,11 +40,15 @@ public class LZerDWrapper {
                                  double dcut, int votes, double nrad, boolean applyrandommotion,
                                  String output_filename);
 
-    public static void runLZerD(String rec, String lig, String rzec, String zlig,
+    public static String runLZerD(String rec, String lig, String rzec, String zlig,
                                 String prec, String plig, String irec, String ilig,
                                 double corr, double rfmin, double rfmax, double rfdist,
                                 double dcut, int votes, double nrad, boolean applyrandommotion,
                                 String output_filename) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        PrintStream old = System.out;
+        System.setOut(ps);
 
         LZerDWrapper wrapper = new LZerDWrapper();
 
@@ -51,6 +58,10 @@ public class LZerDWrapper {
                 dcut, votes, nrad, applyrandommotion,
                 output_filename);
 
+        System.out.flush();
+        System.setOut(old);
+
+        return baos.toString();
     }
 
 }
