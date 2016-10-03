@@ -54,9 +54,11 @@ public class Main {
      */
     public static void main(String[] args) {
         Log.get().setSeverity(Log.Severity.DEBUG);
-        Cortex<PFPController> cortex = Cortex.of(PFPController.class);
+        // Cortex<PFPController> cortex = Cortex.of(PFPController.class);
+        Cortex<LZerDController> cortex = Cortex.of(LZerDController.class);
         try {
-            PFPController main = cortex.getNodes().get(0);
+            // PFPController main = cortex.getNodes().get(0);
+            LZerDController main = cortex.getNodes().get(0);
             startHTTP(8080, main);
             startShell(cortex.getNodes());
         } catch (Exception e) {
@@ -186,10 +188,16 @@ public class Main {
             os.close();
 
             // Begin the PFP processing from HTTP.
+            /*
             if (params.get("data") != null)
                 Cortex.of(PFPController.class)
                         .getNodes().get(0)
                         .beginPFP(params.get("data"));
+            */
+            // Test LZerDController.
+            Cortex.of(LZerDController.class)
+                    .getNodes().get(0)
+                    .runLzerdFlow("", "");
         });
         context.getFilters().add(new ParameterFilter());
         server.createContext("/fileupload", new UploadHandler());
@@ -204,7 +212,8 @@ public class Main {
      *
      * @throws Exception
      */
-    public static void startShell(List<PFPController> nodes) throws Exception {
+    // public static void startShell(List<PFPController> nodes) throws Exception {
+    public static void startShell(List<LZerDController> nodes) throws Exception {
         System.err.println("Binoculars Runtime Environment (ver. b1.0.0)");
         System.err.println("For help, enter \"help()\" and press enter.");
         JavascriptEngine.bindings = bindings -> {
