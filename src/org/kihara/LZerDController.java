@@ -95,10 +95,10 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // --------------------------------------------------------------------
     // Handy JS function to begin PFP without messing with Cortex.
-    public static void go(String filename) throws Exception {
+    public static void go(String receptorFile, String ligandFile) throws Exception {
         Cortex.of(LZerDController.class)
                 .getNodes().get(0)
-                .runLzerdFlow("", "");
+                .runLzerdFlow(receptorFile, ligandFile);
     }
     // --------------------------------------------------------------------
 
