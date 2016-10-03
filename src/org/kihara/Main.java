@@ -229,7 +229,8 @@ public class Main {
             bindings.put("info", (Consumer)(s) -> System.err.println("Command Info: " + s));
             bindings.put("time", (Supplier) System::currentTimeMillis);
         };
-        JavascriptEngine.script = () -> "var PFP = Java.type(\"org.kihara.PFPController\")\n";
+        JavascriptEngine.script = () -> "var PFP = Java.type(\"org.kihara.PFPController\");\n" +
+                "var LZerD = Java.type(\"org.kihara.LZerDController;\")\n";
         JavascriptEngine.shell(System.in, System.out, System.err);
     }
 }
