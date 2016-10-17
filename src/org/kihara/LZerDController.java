@@ -85,6 +85,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     // --------------------------------------------------------------------
     // Set + Get for current store path.
     String storePath = System.getProperty("user.dir");
+    String LZerDdir = storePath + "/bin/lzerd";
     public Future<String> getStorePath() {
         return new CompletableFuture<>(storePath);
     }
@@ -108,7 +109,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     Function<String[], ProcessBuilder> _lzerd = (String ... args) -> {
         System.out.println("Running " + Arrays.toString(args));
         ProcessBuilder pb = new ProcessBuilder(args)
-                .directory(new File(storePath))
+                .directory(new File(LZerDdir))
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT);
         pb.environment().put("BLASTMAT", storePath + "/bin/data");
@@ -122,7 +123,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<String> runMarkSur(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
-        _lzerd.apply(new String[]{"./bin/mark_sur", inputFile, inputFile + ".ms"})
+        _lzerd.apply(new String[]{"mark_sur", inputFile, inputFile + ".ms"})
                 .start().waitFor();
         promise.complete("");
         return promise;
