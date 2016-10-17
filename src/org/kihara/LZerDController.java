@@ -134,17 +134,29 @@ public class LZerDController extends Nucleus<LZerDController> {
     // Returns output file abs. path as String
     public Future<HashMap<String, String>> runGetPoints(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
+
         Log.i(TAG, "Step 2: Running GETPOINTS.");
+
         double smooth = 0.35;
         String cut = "1e-04";
+
         String baseName = Paths.get(inputFile).getFileName().toString();
         if (baseName.indexOf('.') > 0) baseName = baseName.substring(0, baseName.indexOf('.'));
         Log.d(TAG, "File name: " + baseName);
+
         _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
                 .start().waitFor();
+
         HashMap<String, String> outputFiles = new HashMap<>();
-        outputFiles.put("cp-txt", "");
-        outputFiles.put("gts", "");
+
+        String outputBase = LZerDdir + "/" + baseName;
+        String cpTxt = outputBase + "_cp.txt";
+        String gts = outputBase + ".gts";
+
+        // TODO: Convert to temp files
+
+        outputFiles.put("cp-txt", cpTxt);
+        outputFiles.put("gts", gts);
         promise.complete(outputFiles);
         return promise;
     }
@@ -154,7 +166,20 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<String> runLzd32(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 3: Running LZD32.");
-        promise.complete("");
+
+        String baseName = Paths.get(inputFile).getFileName().toString();
+        if (baseName.indexOf('.') > 0) baseName = baseName.substring(0, baseName.indexOf('.'));
+        String outputFile = baseName + "_01.inv";
+
+        int dim = 161;
+        double rad = 6;
+        int ord = 10;
+
+        _lzerd.apply(new String[]{"./LZD32", "-g", inputFile, "-o", outputFile,
+                "-dim", String.valueOf(dim), "-rad", String.valueOf(rad), "-ord", String.valueOf(ord) })
+                .start().waitFor();
+
+        promise.complete(LZerDdir + "/" + outputFile);
         return promise;
     }
 
