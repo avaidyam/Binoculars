@@ -183,7 +183,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs LZerD
     // Returns output file abs. path as String
-    public Future<String> runLzerd(HashMap<String, String> inputFiles) {
+    public Future<String> runLzerd(HashMap<String, String> inputFiles) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 4: Running LZerD.");
 
@@ -214,7 +214,8 @@ public class LZerDController extends Nucleus<LZerDController> {
                 "-prec", rec_ms, "-plig", lig_ms, "-zrec", rec_inv,
                 "-zlig", lig_inv, "-rfmin", String.valueOf(rfmin), "-rfmax", String.valueOf(rfmax),
                 "-rfpmax", String.valueOf(rfpmax), "-nvotes", String.valueOf(nvotes), "-cor", String.valueOf(cor),
-                "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad), ">", outFile});
+                "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad), ">", outFile})
+                .start().waitFor();
 
         promise.complete(outFile);
         return promise;
@@ -311,10 +312,14 @@ public class LZerDController extends Nucleus<LZerDController> {
         for (LZerDController c : lzerd) {
             if (c.hasJobContext().await())
                 continue;
-
-            c.runLzerd(inputFiles).then((lo, le) -> {
-                Log.i(TAG, "Finished LzerD.");
-            });
+            try {
+                c.runLzerd(inputFiles).then((lo, le) -> {
+                    Log.i(TAG, "Finished LzerD.");
+                });
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
         }
     }
 }
