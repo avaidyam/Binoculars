@@ -195,9 +195,6 @@ public class Main {
                         .beginPFP(params.get("data"));
             */
             // Test LZerDController.
-            Cortex.of(LZerDController.class)
-                    .getNodes().get(0)
-                    .runLzerdFlow("", "");
         });
         context.getFilters().add(new ParameterFilter());
         server.createContext("/fileupload", new UploadHandler());

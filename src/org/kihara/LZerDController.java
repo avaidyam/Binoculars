@@ -122,13 +122,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<String> runMarkSur(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
-        _lzerd.apply(new String[]{"echo", "test1"})
-                .start().waitFor();
-        _lzerd.apply(new String[]{"echo", "test2"})
-                .start().waitFor();
-        _lzerd.apply(new String[]{"echo", "test3"})
-                .start().waitFor();
-        _lzerd.apply(new String[]{"echo", "test4"})
+        _lzerd.apply(new String[]{"echo", "./bin/mark_sur", inputFile, inputFile + ".ms"})
                 .start().waitFor();
         promise.complete("");
         return promise;
@@ -209,6 +203,13 @@ public class LZerDController extends Nucleus<LZerDController> {
     public void runLzerdFlow(String receptorFile, String ligandFile) {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Initating LZerD.");
+
+        // Convert to .pdb.ms (mark_sur)
+        // Get CP (GETPOINTS)
+        // Get ZINV (LZD32)
+        // Run LZerD (LZerD1.0)
+        // Sort output (grep and stuff)
+        // Output top ranked results (PDBGEN)
 
         List<LZerDController> lzerd = Cortex.of(LZerDController.class).getNodes();
 
