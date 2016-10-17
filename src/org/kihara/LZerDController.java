@@ -122,7 +122,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<String> runMarkSur(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
-        _lzerd.apply(new String[]{"echo", "./bin/mark_sur", inputFile, inputFile + ".ms"})
+        _lzerd.apply(new String[]{"./bin/mark_sur", inputFile, inputFile + ".ms"})
                 .start().waitFor();
         promise.complete("");
         return promise;
