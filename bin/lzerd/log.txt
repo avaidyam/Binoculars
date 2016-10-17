@@ -1,0 +1,34 @@
+nohup: ignoring input
+Calculating surfaces ...
+Calculating Zernike ...
+===== Generate Mesh2DX ======
+check_del & cen 0 0
+Reading file 1PPE_l_b.gts
+231969514634
+In two
+Mesh parameters:  gs 161 del 0.268533 cenX 1.85455 cenY 9.15907 cenZ 2.31208
+==== Transfrom selected Points ====
+finished reading 1PPE_l_b_cp.txt
+finished Transforming
+CP parameters:  gs 161 del 0.268533 cenX 1.85455 cenY 9.15907 cenZ 2.31208
+==== Generate Zernike Descriptor ====
+radius 22.3436
+invFilename : 1PPE_l_b_01.inv
+===== Generate Mesh2DX ======
+check_del & cen 0 0
+Reading file 1PPE_r_b.gts
+98932958319722
+In two
+Mesh parameters:  gs 161 del 0.519181 cenX 15.7032 cenY 8.48517 cenZ 14.0765
+==== Transfrom selected Points ====
+finished reading 1PPE_r_b_cp.txt
+finished Transforming
+CP parameters:  gs 161 del 0.519181 cenX 15.7032 cenY 8.48517 cenZ 14.0765
+==== Generate Zernike Descriptor ====
+radius 11.5567
+invFilename : 1PPE_r_b_01.inv
+LZerD ...
+debug: reading files ...
+debug: hashing ...
+vdock done in a total of 12638 seconds
+Outputing top ranked results
