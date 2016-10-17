@@ -137,7 +137,9 @@ public class LZerDController extends Nucleus<LZerDController> {
         Log.i(TAG, "Step 2: Running GETPOINTS.");
         double smooth = 0.35;
         String cut = "1e-04";
-        Log.d(TAG, "File name: " + Paths.get(inputFile).getFileName().toString());
+        String baseName = Paths.get(inputFile).getFileName().toString();
+        if (baseName.indexOf('.') > 0) baseName = baseName.substring(0, baseName.indexOf('.'));
+        Log.d(TAG, "File name: " + baseName);
         _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
                 .start().waitFor();
         HashMap<String, String> outputFiles = new HashMap<>();
