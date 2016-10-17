@@ -38,6 +38,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -112,6 +113,7 @@ public class Main {
                 t.sendResponseHeaders(200, 0);
 
                 OutputStream os = t.getResponseBody();
+                HashMap<String, String> inputFiles = new HashMap<>();
                 for(FileItem fi : result) {
                     try {
                         if (fi.getSize() > 0) {
@@ -123,6 +125,7 @@ public class Main {
                             temp.deleteOnExit();
                             fi.write(temp);
                             System.out.println("Temp file path: " + temp.getAbsolutePath());
+                            inputFiles.put(fi.getFieldName(), temp.getAbsolutePath());
                         }
                         os.write(fi.getName().getBytes());
                         os.write("\r\n".getBytes());
@@ -135,6 +138,11 @@ public class Main {
                     }
                 }
                 os.close();
+                if (inputFiles.containsKey("receptor") && inputFiles.containsKey("ligand")) {
+                    Cortex.of(LZerDController.class)
+                            .getNodes().get(0)
+                            .runLzerdFlow(inputFiles.get("receptor"), inputFiles.get("ligand"));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -194,7 +202,7 @@ public class Main {
                         .getNodes().get(0)
                         .beginPFP(params.get("data"));
             */
-            // Test LZerDController.
+            // Test LZerDController;
         });
         context.getFilters().add(new ParameterFilter());
         server.createContext("/fileupload", new UploadHandler());
