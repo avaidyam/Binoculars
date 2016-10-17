@@ -120,11 +120,12 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs mark_sur
     // Returns output file abs. path as String
-    public Future<String> runMarkSur(String inputFile) throws IOException, InterruptedException {
+    public Future<String> runMarkSur(String inputFileBase) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
+        String inputFile = "/tmp/" + inputFileBase + ".pdb";
         String outputFile = inputFile + ".ms";
-        _lzerd.apply(new String[]{"./mark_sur", inputFile, inputFile + ".ms"})
+        _lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
                 .start().waitFor();
         promise.complete(outputFile);
         return promise;
@@ -132,7 +133,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs GETPOINTS
     // Returns output file abs. path as String
-    public Future<HashMap<String, String>> runGetPoints(String inputFile) throws IOException, InterruptedException {
+    public Future<HashMap<String, String>> runGetPoints(String inputFileBase) throws IOException, InterruptedException {
         CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
 
         Log.i(TAG, "Step 2: Running GETPOINTS.");
@@ -140,18 +141,15 @@ public class LZerDController extends Nucleus<LZerDController> {
         double smooth = 0.35;
         String cut = "1e-04";
 
-        String baseName = Paths.get(inputFile).getFileName().toString();
-        if (baseName.indexOf('.') > 0) baseName = baseName.substring(0, baseName.indexOf('.'));
-        Log.d(TAG, "File name: " + baseName);
+        String inputFile = "/tmp/" + inputFileBase + ".pdb.ms";
 
         _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
                 .start().waitFor();
 
         HashMap<String, String> outputFiles = new HashMap<>();
 
-        String outputBase = LZerDdir + "/" + baseName;
-        String cpTxt = outputBase + "_cp.txt";
-        String gts = outputBase + ".gts";
+        String cpTxt = inputFileBase + "_cp.txt";
+        String gts = inputFileBase + ".gts";
 
         // TODO: Convert to temp files
 
@@ -163,19 +161,19 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs LZD32
     // Returns output file abs. path as String
-    public Future<String> runLzd32(String inputFile) throws IOException, InterruptedException {
+    public Future<String> runLzd32(String inputFileBase) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 3: Running LZD32.");
 
-        String baseName = Paths.get(inputFile).getFileName().toString();
-        if (baseName.indexOf('.') > 0) baseName = baseName.substring(0, baseName.indexOf('.'));
-        String outputFile = baseName + "_01.inv";
+        String gtsInput = inputFileBase + ".gts";
+        String cpInput = inputFileBase + "_cp.txt";
+        String outputFile = inputFileBase + "_01.inv";
 
         int dim = 161;
         double rad = 6;
         int ord = 10;
 
-        _lzerd.apply(new String[]{"./LZD32", "-g", inputFile, "-o", baseName,
+        _lzerd.apply(new String[]{"./LZD32", "-g", gtsInput, "-c", cpInput, "-o", inputFileBase,
                 "-dim", String.valueOf(dim), "-rad", String.valueOf(rad), "-ord", String.valueOf(ord) })
                 .start().waitFor();
 
@@ -192,11 +190,9 @@ public class LZerDController extends Nucleus<LZerDController> {
         String rec_cp = inputFiles.get("receptor-cp-txt");
         String lig_cp = inputFiles.get("ligand-cp-txt");
 
-        String recBaseName = Paths.get(rec_cp).getFileName().toString();
-        if (recBaseName.indexOf('.') > 0) recBaseName = recBaseName.substring(0, recBaseName.indexOf('.'));
+        String recBaseName = inputFiles.get("receptor-base");
 
-        String ligBaseName = Paths.get(rec_cp).getFileName().toString();
-        if (ligBaseName.indexOf('.') > 0) ligBaseName = ligBaseName.substring(0, ligBaseName.indexOf('.'));
+        String ligBaseName = inputFiles.get("ligand-base");
 
         String rec_ms = inputFiles.get("receptor-mark_sur");
         String lig_ms = inputFiles.get("ligand-mark_sur");
@@ -224,22 +220,23 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
-    public Future<HashMap<String, String>> prepareFile(String inputFile) {
+    public Future<HashMap<String, String>> prepareFile(String inputFileBase) {
         CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
 
         try {
             Log.i(TAG, "Initiating file preparation.");
 
             HashMap<String, String> outputFiles = new HashMap<>();
+            outputFiles.put("base", inputFileBase);
 
-            runMarkSur(inputFile).then((mso, mse) -> {
+            runMarkSur(inputFileBase).then((mso, mse) -> {
                 outputFiles.put("mark_sur", mso);
                 try {
-                    runGetPoints(mso).then((gpo, gpe) -> {
+                    runGetPoints(inputFileBase).then((gpo, gpe) -> {
                         outputFiles.put("getpoints-cp-txt", gpo.get("cp-txt"));
                         outputFiles.put("getpoints-gts", gpo.get("gts"));
                         try {
-                            runLzd32(gpo.get("cp-txt")).then((lzo, lze) -> {
+                            runLzd32(inputFileBase).then((lzo, lze) -> {
                                 outputFiles.put("lzd32", lzo);
                                 promise.complete(outputFiles);
                             });
@@ -270,6 +267,11 @@ public class LZerDController extends Nucleus<LZerDController> {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Initating LZerD.");
 
+        String recBaseName = Paths.get(receptorFile).getFileName().toString();
+        if (recBaseName.indexOf('.') > 0) recBaseName = recBaseName.substring(0, recBaseName.indexOf('.'));
+        String ligBaseName = Paths.get(ligandFile).getFileName().toString();
+        if (ligBaseName.indexOf('.') > 0) ligBaseName = ligBaseName.substring(0, ligBaseName.indexOf('.'));
+
         // Convert to .pdb.ms (mark_sur)
         // Get CP (GETPOINTS)
         // Get ZINV (LZD32)
@@ -287,10 +289,10 @@ public class LZerDController extends Nucleus<LZerDController> {
             if (c.hasJobContext().await())
                 continue;
 
-            futureQueue.add(c.prepareFile(receptorFile).then((ro, re) -> {
+            futureQueue.add(c.prepareFile(recBaseName).then((ro, re) -> {
                 appendInputFiles("receptor", ro, inputFiles);
             }));
-            futureQueue.add(c.prepareFile(ligandFile).then((lo, le) -> {
+            futureQueue.add(c.prepareFile(ligBaseName).then((lo, le) -> {
                 appendInputFiles("ligand", lo, inputFiles);
             }));
             break;
