@@ -123,9 +123,10 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<String> runMarkSur(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
+        String outputFile = inputFile + ".ms";
         _lzerd.apply(new String[]{"./mark_sur", inputFile, inputFile + ".ms"})
                 .start().waitFor();
-        promise.complete("");
+        promise.complete(outputFile);
         return promise;
     }
 
@@ -134,6 +135,10 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<HashMap<String, String>> runGetPoints(String inputFile) throws IOException, InterruptedException {
         CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 2: Running GETPOINTS.");
+        double smooth = 0.35;
+        String cut = "1e-04";
+        _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
+                .start().waitFor();
         HashMap<String, String> outputFiles = new HashMap<>();
         outputFiles.put("cp-txt", "");
         outputFiles.put("gts", "");
