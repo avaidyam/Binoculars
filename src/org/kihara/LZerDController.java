@@ -175,7 +175,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         double rad = 6;
         int ord = 10;
 
-        _lzerd.apply(new String[]{"./LZD32", "-g", inputFile, "-o", outputFile,
+        _lzerd.apply(new String[]{"./LZD32", "-g", inputFile, "-o", baseName,
                 "-dim", String.valueOf(dim), "-rad", String.valueOf(rad), "-ord", String.valueOf(ord) })
                 .start().waitFor();
 
@@ -188,7 +188,39 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<String> runLzerd(HashMap<String, String> inputFiles) {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 4: Running LZerD.");
-        promise.complete("");
+
+        String rec_cp = inputFiles.get("receptor-cp-txt");
+        String lig_cp = inputFiles.get("ligand-cp-txt");
+
+        String recBaseName = Paths.get(rec_cp).getFileName().toString();
+        if (recBaseName.indexOf('.') > 0) recBaseName = recBaseName.substring(0, recBaseName.indexOf('.'));
+
+        String ligBaseName = Paths.get(rec_cp).getFileName().toString();
+        if (ligBaseName.indexOf('.') > 0) ligBaseName = ligBaseName.substring(0, ligBaseName.indexOf('.'));
+
+        String rec_ms = inputFiles.get("receptor-mark_sur");
+        String lig_ms = inputFiles.get("ligand-mark_sur");
+
+        String rec_inv = inputFiles.get("receptor-lzd32");
+        String lig_inv = inputFiles.get("ligand-lzd32");
+
+        double rfmin = 4.0;
+        double rfmax = 9.0;
+        double rfpmax = 15.0;
+        int nvotes = 8;
+        double cor = 0.7;
+        double dist = 2.0;
+        double nrad = 2.5;
+
+        String outFile = recBaseName + "_" + ligBaseName + ".out";
+
+        _lzerd.apply(new String[]{"./LZerD1.0", "-rec", rec_cp, "-lig", lig_cp,
+                "-prec", rec_ms, "-plig", lig_ms, "-zrec", rec_inv,
+                "-zlig", lig_inv, "-rfmin", String.valueOf(rfmin), "-rfmax", String.valueOf(rfmax),
+                "-rfpmax", String.valueOf(rfpmax), "-nvotes", String.valueOf(nvotes), "-cor", String.valueOf(cor),
+                "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad), ">", outFile});
+
+        promise.complete(outFile);
         return promise;
     }
 
