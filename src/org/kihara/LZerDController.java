@@ -187,8 +187,8 @@ public class LZerDController extends Nucleus<LZerDController> {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 4: Running LZerD.");
 
-        String rec_cp = inputFiles.get("receptor-cp-txt");
-        String lig_cp = inputFiles.get("ligand-cp-txt");
+        String rec_cp = inputFiles.get("receptor-getpoints-cp-txt");
+        String lig_cp = inputFiles.get("ligand-getpoints-cp-txt");
 
         String recBaseName = inputFiles.get("receptor-base");
 
