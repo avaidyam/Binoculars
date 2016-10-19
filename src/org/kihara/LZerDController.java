@@ -103,6 +103,11 @@ public class LZerDController extends Nucleus<LZerDController> {
     }
     // --------------------------------------------------------------------
 
+    public static void sendEmailTest() {
+        Cortex.of(LZerDController.class)
+                .getNodes().get(0)
+                .sendEmail();
+    }
 
     // --------------------------------------------------------------------
     // Helper lambda to concisely produce processes for PFP.
@@ -294,6 +299,19 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
+    public Future<Void> sendEmail() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+        try {
+            _lzerd.apply(new String[]{"echo", "\"The LZerD job you started is complete\"", "|",
+                    "mail", "-s", "\"LZerD job complete!\"", "waldena@purdue.edu"})
+                    .start().waitFor();
+            promise.complete();
+        } catch (InterruptedException | IOException e) {
+            promise.completeExceptionally(e);
+        }
+        return promise;
+    }
+
     // Runs LZerD pipeline
     // Returns output file abs. path as String
     public Future<String> runLzerdFlow(String receptorFile, String ligandFile) {
@@ -350,6 +368,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                     cleanOutFiles(inputFiles);
                     inputFiles.put("lzerd-out", lo);
                     promise.complete(lo);
+                    sendEmail();
                 });
             } catch (IOException | InterruptedException e) {
                 promise.completeExceptionally(e);
