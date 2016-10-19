@@ -302,20 +302,23 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> sendEmail() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         try {
-            ProcessBuilder mailProcess = _lzerd.apply(new String[]{"mail", "-s", "\"LZerD job complete!\"", "waldena@purdue.edu"});
-            ProcessBuilder echoProcess = _lzerd.apply(new String[]{"echo", "\"The LZerD job you started is complete!\""});
-            
-            ProcessBuilder.Redirect mailInput = mailProcess.redirectInput();
-            ProcessBuilder.Redirect echoOutput = echoProcess.redirectOutput();
+            ProcessBuilder mailProcessBuilder = _lzerd.apply(new String[]{"mail", "-s", "\"LZerD job complete!\"", "waldena@purdue.edu"});
+            ProcessBuilder echoProcessBuilder = _lzerd.apply(new String[]{"echo", "\"The LZerD job you started is complete!\""});
 
-            mailProcess.redirectInput(echoOutput);
-            echoProcess.redirectOutput(mailInput);
+            ProcessBuilder.Redirect mailInput = mailProcessBuilder.redirectInput();
+            ProcessBuilder.Redirect echoOutput = echoProcessBuilder.redirectOutput();
 
-            echoProcess.start().waitFor();
-            mailProcess.start().waitFor();
+            mailProcessBuilder.redirectInput(echoOutput);
+            echoProcessBuilder.redirectOutput(mailInput);
 
-            echoProcess.redirectOutput(echoOutput);
-            mailProcess.redirectInput(mailInput);
+            Process echoProcess = echoProcessBuilder.start();
+            Process mailProcess = mailProcessBuilder.start();
+
+            echoProcess.waitFor();
+            mailProcess.waitFor();
+
+            echoProcessBuilder.redirectOutput(echoOutput);
+            mailProcessBuilder.redirectInput(mailInput);
 
             promise.complete();
         } catch (InterruptedException | IOException e) {
