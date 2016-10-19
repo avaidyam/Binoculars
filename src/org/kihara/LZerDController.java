@@ -264,7 +264,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs LZerD pipeline
     // Returns output file abs. path as String
-    public void runLzerdFlow(String receptorFile, String ligandFile) {
+    public Future<String> runLzerdFlow(String receptorFile, String ligandFile) {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Initating LZerD.");
 
@@ -315,11 +315,13 @@ public class LZerDController extends Nucleus<LZerDController> {
             try {
                 c.runLzerd(inputFiles).then((lo, le) -> {
                     Log.i(TAG, "Finished LzerD.");
+                    promise.complete(lo);
                 });
             } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+                promise.completeExceptionally(e);
                 break;
             }
         }
+        return promise;
     }
 }

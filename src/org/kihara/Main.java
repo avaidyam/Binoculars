@@ -141,7 +141,7 @@ public class Main {
                 if (inputFiles.containsKey("receptor") && inputFiles.containsKey("ligand")) {
                     Cortex.of(LZerDController.class)
                             .getNodes().get(0)
-                            .runLzerdFlow(inputFiles.get("receptor"), inputFiles.get("ligand"));
+                            .runLzerdFlow(inputFiles.get("receptor"), inputFiles.get("ligand")).then((r, e) -> {});
                 }
             } catch (Exception e) {
                 e.printStackTrace();
