@@ -262,6 +262,38 @@ public class LZerDController extends Nucleus<LZerDController> {
         }
     }
 
+    // Deletes a file by its path
+    public Future<Void> deleteFile(String filePath) {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+        Path thePath = Paths.get(filePath);
+        try {
+            Files.delete(thePath);
+            promise.complete();
+        } catch (IOException e) {
+            promise.completeExceptionally(e);
+        }
+        return promise;
+    }
+
+    // Removes all the intermediate files
+    public Future<Void> cleanOutFiles(HashMap<String, String> outFiles) {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        String[] fileKeys = {"receptor-mark_sur", "ligand-mark_sur",
+                "receptor-getpoints-cp-txt", "ligand-getpoints-cp-txt",
+                "receptor-getpoints-gts", "ligand-getpoints-gts",
+                "receptor-lzd32", "ligand-lzd32"
+               // , "lzerd-out"
+        };
+
+        for (String key : fileKeys) {
+            deleteFile(outFiles.get(key));
+        }
+
+        promise.complete();
+        return promise;
+    }
+
     // Runs LZerD pipeline
     // Returns output file abs. path as String
     public Future<String> runLzerdFlow(String receptorFile, String ligandFile) {
@@ -315,6 +347,8 @@ public class LZerDController extends Nucleus<LZerDController> {
             try {
                 c.runLzerd(inputFiles).then((lo, le) -> {
                     Log.i(TAG, "Finished LzerD.");
+                    cleanOutFiles(inputFiles);
+                    inputFiles.put("lzerd-out", lo);
                     promise.complete(lo);
                 });
             } catch (IOException | InterruptedException e) {
