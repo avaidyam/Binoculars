@@ -302,28 +302,8 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> sendEmail() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         try {
-            /*
-            ProcessBuilder mailProcessBuilder = _lzerd.apply(new String[]{"mail", "-s", "\"LZerD job complete!\"", "waldena@purdue.edu"});
-            ProcessBuilder echoProcessBuilder = _lzerd.apply(new String[]{"echo", "\"The LZerD job you started is complete!\""});
-
-            ProcessBuilder.Redirect mailInput = mailProcessBuilder.redirectInput();
-            ProcessBuilder.Redirect echoOutput = echoProcessBuilder.redirectOutput();
-
-            mailProcessBuilder.redirectInput(echoOutput);
-            echoProcessBuilder.redirectOutput(mailInput);
-
-            Process echoProcess = echoProcessBuilder.start();
-            Process mailProcess = mailProcessBuilder.start();
-
-            echoProcess.waitFor();
-            mailProcess.waitFor();
-
-            echoProcessBuilder.redirectOutput(echoOutput);
-            mailProcessBuilder.redirectInput(mailInput);
-            */
-
-            _lzerd.apply(new String[]{"echo \"The LZerD job you started is complete!\" | mail -s \"LZerD job complete\" waldena@purdue.edu"})
-                    .start().waitFor();
+            _lzerd.apply(new String[]{"./notify.sh"})
+                .start().waitFor();
             promise.complete();
         } catch (InterruptedException | IOException e) {
             promise.completeExceptionally(e);
