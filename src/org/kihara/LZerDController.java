@@ -219,7 +219,8 @@ public class LZerDController extends Nucleus<LZerDController> {
                 "-prec", rec_ms, "-plig", lig_ms, "-zrec", rec_inv,
                 "-zlig", lig_inv, "-rfmin", String.valueOf(rfmin), "-rfmax", String.valueOf(rfmax),
                 "-rfpmax", String.valueOf(rfpmax), "-nvotes", String.valueOf(nvotes), "-cor", String.valueOf(cor),
-                "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad), ">", outFile})
+                "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad)})
+                .redirectOutput(new File(LZerDdir + "/" + outFile))
                 .start().waitFor();
 
         promise.complete(outFile);
