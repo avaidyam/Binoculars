@@ -227,6 +227,32 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
+    public Future<String> runGrep(String inputFile) throws IOException, InterruptedException {
+        CompletableFuture<String> promise = new CompletableFuture<>();
+
+        File tmpFile = new File(inputFile + ".tmp");
+        File redirectFile = new File(inputFile + ".v.tmp");
+
+        _lzerd.apply(new String[]{"grep", "^LIG", inputFile})
+                .redirectOutput(tmpFile)
+                .start().waitFor();
+
+        _lzerd.apply(new String[]{"grep", "-v", "^LIG", inputFile})
+                .redirectOutput(redirectFile)
+                .start().waitFor();
+
+        _lzerd.apply(new String[]{"sort", "k", "13,13", "-nr"})
+                .redirectInput(redirectFile)
+                .redirectOutput(ProcessBuilder.Redirect.appendTo(tmpFile))
+                .start().waitFor();
+
+        _lzerd.apply(new String[]{"mv", tmpFile.getAbsolutePath(), inputFile})
+                .start().waitFor();
+
+        promise.complete(inputFile);
+        return promise;
+    }
+
     public Future<HashMap<String, String>> prepareFile(String inputFileBase) {
         CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
 
@@ -366,9 +392,17 @@ public class LZerDController extends Nucleus<LZerDController> {
                 c.runLzerd(inputFiles).then((lo, le) -> {
                     Log.i(TAG, "Finished LzerD.");
                     cleanOutFiles(inputFiles);
-                    inputFiles.put("lzerd-out", lo);
-                    promise.complete(lo);
-                    sendEmail();
+                    try {
+                        Log.i(TAG, "Starting grep.");
+                        c.runGrep(lo).then((go, ge) -> {
+                            Log.i(TAG, "Finished grep.");
+                            inputFiles.put("lzerd-out", go);
+                            promise.complete(go);
+                            sendEmail();
+                        });
+                    } catch (IOException | InterruptedException e) {
+                        promise.completeExceptionally(e);
+                    }
                 });
             } catch (IOException | InterruptedException e) {
                 promise.completeExceptionally(e);
