@@ -241,7 +241,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                 .redirectOutput(redirectFile)
                 .start().waitFor();
 
-        _lzerd.apply(new String[]{"sort", "k", "13,13", "-nr"})
+        _lzerd.apply(new String[]{"sort", "-k", "13,13", "-nr"})
                 .redirectInput(redirectFile)
                 .redirectOutput(ProcessBuilder.Redirect.appendTo(tmpFile))
                 .start().waitFor();
@@ -250,6 +250,16 @@ public class LZerDController extends Nucleus<LZerDController> {
                 .start().waitFor();
 
         promise.complete(inputFile);
+        return promise;
+    }
+
+    public Future<Void> runPDBGEN(String receptorFile, String ligandFile, String outFile) throws IOException, InterruptedException {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        _lzerd.apply(new String[]{"./PDBGEN", receptorFile, ligandFile, outFile, "3"})
+                .start().waitFor();
+
+        promise.complete();
         return promise;
     }
 
@@ -391,14 +401,14 @@ public class LZerDController extends Nucleus<LZerDController> {
             try {
                 c.runLzerd(inputFiles).then((lo, le) -> {
                     Log.i(TAG, "Finished LzerD.");
-                    cleanOutFiles(inputFiles);
                     try {
                         Log.i(TAG, "Starting grep.");
                         c.runGrep(lo).then((go, ge) -> {
                             Log.i(TAG, "Finished grep.");
+
+                            cleanOutFiles(inputFiles);
                             inputFiles.put("lzerd-out", go);
                             promise.complete(go);
-                            sendEmail();
                         });
                     } catch (IOException | InterruptedException e) {
                         promise.completeExceptionally(e);
