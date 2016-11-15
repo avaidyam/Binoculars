@@ -220,9 +220,9 @@ public class Main {
 
         HttpContext ticketContext = server.createContext("/ticket", exchange -> {
             Map<String, String> params = (Map<String, String>)exchange.getAttribute("parameters");
+            String response = "Ticket not found";
             if (params.containsKey("id") && params.get("id") != null) {
                 String idString = params.get("id");
-                String response = "Ticket not found";
                 try {
                     int id = Integer.parseInt(idString);
                     if (ticketManager.hasTicket(id) && ticketManager.isSet(id)) {
@@ -231,12 +231,12 @@ public class Main {
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-
-                exchange.sendResponseHeaders(200, response.length());
-                OutputStream os = exchange.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
             }
+            
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
         });
         ticketContext.getFilters().add(new ParameterFilter());
         server.setExecutor(executor);
