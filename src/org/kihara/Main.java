@@ -33,6 +33,7 @@ import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.kihara.util.ParameterFilter;
+import org.kihara.util.TicketManager;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -49,6 +50,8 @@ import java.util.function.Supplier;
  * Entry point for the sample application (PFP).
  */
 public class Main {
+
+    private static TicketManager<String> ticketManager;
 
     /**
      * Initialize the Cortex, and start the HTTP server and shell.
@@ -206,6 +209,35 @@ public class Main {
         });
         context.getFilters().add(new ParameterFilter());
         server.createContext("/fileupload", new UploadHandler());
+
+        ticketManager = new TicketManager<>();
+        int testId1 = ticketManager.getNewTicket();
+        ticketManager.set(testId1, "The quick brown fox jumps over the lazy dog");
+        Log.d("Main.java", "testId1: " + String.valueOf(testId1));
+        int testId2 = ticketManager.getNewTicket();
+        ticketManager.set(testId2, "The fish was delish and it made quite a dish");
+        Log.d("Main.java", "testId2: " + String.valueOf(testId2));
+
+        HttpContext ticketContext = server.createContext("/ticket", exchange -> {
+            Map<String, String> params = (Map<String, String>)exchange.getAttribute("parameters");
+            if (params.containsKey("id") && params.get("id") != null) {
+                String idString = params.get("id");
+                String response = "Ticket not found";
+                try {
+                    int id = Integer.parseInt(idString);
+                    if (ticketManager.hasTicket(id) && ticketManager.isSet(id)) {
+                        response = ticketManager.get(id);
+                    }
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+                
+                exchange.sendResponseHeaders(200, response.length());
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        });
         server.setExecutor(executor);
         server.start();
     }
