@@ -231,13 +231,14 @@ public class Main {
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-                
+
                 exchange.sendResponseHeaders(200, response.length());
                 OutputStream os = exchange.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
             }
         });
+        ticketContext.getFilters().add(new ParameterFilter());
         server.setExecutor(executor);
         server.start();
     }
