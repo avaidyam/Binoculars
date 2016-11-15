@@ -126,7 +126,7 @@ public class TicketManager<T> {
             fileHashMap.remove(id);
         }
         else if (hasTicket(id)) {
-            idSet.remove(id);
+            idSet.remove((Integer) id);
         }
     }
 }
