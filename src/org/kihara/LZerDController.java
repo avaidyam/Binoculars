@@ -30,6 +30,7 @@ import com.avaidyam.binoculars.Cortex;
 import com.avaidyam.binoculars.util.Eponym;
 import com.avaidyam.binoculars.util.Log;
 import org.kihara.util.SeekableFile;
+import org.kihara.util.TicketManager;
 
 import java.io.*;
 import java.nio.file.*;
@@ -107,6 +108,10 @@ public class LZerDController extends Nucleus<LZerDController> {
         Cortex.of(LZerDController.class)
                 .getNodes().get(0)
                 .sendEmail();
+    }
+
+    public static TicketManager<String> getTicketManager() {
+        return new TicketManager<>();
     }
 
     // --------------------------------------------------------------------

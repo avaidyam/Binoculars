@@ -22,7 +22,6 @@
 
 package org.kihara.util;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
@@ -30,26 +29,30 @@ import java.util.Set;
 /**
  * Created by andrew on 11/14/16.
  */
-public class FileTicketManager {
+public class TicketManager<T> {
 
-    public static HashMap<Integer, String> fileHashMap;
+    public static Set<Integer> idSet;
 
+    public HashMap<Integer, T> fileHashMap;
+
+    public TicketManager() {
+        fileHashMap = new HashMap<>();
+    }
 
     /**
      * Tells if a ticket has already been registered with the ID
      * @param id
      * @return
      */
-    public static boolean hasTicket(int id) {
-        return fileHashMap.containsKey(id);
+    public boolean hasTicket(int id) {
+        return idSet.contains(id);
     }
 
     /**
      * Generates new random int ID
      * @return
      */
-    private static int getNewId() {
-        Set<Integer> ids = fileHashMap.keySet();
+    private int getNewId() {
 
         int newId;
         Random generator = new Random();
@@ -66,10 +69,10 @@ public class FileTicketManager {
      * Registers a new ticket with a random ID
      * @return
      */
-    public static int getNewTicket() {
+    public int getNewTicket() {
         int newId = getNewId();
 
-        fileHashMap.put(newId, null);
+        idSet.add(newId);
 
         return newId;
     }
@@ -79,7 +82,7 @@ public class FileTicketManager {
      * @param id
      * @return
      */
-    public static String getFile(int id) {
+    public T getFile(int id) {
         if (!hasTicket(id)) {
             return null;
         }
@@ -91,9 +94,9 @@ public class FileTicketManager {
      * @param id
      * @return
      */
-    public static boolean isSet(int id) {
+    public boolean isSet(int id) {
         if (hasTicket(id)) {
-            return getFile(id) != null;
+            return fileHashMap.containsKey(id);
         }
         return false;
     }
@@ -103,7 +106,7 @@ public class FileTicketManager {
      * @param id
      * @param s
      */
-    public static void setFile(int id, String s) {
+    public void set(int id, T s) {
         if ((!hasTicket(id)) || isSet(id)) {
             // TODO: Maybe throw exception or something?
             return;
@@ -112,7 +115,16 @@ public class FileTicketManager {
         fileHashMap.put(id, s);
     }
 
-    public static void removeFile(int id) {
-
+    /**
+     * Removes the file with the id, or the id from the list of ids
+     * @param id
+     */
+    public void removeFile(int id) {
+        if (isSet(id)) {
+            fileHashMap.remove(id);
+        }
+        else if (hasTicket(id)) {
+            idSet.remove(id);
+        }
     }
 }
