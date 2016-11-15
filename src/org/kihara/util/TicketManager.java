@@ -25,19 +25,18 @@ package org.kihara.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * Created by andrew on 11/14/16.
  */
 public class TicketManager<T> {
 
-    public static ArrayList<Integer> idSet;
+    private static ArrayList<Integer> idSet;
 
-    public HashMap<Integer, T> fileHashMap;
+    private HashMap<Integer, T> itemHashMap;
 
     public TicketManager() {
-        fileHashMap = new HashMap<>();
+        itemHashMap = new HashMap<>();
         idSet = new ArrayList<>();
     }
 
@@ -84,11 +83,11 @@ public class TicketManager<T> {
      * @param id
      * @return
      */
-    public T getFile(int id) {
+    public T get(int id) {
         if (!hasTicket(id)) {
             return null;
         }
-        return fileHashMap.get(id);
+        return itemHashMap.get(id);
     }
 
     /**
@@ -98,7 +97,7 @@ public class TicketManager<T> {
      */
     public boolean isSet(int id) {
         if (hasTicket(id)) {
-            return fileHashMap.containsKey(id);
+            return itemHashMap.containsKey(id);
         }
         return false;
     }
@@ -114,16 +113,16 @@ public class TicketManager<T> {
             return;
         }
 
-        fileHashMap.put(id, s);
+        itemHashMap.put(id, s);
     }
 
     /**
      * Removes the file with the id, or the id from the list of ids
      * @param id
      */
-    public void removeFile(int id) {
+    public void remove(int id) {
         if (isSet(id)) {
-            fileHashMap.remove(id);
+            itemHashMap.remove(id);
         }
         else if (hasTicket(id)) {
             idSet.remove((Integer) id);
