@@ -22,6 +22,7 @@
 
 package org.kihara.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
@@ -31,12 +32,13 @@ import java.util.Set;
  */
 public class TicketManager<T> {
 
-    public static Set<Integer> idSet;
+    public static ArrayList<Integer> idSet;
 
     public HashMap<Integer, T> fileHashMap;
 
     public TicketManager() {
         fileHashMap = new HashMap<>();
+        idSet = new ArrayList<>();
     }
 
     /**
