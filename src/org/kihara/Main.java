@@ -235,8 +235,7 @@ public class Main {
             bindings.put("time", (Supplier) System::currentTimeMillis);
         };
         JavascriptEngine.script = () -> "var PFP = Java.type(\"org.kihara.PFPController\");\n" +
-                "var LZerD = Java.type(\"org.kihara.LZerDController\")\n" +
-                "var FileTicketManager = Java.type(\"org.kihara.util.FileTicketManager\")\n";
+                "var LZerD = Java.type(\"org.kihara.LZerDController\")\n";
         JavascriptEngine.shell(System.in, System.out, System.err);
     }
 }
