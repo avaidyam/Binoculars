@@ -23,24 +23,30 @@
 package com.avaidyam.binoculars;
 
 import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
-import org.kihara.tasks.TaskScheduler;
 import com.avaidyam.binoculars.remoting.tcp.TCPPublisher;
 import com.avaidyam.binoculars.util.Eponym;
-import external.zeroconf.discovery.*;
 import com.avaidyam.binoculars.util.Log;
+import org.kihara.tasks.TaskScheduler;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public class Cortex<T extends Nucleus> {
 
-    private static ZeroConf zeroConf;
+    private static JmDNS zeroConf;
     static {
         try {
-            zeroConf = ZeroConf.create();
+            zeroConf = JmDNS.create();
             //zeroConf = ZeroConfMulti.Factory.getInstance();
         } catch(Exception e) {
             Log.i(Runtime.getRuntime().toString(), "ZeroConf disabled. Error details: " + e.getMessage() + ".");
