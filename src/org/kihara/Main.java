@@ -35,7 +35,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -55,10 +54,9 @@ public class Main {
         PLPatchSurferController plps = Nucleus.of(PLPatchSurferController.class);
         plps.init().await();
         plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
-                "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb",
-                Arrays.asList("~/PatchSurfer/example/2_prepare_ligands/ZINC03815630.mol2",
-                        "~/PatchSurfer/example/2_prepare_ligands/ZINC03833861.mol2"), 50).await();
+                "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb", 50).await();
         plps.generateInputs().await();
+        /*
         plps.prepareReceptor().await();
         plps.prepareLigands().await();
         plps.compareSeeds().await();
@@ -66,6 +64,7 @@ public class Main {
             Log.d("Main", "Finished task!", e);
             e.printStackTrace();
         });
+        //*/
     }
 
     /*public static void main(String[] args) {

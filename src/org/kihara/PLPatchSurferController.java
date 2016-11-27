@@ -33,11 +33,11 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static java.lang.ProcessBuilder.Redirect.appendTo;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
@@ -72,6 +72,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         List<String> databaseSet = Arrays.asList(
                 "/net/kihara/shin183/DATA-scratch/zinc_druglike_90/druglike.list",
                 "/net/kihara/shin183/DATA-scratch/chembl/chembl_19/chembl.list"
+                //"/net/kihara/avaidyam/PLPSSample/PLPSSample.list"
         );
 
         @Override
@@ -150,7 +151,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         // FIXME REMOVE THIS:
         String receptorFilePDB = ""; //ex: rec.pdb
         String xtalLigand = ""; //ex: xtal-lig.pdb
-        List<String> ligandFiles = new ArrayList<>(); //ex: [ZINC03833861, ZINC03815630] (mol2 is appended)
+        //List<String> ligandFiles = new ArrayList<>(); //ex: [ZINC03833861, ZINC03815630] (mol2 is appended)
         int n_conf = 0; //ex: 50
         boolean useLCSinsteadOfBS = false; //ex: bs.rank
         String outputFile = ""; //ex: lcs.rank
@@ -163,7 +164,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     ", stage=" + stage +
                     ", receptorFilePDB='" + receptorFilePDB + '\'' +
                     ", xtalLigand='" + xtalLigand + '\'' +
-                    ", ligandFiles=" + ligandFiles +
+                    //", ligandFiles=" + ligandFiles +
                     ", n_conf=" + n_conf +
                     ", outputFile='" + outputFile + '\'' +
                     '}';
@@ -260,12 +261,12 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      *
      * @param receptorFile
      * @param xtalLigand
-     * @param ligandFiles
+     //* @param ligandFiles
      * @param nconf
      * @return
      * @throws Exception
      */
-    public Future<Void> begin(String receptorFile, String xtalLigand, List<String> ligandFiles, int nconf) throws Exception {
+    public Future<Void> begin(String receptorFile, String xtalLigand, int nconf) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (self().state != null && self().configuration != null) {
             return new CompletableFuture<>(new RuntimeException("Can't start another task!"));
@@ -288,20 +289,10 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     REPLACE_EXISTING, COPY_ATTRIBUTES, NOFOLLOW_LINKS);
         Files.copy(xtalPath, path.resolve(xtalPath.getFileName()),
                     REPLACE_EXISTING, COPY_ATTRIBUTES, NOFOLLOW_LINKS);
-        ArrayList<String> updateLigands = new ArrayList<>();
-        for (String s : ligandFiles) {
-            Path sPath = Paths.get(tilde(s));
-            Files.copy(sPath, path.resolve(sPath.getFileName()),
-                        REPLACE_EXISTING, COPY_ATTRIBUTES, NOFOLLOW_LINKS);
-            String ss = sPath.getFileName().toString();
-            ss = ss.substring(0, ss.lastIndexOf('.')); // strip .mol2
-            updateLigands.add(ss);
-        }
 
         // Mark the updated paths instead of the input ones.
         st.receptorFilePDB = rfPath.getFileName().toString();
         st.xtalLigand = xtalPath.getFileName().toString();
-        st.ligandFiles = updateLigands;
 
         // Wrap up and exit.
         Log.d(TAG, "Generated state " + st.toString());
@@ -336,17 +327,25 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                 "\nBABEL_path\t" + babelPath +"\nn_conf\t" + st.n_conf;
         String s3 = "PLPS_path\t" + conf.plpsPath + "\nreceptor_file\t" + rfSSIC + "\nn_conf\t" + st.n_conf;
         String s4 = "receptor_file\t" + rfSSIC + "\noutput_file\tout.rank";
-        for (String lig : st.ligandFiles) {
-            s2 += "\nligand_file\t" + lig + ".mol2";
-            s3 += "\nligand_dir\t" + lig;
-            s4 += "\nligand_dir\t" + lig;
+
+        for (String db : conf.databaseSet) {
+            try (Stream<String> lines = Files.lines(Paths.get(db))) {
+                String set = lines
+                        .map((lig) -> "\nligand_dir\t" + lig)
+                        .reduce((r, s) -> r + s)
+                        .orElse("");
+
+                //s2 += "\nligand_file\t" + lig + ".mol2";
+                s3 += set;
+                s4 += set;
+            }
         }
 
         // Log progress.
-        Log.d(TAG, "Generated " + st.path + "s1.in: \n" + s1 + "\n");
-        Log.d(TAG, "Generated " + st.path + "s2.in: \n" + s2 + "\n");
-        Log.d(TAG, "Generated " + st.path + "s3.in: \n" + s3 + "\n");
-        Log.d(TAG, "Generated " + st.path + "s4.in: \n" + s4 + "\n");
+        Log.d(TAG, "Generated " + st.path + "s1.in: \n");
+        Log.d(TAG, "Generated " + st.path + "s2.in: \n");
+        Log.d(TAG, "Generated " + st.path + "s3.in: \n");
+        Log.d(TAG, "Generated " + st.path + "s4.in: \n");
 
         // Export the configuration files.
         try (

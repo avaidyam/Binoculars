@@ -11,19 +11,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e091d3d-33a3-40b0-b537-a7db5a522861" name="Default" comment="Adds support for loading files other than index on the server">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/kihara/PLPatchSurferController.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/blood.fasta" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/reactivestreams.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample.fasta" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test.fasta" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test3.fasta" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/plps_visualizer.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Binoculars.jar" afterPath="$PROJECT_DIR$/Binoculars.jar" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Binoculars.iml" afterPath="$PROJECT_DIR$/Binoculars.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/avaidyam/binoculars/Cortex.java" afterPath="$PROJECT_DIR$/src/com/avaidyam/binoculars/Cortex.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/JavascriptEngine.java" afterPath="$PROJECT_DIR$/src/org/kihara/JavascriptEngine.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/Main.java" afterPath="$PROJECT_DIR$/src/org/kihara/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/PFPController.java" afterPath="$PROJECT_DIR$/src/org/kihara/PFPController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/kihara/PLPatchSurferController.java" afterPath="$PROJECT_DIR$/src/org/kihara/PLPatchSurferController.java" />
     </list>
     <ignored path="Demo.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -49,31 +41,19 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/kihara/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.333333">
-              <caret line="62" column="38" selection-start-line="62" selection-start-column="38" selection-end-line="62" selection-end-column="38" />
+            <state vertical-scroll-proportion="-10.074074">
+              <caret line="59" column="39" selection-start-line="59" selection-start-column="39" selection-end-line="59" selection-end-column="39" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PLPatchSurferController.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="PLPatchSurferController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/org/kihara/PLPatchSurferController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="417" column="0" selection-start-line="417" selection-start-column="0" selection-end-line="417" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.23192771">
+              <caret line="319" column="0" selection-start-line="319" selection-start-column="0" selection-end-line="319" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TaskTest.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/TaskTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.10240964">
-              <caret line="6" column="22" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="22" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -116,6 +96,7 @@
         <option value="JUnit4 Test Class" />
         <option value="AnnotationType" />
         <option value="Class" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -130,8 +111,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/org/kihara/tasks/Source.java" />
-        <option value="$PROJECT_DIR$/src/com/binoculars/nuclei/remoting/NucleusProxyFactory.java" />
         <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/RemoteConnection.java" />
         <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/RemoteConnection.java" />
         <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/NucleusProxy.java" />
@@ -181,6 +160,8 @@
         <option value="$PROJECT_DIR$/src/com/avaidyam/binoculars/Cortex.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/Main.java" />
         <option value="$PROJECT_DIR$/src/org/kihara/PLPatchSurferController.java" />
+        <option value="$PROJECT_DIR$/src/plps_visualizer.html" />
+        <option value="$PROJECT_DIR$/plps_visualizer.html" />
       </list>
     </option>
   </component>
@@ -327,6 +308,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="full.screen.before.presentation.mode" value="true" />
     <property name="FullScreen" value="true" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
@@ -352,6 +334,7 @@
       <recent name="org" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/" />
       <recent name="C:\Users\Aditya\Desktop\Binoculars" />
       <recent name="C:\Users\Aditya\Desktop\Binoculars\src" />
     </key>
@@ -875,20 +858,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/encoding/RemoteCallEntry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="78" column="20" selection-start-line="78" selection-start-column="20" selection-end-line="78" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/kihara/tasks/Task.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="645" column="24" selection-start-line="645" selection-start-column="24" selection-end-line="645" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/net/ConnectException.java" />
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/remoting/base/RemoteRegistry.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1138,14 +1107,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/nio/file/Files.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1232" column="28" selection-start-line="1232" selection-start-column="28" selection-end-line="1232" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/avaidyam/binoculars/future/CompletableFuture.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.10526316">
@@ -1193,14 +1154,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/kihara/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.333333">
-          <caret line="62" column="38" selection-start-line="62" selection-start-column="38" selection-end-line="62" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/lang/ProcessBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1209,21 +1162,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/kihara/PLPatchSurferController.java">
+    <entry file="file://$PROJECT_DIR$/src/test/TaskTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="417" column="0" selection-start-line="417" selection-start-column="0" selection-end-line="417" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.30722892">
+          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/io/BufferedReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334">
+          <caret line="69" column="38" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/TaskTest.java">
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/nio/file/Files.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.10240964">
-          <caret line="6" column="22" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="22" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="3744" column="13" selection-start-line="3744" selection-start-column="13" selection-end-line="3744" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/kihara/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.074074">
+          <caret line="59" column="39" selection-start-line="59" selection-start-column="39" selection-end-line="59" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plps_visualizer.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.12268041">
+          <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/kihara/PLPatchSurferController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.23192771">
+          <caret line="319" column="0" selection-start-line="319" selection-start-column="0" selection-end-line="319" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
