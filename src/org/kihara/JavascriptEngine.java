@@ -34,11 +34,9 @@ import jdk.nashorn.internal.parser.Parser;
 import jdk.nashorn.internal.runtime.*;
 import jdk.nashorn.internal.runtime.options.Options;
 
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleScriptContext;
+import javax.script.*;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -151,13 +149,25 @@ public final class JavascriptEngine {
         scriptContext.setBindings(mirror, ScriptContext.ENGINE_SCOPE);
         bindings.accept(scriptContext.getBindings(ScriptContext.ENGINE_SCOPE));
 
-        // TODO: JDK 1.8u60 method only. Will invoke old call if fails.
+        // TODO: JDK 1.8u65 method only. Will invoke old call if fails.
         try {
-            ((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"), scriptContext);
-            //((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"));
-        } catch (NoSuchMethodError e) {
-            ((Global)global).setScriptContext(scriptContext);
-        }
+            Global g = ((Global)global);
+            ScriptEngine s = new ScriptEngineManager().getEngineByName("nashorn");
+
+            try {
+                Method m = Global.class.getMethod("initBuiltinObjects", ScriptEngine.class, ScriptContext.class);
+                m.invoke(g, s, scriptContext);
+            } catch (NoSuchMethodException e) {
+                try {
+                    Method m = Global.class.getMethod("initBuiltinObjects", ScriptEngine.class);
+                    m.invoke(g, s);
+                    g.setScriptContext(scriptContext);
+                } catch (NoSuchMethodException ee) {
+                    System.err.println("COULD NOT INIT!");
+                    throw new IOException("COULD NOT INIT!");
+                }
+            }
+        } catch (Exception ignored) {}
 
         if (files.isEmpty()) {
             return readEvalPrint(context, global);

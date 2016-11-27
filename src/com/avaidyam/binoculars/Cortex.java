@@ -89,7 +89,7 @@ public class Cortex<T extends Nucleus> {
 
     private final String broadcastType;
     private final String broadcastName = "endpoint-" + Eponym.eponymate("-", 4);
-    private final int broadcastPort = getLocalPort();
+    private final int broadcastPort = 30003;//getLocalPort(); // TODO: Allocate this port.
 
     private final Class<T> actorClass;
     private final List<T> nodes = new ArrayList<>();
@@ -151,15 +151,7 @@ public class Cortex<T extends Nucleus> {
             e.printStackTrace();
         } finally {
             publish();
-            discover((h, p) -> {
-                try {
-	                new TCPConnectible(this.actorClass, h, p).connect().then((node, error) -> {
-	                    this.nodes.add((T)node);
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }, (h, p) -> {
+            discover(this::manuallyConnect, (h, p) -> {
                 Log.i("[Cortex]", "Node dropped at " + h + ":" + p);
                 //
             });
@@ -264,6 +256,21 @@ public class Cortex<T extends Nucleus> {
         this.connectListener = connectListener;
         this.disconnectListener = disconnectListener;
         zeroConf.addServiceListener(broadcastType, listener);
+    }
+
+    public boolean manuallyConnect(String host, int port) {
+        try {
+            new TCPConnectible(this.actorClass, host, port).connect().onResult(node -> {
+                Log.i("Cortex", "Adding node from \"" + host + ":" + port + "\".");
+                this.nodes.add((T)node);
+            }).onError(error -> {
+                Log.e("Cortex", "Couldn't manually connect to \"" + host + ":" + port + "\"!");
+            });
+        } catch (Exception e) {
+            Log.e("Cortex", "Couldn't manually connect to \"" + host + ":" + port + "\"!", e);
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -80,6 +80,17 @@ public class PFPController extends Nucleus<PFPController> {
 	public void clearJobContext() {
 		self().context = null;
 	}
+
+	private String _name = Eponym.eponymate("-", 4);
+	public Future<String> workerName() {
+		return new CompletableFuture<>(_name);
+	}
+	public Future<String> getprop(String key) {
+		return new CompletableFuture<>(System.getProperty(key));
+	}
+	public Future<String> getenv(String key) {
+		return new CompletableFuture<>(System.getenv(key));
+	}
 	// --------------------------------------------------------------------
 
 	// --------------------------------------------------------------------

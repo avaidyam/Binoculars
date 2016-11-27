@@ -23,6 +23,7 @@
 package org.kihara;
 
 import com.avaidyam.binoculars.Cortex;
+import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
@@ -34,6 +35,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -48,17 +50,56 @@ public class Main {
     /**
      * Initialize the Cortex, and start the HTTP server and shell.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        Log.get().setSeverity(Log.Severity.DEBUG);
+        PLPatchSurferController plps = Nucleus.of(PLPatchSurferController.class);
+        plps.init().await();
+        plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
+                "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb",
+                Arrays.asList("~/PatchSurfer/example/2_prepare_ligands/ZINC03815630.mol2",
+                        "~/PatchSurfer/example/2_prepare_ligands/ZINC03833861.mol2"), 50).await();
+        plps.generateInputs().await();
+        plps.prepareReceptor().await();
+        plps.prepareLigands().await();
+        plps.compareSeeds().await();
+        plps.compareLigands().then((r, e) -> {
+            Log.d("Main", "Finished task!", e);
+            e.printStackTrace();
+        });
+    }
+
+    /*public static void main(String[] args) {
         Log.get().setSeverity(Log.Severity.DEBUG);
         Cortex<PFPController> cortex = Cortex.of(PFPController.class);
+        PFPController main = cortex.getNodes().get(0);
+
+        // Safely bind the web interface, if possible.
         try {
-            PFPController main = cortex.getNodes().get(0);
-            startHTTP(8080, main);
+            startHTTP(8080, main); // TODO: Don't use 8080.
+        } catch (Exception e) {
+            Log.w("Main", "Could not bind web interface.");
+        }
+
+        // Get the hostname.
+        String host = "";
+        try {
+            host = InetAddress.getLocalHost().getHostName();
+        } catch (Exception ignored) {}
+        Log.i("Main", "Resolving on host " + host + "...");
+
+        // Manually connect the demo machine.
+        if (host.equals("dragon"))
+            cortex.manuallyConnect("miffy.bio.purdue.edu", 30003);
+        else cortex.manuallyConnect("dragon.bio.purdue.edu", 30003);
+
+        // Safely bind the shell, if possible.
+        try {
             startShell(cortex.getNodes());
         } catch (Exception e) {
             Log.e("Main", "Could not begin application.", e);
+            System.exit(-1);
         }
-    }
+    }*/
 
     /**
      * Jumpstart a quick HTTPServer atop the PFPController
