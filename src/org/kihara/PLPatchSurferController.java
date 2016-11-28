@@ -36,7 +36,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.lang.ProcessBuilder.Redirect.appendTo;
@@ -69,11 +68,11 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         String xlogp3Path = "~/PatchSurfer/XLOGP3/bin/";
         String omegaPath = "~/PatchSurfer/openeye/arch/Ubuntu-12.04-x64/omega";
         String omegaLicense = "~/PatchSurfer/openeye/oe_license.txt";
-        String databaseSet = "/net/kihara/shin183/DATA-scratch/zinc_druglike_90/druglike.list"; // 5
-                            //"/net/kihara/shin183/DATA-scratch/chembl/chembl_19/chembl.list"; // 2
-                            //"/net/kihara/avaidyam/PLPSSample/PLPSSample.list"; // 50
-        int n_conf = 5; // Must match databaseSet's n_conf (that is, file_n.ssic)
-        boolean useLCSinsteadOfBS = false; //ex: bs.rank
+        String databaseSet = //"/net/kihara/shin183/DATA-scratch/zinc_druglike_90/druglike.list";
+                            //"/net/kihara/shin183/DATA-scratch/chembl/chembl_19/chembl.list";
+                            //"/net/kihara/avaidyam/PLPSSample/PLPSSample.list";
+                            "/net/kihara/avaidyam/PLPSSample2/PLPSSample2.list";
+        int n_conf = 50; // max n_conf for the database
 
         @Override
         public String toString() {
@@ -88,7 +87,6 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     ", omegaLicense='" + omegaLicense + '\'' +
                     ", databaseSet='" + databaseSet + '\'' +
                     ", n_conf='" + n_conf + '\'' +
-                    ", useLCSinsteadOfBS='" + useLCSinsteadOfBS + '\'' +
                     '}';
         }
 
@@ -303,6 +301,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         Configuration conf = self().configuration;
         State st = self().state;
+        self().state.stage = State.Stage.PREPARE_RECEPTOR;
 
         // Expand all tildes once for effectiveness.
         //String plpsPath = tilde(conf.plpsPath);
@@ -318,7 +317,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         String s2 = "PLPS_path\t" + conf.plpsPath + "\nPDB2PQR_path\t" + pdb2pqrPath + "\nAPBS_path\t" +
                 apbsPath + "\nXLOGP3_path\t" + tilde(conf.xlogp3Path) + "\nOMEGA_path\t" + tilde(conf.omegaPath) +
                 "\nBABEL_path\t" + babelPath +"\nn_conf\t" + conf.n_conf;
-        String s3 = "PLPS_path\t" + conf.plpsPath + "\nreceptor_file\t" + rfSSIC + "\nn_conf\t" + conf.n_conf;
+        String s3 = "PLPS_path\t" + conf.plpsPath + "\nreceptor_file\t" + rfSSIC;
         String s4 = "receptor_file\t" + rfSSIC + "\noutput_file\tout.rank";
 
         try (Stream<String> lines = Files.lines(Paths.get(conf.databaseSet))) {
@@ -328,15 +327,9 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     .orElse("");
 
             //s2 += "\nligand_file\t" + lig + ".mol2";
-            s3 += set;
+            //s3 += set;
             s4 += set;
         }
-
-        // Log progress.
-        Log.d(TAG, "Generated " + st.path + "s1.in: \n");
-        Log.d(TAG, "Generated " + st.path + "s2.in: \n");
-        Log.d(TAG, "Generated " + st.path + "s3.in: \n");
-        Log.d(TAG, "Generated " + st.path + "s4.in: \n");
 
         // Export the configuration files.
         try (
@@ -351,7 +344,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             out4.println(s4);
 
             // Notify completion or error status here.
-            self().state.stage = State.Stage.PREPARE_RECEPTOR;
+            Log.d(TAG, "Generated input files at" + st.path + ".");
             promise.complete();
         } catch (Exception e) {
             promise.completeExceptionally(e);
@@ -374,11 +367,11 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         if (self().state == null || self().configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
+        self().state.stage = State.Stage.PREPARE_LIGANDS;
 
         // Run script on the generated input.
         _plps.apply(new String[]{"python", tilde(self().configuration.plpsPath) + "scripts/prepare_receptor.py", self().state.path + "s1.in"})
                 .start().waitFor();
-        self().state.stage = State.Stage.PREPARE_LIGANDS;
 
         promise.complete();
         return promise;
@@ -398,11 +391,11 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         if (self().state == null || self().configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
+        self().state.stage = State.Stage.COMPARE_SEEDS;
 
         // Run script on the generated input.
         _plps.apply(new String[]{"python", tilde(self().configuration.plpsPath) + "scripts/prepare_ligands.py", self().state.path + "s2.in"})
                 .start().waitFor();
-        self().state.stage = State.Stage.COMPARE_SEEDS;
 
         promise.complete();
         return promise;
@@ -420,36 +413,39 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         if (self().state == null || self().configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
+        self().state.stage = State.Stage.COMPARE_LIGANDS;
 
         // Run script on the generated input.
         _plps.apply(new String[]{"python", tilde(self().configuration.plpsPath) + "scripts/compare_seeds.py", self().state.path + "s3.in"})
                 .start().waitFor();
-        self().state.stage = State.Stage.COMPARE_LIGANDS;
 
         promise.complete();
         return promise;
     }
 
-    private int get_np_patch(String proto_ssic_file) throws Exception {
-        try (Stream<String> lines = Files.lines(Paths.get(proto_ssic_file))) {
-            int np_patch = Integer.valueOf(lines.findFirst().orElse("").split(" ")[0]);
-            return np_patch;
-        }
-    }
-
-    public Future<Void> compareSeeds2() throws Exception {
+    /**
+     *
+     * @return
+     * @throws Exception
+     */
+    public Future<Void> compareSeedsDB() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (self().state == null || self().configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
+        self().state.stage = State.Stage.COMPARE_LIGANDS;
 
-        try (Stream<String> lines = Files.lines(Paths.get(self().configuration.databaseSet))) {
+        String db = self().configuration.databaseSet;
+        String par = Paths.get(db).getParent().toString();
+        try (Stream<String> lines = Files.lines(Paths.get(db))) {
             lines.forEach((s) -> {
-                IntStream.rangeClosed(0, self().configuration.n_conf).forEach((i) -> {
-                    // iteration here
-                });
-                // summary_file = ...
-                // write_summary(...)
+                try {
+
+                    // Run script on the generated input.
+                    String loc = tilde(self().configuration.plpsPath) + "scripts/compare_seeds_indiv.py";
+                    _plps.apply(new String[]{"python", loc, self().state.path + "s3.in", par + "/" + s, "" + self().configuration.n_conf})
+                            .start().waitFor();
+                } catch(Exception ignored) {}
             });
         }
 
@@ -464,33 +460,44 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    public Future<String> compareLigands() throws Exception {
-        CompletableFuture<String> promise = new CompletableFuture<>();
+    public Future<Void> compareLigands() throws Exception {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
         if (self().state == null || self().configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
 
         // Run script on the generated input.
-        String select = self().configuration.useLCSinsteadOfBS ? "lcs" : "bs";
-        _plps.apply(new String[]{"python", tilde(self().configuration.plpsPath) + "scripts/rank_ligands_" + select + ".py", self().state.path + "s4.in"})
+        _plps.apply(new String[]{"python", tilde(self().configuration.plpsPath) + "scripts/rank_ligands_indiv.py", self().state.path + "s4.in"})
                 .start().waitFor();
+
+        // Templating sources...
+        final String a = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>PL-PatchSurfer Results</title><script src=\"http://3dmol.csb.pitt.edu/build/3Dmol-min.js\"></script></head><body>";
+        final String b = "<script>$(document).ready(function() {";
+        final String c = "});</script></body></html>";
+        final StringBuilder htmls = new StringBuilder();
+        final StringBuilder jss = new StringBuilder();
+
+        String rank = tilde(self().configuration.plpsPath) + "/out.rank";
+        Files.lines(Paths.get(rank)).limit(5).forEach((s) -> {
+            String in1 = "<div id='m${NUM}' style=\"height: 512px; width: 512px;\" class='viewer_3Dmoljs' data-href='${PATH}' data-backgroundcolor='0xffffff' data-style='stick'></div>";
+            String in2 = "3Dmol.viewers['m${NUM}'].addLabel(\"Score: ${SCORE}\", {position: {x:0, y:0, z:0}, backgroundColor: 0x000000, backgroundOpacity: 0.8});";
+
+            // Makeshift templating engine here...
+            in1 = in1.replace("${NUM}", "1");
+            in1 = in1.replace("${PATH}", "1");
+            in2 = in2.replace("${NUM}", "1");
+            in2 = in2.replace("${SCORE}", "1");
+
+            htmls.append(in1);
+            jss.append(in1);
+        });
+
+        // Write the results HTML output.
+        String out = a + htmls.toString() + b + jss.toString() + c;
+        Files.write(Paths.get(tilde(self().configuration.plpsPath) + "/results.html"), out.getBytes());
+
         self().state.stage = State.Stage.COMPLETE;
-
-        promise.complete(self().state.outputFile);
+        promise.complete();
         return promise;
-    }
-
-    // Optional:
-
-    /**
-     *
-     * @param ssicFile
-     * @return
-     * @throws Exception
-     */
-    public Future<String> convertSSICtoPDB(String ssicFile) throws Exception {
-        _plps.apply(new String[]{"python", tilde(self().configuration.plpsPath) + "scripts/convert_ssic_to_pdb.py", ssicFile, "pdbOut.pdb"})
-                .start().waitFor();
-        return new CompletableFuture<>("pdbOut.pdb");
     }
 }

@@ -56,10 +56,9 @@ public class Main {
         plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
                 "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb").await();
         plps.generateInputs().await();
-        /*
         plps.prepareReceptor().await();
-        plps.prepareLigands().await();
-        plps.compareSeeds().await();
+        //plps.prepareLigands().await();
+        plps.compareSeedsDB().await();
         plps.compareLigands().then((r, e) -> {
             Log.d("Main", "Finished task!", e);
             e.printStackTrace();
