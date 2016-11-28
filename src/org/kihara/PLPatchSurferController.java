@@ -477,19 +477,26 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         final StringBuilder htmls = new StringBuilder();
         final StringBuilder jss = new StringBuilder();
 
+        // Iteration things over here.
+        final int[] idx = {0};
+        String db = self().configuration.databaseSet;
+        String dbSource = Paths.get(db).getParent().toString();
         String rank = tilde(self().configuration.plpsPath) + "/out.rank";
-        Files.lines(Paths.get(rank)).limit(5).forEach((s) -> {
+
+        // Iterate and transform each rank listing <mol2> <score> into a visualization.
+        Files.lines(Paths.get(rank)).limit(5).forEachOrdered((s) -> {
             String in1 = "<div id='m${NUM}' style=\"height: 512px; width: 512px;\" class='viewer_3Dmoljs' data-href='${PATH}' data-backgroundcolor='0xffffff' data-style='stick'></div>";
             String in2 = "3Dmol.viewers['m${NUM}'].addLabel(\"Score: ${SCORE}\", {position: {x:0, y:0, z:0}, backgroundColor: 0x000000, backgroundOpacity: 0.8});";
+            String parts[] = s.split("\\s+");
 
             // Makeshift templating engine here...
-            in1 = in1.replace("${NUM}", "1");
-            in1 = in1.replace("${PATH}", "1");
-            in2 = in2.replace("${NUM}", "1");
-            in2 = in2.replace("${SCORE}", "1");
-
+            in1 = in1.replace("${NUM}", "" + idx[0]);
+            in1 = in1.replace("${PATH}", dbSource + "/" + parts[0]);
+            in2 = in2.replace("${NUM}", "" + idx[0]);
+            in2 = in2.replace("${SCORE}", parts[1]);
             htmls.append(in1);
             jss.append(in1);
+            idx[0]++;
         });
 
         // Write the results HTML output.
