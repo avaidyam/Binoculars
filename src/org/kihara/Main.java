@@ -112,7 +112,7 @@ public class Main {
                     }
 
                 });
-                t.getResponseHeaders().add("Content-type", "text/plain");
+                t.getResponseHeaders().add("Content-type", "text/html");
                 t.sendResponseHeaders(200, 0);
 
                 OutputStream os = t.getResponseBody();
