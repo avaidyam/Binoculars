@@ -50,6 +50,9 @@ public class LZerDController extends Nucleus<LZerDController> {
     // --------------------------------------------------------------------
     // Context for PFP application jobs, including FASTA and divisions.
     public static final String TAG = "[LZerD]";
+
+    public int ticketID;
+
     static class JobContext implements Serializable {
         PrintWriter writer = null;
         FutureLatch<Void> latch = null;
@@ -116,7 +119,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // --------------------------------------------------------------------
     // Helper lambda to concisely produce processes for PFP.
-    Function<String[], ProcessBuilder> _lzerd = (String ... args) -> {
+    Function<String[], ProcessBuilder> _lzerd = (String[] args) -> {
         System.out.println("Running " + Arrays.toString(args));
         ProcessBuilder pb = new ProcessBuilder(args)
                 .directory(new File(LZerDdir))
@@ -344,12 +347,19 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> sendEmail() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         try {
-            _lzerd.apply(new String[]{"./notify.sh"})
+            _lzerd.apply(new String[]{"./notify.sh", String.valueOf(this.ticketID)})
                 .start().waitFor();
             promise.complete();
         } catch (InterruptedException | IOException e) {
             promise.completeExceptionally(e);
         }
+        return promise;
+    }
+
+    public Future<Void> setTicket(int ticket) {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+        this.ticketID = ticket;
+        promise.complete();
         return promise;
     }
 

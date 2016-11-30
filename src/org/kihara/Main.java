@@ -155,7 +155,9 @@ public class Main {
                 if (inputFiles.containsKey("receptor") && inputFiles.containsKey("ligand")) {
                     LZerDController c = Cortex.of(LZerDController.class)
                             .getNodes().get(0);
-                    c.runLzerdFlow(inputFiles.get("receptor"), inputFiles.get("ligand")).then((r, e) -> c.sendEmail());
+                    c.setTicket(ticketManager.getNewTicket()). then((r, e) -> {
+                        c.runLzerdFlow(inputFiles.get("receptor"), inputFiles.get("ligand")).then((r2, e2) -> c.sendEmail());
+                    });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
