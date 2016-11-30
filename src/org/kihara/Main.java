@@ -130,8 +130,15 @@ public class Main {
                             System.out.println("Temp file path: " + temp.getAbsolutePath());
                             inputFiles.put(fi.getFieldName(), temp.getAbsolutePath());
                         }
+                        /*
                         os.write(fi.getName().getBytes());
                         os.write("\r\n".getBytes());
+                        */
+
+                        int ticket = ticketManager.getNewTicket();
+                        String url = "/ticket?id=" + String.valueOf(ticket);
+                        os.write(("<a href='" + url + ">Ticket URL</a>").getBytes());
+
                         System.out.println("File-Item: " + fi.getFieldName() + " = " + fi.getName());
                         System.out.println("Contents:");
                         System.out.println(fi.getString());
@@ -232,7 +239,7 @@ public class Main {
                     e.printStackTrace();
                 }
             }
-            
+
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
