@@ -137,7 +137,11 @@ public class Main {
 
                         int ticket = ticketManager.getNewTicket();
                         String url = "/ticket?id=" + String.valueOf(ticket);
-                        os.write(("<a href='" + url + ">Ticket URL</a>").getBytes());
+                        String response = "Ticket URL";
+                        response = "<a href='" + url + ">" + response + "</a>";
+                        response = "<body>" + response + "</body>";
+                        response = "<html>" + response + "</html>";
+                        os.write(response.getBytes());
 
                         System.out.println("File-Item: " + fi.getFieldName() + " = " + fi.getName());
                         System.out.println("Contents:");
