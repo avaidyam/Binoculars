@@ -263,7 +263,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
-    public Future<Void> runClustering(String lzerdOutput, String ligandFile) {
+    public Future<Void> runClustering() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
 
@@ -307,7 +307,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
 
-        Log.i(TAG, "Should perform scoring");
+        Log.i(TAG, "Should start scoring");
 
         ArrayList<Future<Void>> futureQueue = new ArrayList<>();
 
@@ -318,6 +318,22 @@ public class LZerDController extends Nucleus<LZerDController> {
         for (Future f : futureQueue) f.await();
 
         Log.i(TAG, "All scores done");
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runPostProcessing() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+
+        Log.i(TAG, "Should start post processing");
+
+        runClustering().then((r, e) -> {
+            runScoring().then((r2, e2) -> {
+                Log.i(TAG, "Should be done with post processing.");
+            });
+        });
 
         promise.complete();
         return promise;
