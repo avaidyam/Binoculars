@@ -101,7 +101,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public static void go(String receptorFile, String ligandFile) throws Exception {
         Cortex.of(LZerDController.class)
                 .getNodes().get(0)
-                .runLzerdFlow(receptorFile, ligandFile);
+                .runScoring();
     }
     // --------------------------------------------------------------------
 
@@ -258,6 +258,66 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         _lzerd.apply(new String[]{"./PDBGEN", receptorFile, ligandFile, outFile, "3"})
                 .start().waitFor();
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runClustering(String lzerdOutput, String ligandFile) {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+
+        Log.i(TAG, "Should perform clustering");
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runDFIRE() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+
+        Log.i(TAG, "Should perform DFIRE scoring");
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runGOAP() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+
+        Log.i(TAG, "Should perform GOAP scoring");
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runITScore() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+
+        Log.i(TAG, "Should perform ITScore scoring");
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runScoring() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+
+        Log.i(TAG, "Should perform scoring");
+
+        ArrayList<Future<Void>> futureQueue = new ArrayList<>();
+
+        futureQueue.add(runGOAP());
+        futureQueue.add(runITScore());
+        futureQueue.add(runDFIRE());
+
+        for (Future f : futureQueue) f.await();
+
+        Log.i(TAG, "All scores done");
 
         promise.complete();
         return promise;
