@@ -52,7 +52,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Log.get().setSeverity(Log.Severity.DEBUG);
         PLPatchSurferController plps = Nucleus.of(PLPatchSurferController.class);
-        plps.init().await();
         plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
                 "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb").await();
         plps.generateInputs().await();

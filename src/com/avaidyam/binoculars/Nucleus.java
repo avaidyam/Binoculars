@@ -22,25 +22,25 @@
 
 package com.avaidyam.binoculars;
 
-import com.avaidyam.binoculars.future.Spore;
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Future;
+import com.avaidyam.binoculars.future.*;
+import com.avaidyam.binoculars.management.NucleusStatusMXBean;
 import com.avaidyam.binoculars.remoting.NucleusProxyFactory;
 import com.avaidyam.binoculars.remoting.RemoteConnection;
+import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
 import com.avaidyam.binoculars.scheduler.ElasticScheduler;
 import com.avaidyam.binoculars.scheduler.Scheduler;
-import com.avaidyam.binoculars.management.NucleusStatusMXBean;
-import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
-import com.avaidyam.binoculars.future.TicketMachine;
-import com.avaidyam.binoculars.future.Signal;
-import com.avaidyam.binoculars.future.CompletableFuture;
-import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.util.Log;
 import com.avaidyam.binoculars.util.WrapperExecutorService;
 import external.jaq.mpsc.MpscConcurrentQueue;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -149,7 +149,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
      */
     @SuppressWarnings("unchecked")
     public static <T extends Nucleus> T of(Class<T> actorClazz) {
-        return (T) instance.newProxy(actorClazz, defaultScheduler.get(), -1);
+        return of(actorClazz, defaultScheduler.get(), -1);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
      */
     @SuppressWarnings("unchecked")
     public static <T extends Nucleus> T of(Class<T> actorClazz, int qSize) {
-        return (T) instance.newProxy(actorClazz, defaultScheduler.get(), qSize);
+        return of(actorClazz, defaultScheduler.get(), qSize);
     }
 
     /**
@@ -174,7 +174,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
      */
     @SuppressWarnings("unchecked")
     public static <T extends Nucleus> T of(Class<T> actorClazz, Scheduler scheduler) {
-        return (T) instance.newProxy(actorClazz, scheduler, -1);
+        return of(actorClazz, scheduler, -1);
     }
 
     /**
@@ -187,7 +187,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     @SuppressWarnings("unchecked")
     public static <T extends Nucleus> T of(Class<T> actorClazz, Scheduler scheduler, int qsize) {
         T a = (T) instance.newProxy(actorClazz, scheduler, qsize);
-		a.onStart(); // queue a constructor call.
+		a.init(); // queues a constructor call
 		return a;
     }
 
@@ -422,21 +422,23 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     // Don't actually use!
     @Domain.Local
     public void asyncStop() {
-		onStop();
+		deinit(); // IS NOT QUEUED! locally executed
         __stop();
     }
 
 	/**
 	 * Called upon construction of Nucleus, and should be used instead of a constructor.
 	 */
-	protected void onStart() {
+    @Domain.Local
+	public void init() {
 		// Unimplemented.
 	}
 
 	/**
 	 * Called upon destruction of a Nucleus, and should be used as a destructor.
 	 */
-	protected void onStop() {
+    @Domain.Local
+	public void deinit() {
 		// Unimplemented.
 	}
 
@@ -603,6 +605,20 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
     @Domain.CallerSide
     public boolean isRemote() {
         return __remoteId != 0;
+    }
+
+    /**
+     * generic method for untyped messages.
+     */
+    public Future ask(String interest, Object contents) {
+        return new CompletableFuture();
+    }
+
+    /**
+     * generic method for untyped messages.
+     */
+    public void tell(String interest, Object contents) {
+        //
     }
 
 	/**

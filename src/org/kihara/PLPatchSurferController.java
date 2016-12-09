@@ -227,9 +227,15 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     /**
      * Initializes the PLPatchSurferController with a global configuration.
      */
-    public Future<Void> init() {
+    @Override
+    public void init() {
         self().setConfiguration(new Configuration());
-        return new CompletableFuture<>((Void)null);
+        Log.d(TAG, "Init executed!");
+    }
+
+    @Override
+    public void deinit() {
+        Log.d(TAG, "Deinit executed!");
     }
 
     // --------------------------------------------------------------------

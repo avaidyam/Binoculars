@@ -22,6 +22,8 @@
 
 package com.avaidyam.binoculars;
 
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
 import com.avaidyam.binoculars.remoting.tcp.TCPPublisher;
 import com.avaidyam.binoculars.util.Eponym;
@@ -34,11 +36,10 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Cortex<T extends Nucleus> {
@@ -291,6 +292,111 @@ public class Cortex<T extends Nucleus> {
         } catch(IOException e) {
             e.printStackTrace();
             return 0;
+        }
+    }
+
+
+
+
+
+    //
+    //
+    // INTERESTS API:
+    //
+    //
+
+
+
+
+
+    // For Interests support.
+    private HashMap<String, List<T>> interests = new HashMap<>();
+
+    /**
+     *
+     * @param interest
+     * @param receiver
+     */
+    public void addInterest(String interest,  T receiver) {
+        List<T> list = this.interests.get(interest);
+        if (list == null) {
+            list = new ArrayList<>();
+            this.interests.put(interest, list);
+        }
+        list.add(receiver);
+    }
+
+    /**
+     *
+     * @param interest
+     * @param receiver
+     */
+    public void removeInterest(String interest, T receiver) {
+        List<T> receiverActors = this.interests.get(interest);
+        if (receiverActors != null) {
+            for (Iterator<T> iterator = receiverActors.iterator(); iterator.hasNext(); ) {
+                T receiverActor = iterator.next();
+                if (receiverActor.equals(receiver))
+                    iterator.remove();
+            }
+        }
+    }
+
+    /**
+     *
+     * @param receiver
+     */
+    public void removeAllInterests(T receiver) {
+        this.interests.forEach((interest, list) -> this.removeInterest(interest, receiver));
+    }
+
+    //
+    /*
+    public void syncInterests() {
+        //
+    }*/
+
+    /**
+     *
+     * @param sender
+     * @param interest
+     * @param contents
+     */
+    public void notifyInterest(T sender, String interest, Object contents) {
+        List<T> subscriber = this.interests.get(interest);
+        if ( subscriber != null ) {
+            subscriber.stream()
+                    .filter(subs -> !subs.equals(sender))
+                    .forEach(subs -> subs.tell(interest, contents));
+        }
+    }
+
+    /**
+     *
+     *
+     * Note: WILL BLOCK THREAD OF NOT INVOKED FROM A NUCLEUS CONTEXT!
+     *
+     * @param sender
+     * @param interest
+     * @param contents
+     * @param receipt
+     */
+    public void requestInterest(T sender, String interest, Object contents, Signal receipt) {
+        List<T> subscriber = this.interests.get(interest);
+        if ( subscriber != null ) {
+            List<CompletableFuture> results = subscriber.stream()
+                    .filter(subs -> !subs.equals(sender))
+                    .map(subs -> (CompletableFuture)subs.ask(interest, contents))
+                    .collect(Collectors.toList());
+
+            try {
+                CompletableFuture.allOf((List)results).await(5000, TimeUnit.MILLISECONDS); // is non-blocking
+            } catch (Exception ex) {
+                // timeout goes here
+                Log.i("Notification", "timeout in broadcast");
+            }
+            results.forEach(promise -> receipt.stream(promise.get()));
+            receipt.complete(); // important to release callback mapping in remoting !
         }
     }
 }

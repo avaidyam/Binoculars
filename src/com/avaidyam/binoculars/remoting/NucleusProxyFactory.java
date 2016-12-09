@@ -224,8 +224,12 @@ public class NucleusProxyFactory {
                             originalMethod.getName().equals("asyncStop") ||
                             originalMethod.getName().equals("receive") ||
                             originalMethod.getName().equals("complete") ||
-                            originalMethod.getName().equals("close")||
-		                    originalMethod.getName().equals("spore")
+                            originalMethod.getName().equals("close") ||
+		                    originalMethod.getName().equals("spore") ||
+                            originalMethod.getName().equals("tell") ||
+                            originalMethod.getName().equals("ask") ||
+                            originalMethod.getName().equals("init") ||
+                            originalMethod.getName().equals("deinit")
                     )
             {
                 allowed = true;
