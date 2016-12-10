@@ -27,6 +27,7 @@ import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
+import org.kihara.util.FileWatcher;
 import org.kihara.util.ParameterFilter;
 
 import java.io.File;
@@ -35,6 +36,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.WatchEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -51,6 +53,13 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         Log.get().setSeverity(Log.Severity.DEBUG);
+        FileWatcher fw = FileWatcher.watch((p, e) -> {
+            for (WatchEvent<?> event : e) {
+                Path file = p.resolve((Path) event.context());
+                System.out.println("Notified: " + event.kind() + " on file: " + file);
+            }
+        }, "/Users/aditya/Desktop/");
+
         PLPatchSurferController plps = Nucleus.of(PLPatchSurferController.class);
         plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
                 "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb").await();

@@ -68,7 +68,7 @@ import java.util.function.Supplier;
  *
  * Note that there is no supervision or monitoring; to do so, you can introspect qualities yourself.
  */
-public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
+public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, AutoCloseable {
 
     public static final int MAX_EXTERNAL_THREADS_POOL_SIZE = 1000; // max threads used when externalizing blocking api
 	public static ThreadPoolExecutor exec;
@@ -439,8 +439,8 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor {
 	 */
     @Domain.Local
 	public void deinit() {
-		// Unimplemented.
-	}
+        // Unimplemented.
+    }
 
     @Domain.CallerSide
     public boolean isStopped() {

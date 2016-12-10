@@ -42,6 +42,9 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO: Relay of Interests
+// TODO: Indirect, Direct, Relay connections
+
 public class Cortex<T extends Nucleus> {
 
     private static JmDNS zeroConf;

@@ -43,6 +43,13 @@ import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
+/*
+-- 	algorithm:
+	- distribution: tell(job.data) to enqueue
+	- heartbeat: ask(queue.count, sys.stats) to analyze
+	- stages: tell(job.stage) to advance
+*/
+
 /**
  * The PLPatchSurferController nucleus is designed to wrap the PLPatchSurfer
  * tools and execute them in a managed distributed manner with state safety.
@@ -222,15 +229,6 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      */
     public void clearState() {
         self().state = null;
-    }
-
-    /**
-     * Initializes the PLPatchSurferController with a global configuration.
-     */
-    @Override
-    public void init() {
-        self().setConfiguration(new Configuration());
-        Log.d(TAG, "Init executed!");
     }
 
     @Override
