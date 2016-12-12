@@ -81,103 +81,6 @@ public class Main {
     }
 
     /**
-     * Custom handler for file upload.
-     */
-    static class UploadHandler implements HttpHandler {
-        @Override
-        public void handle(final HttpExchange t) throws IOException {
-
-            for(Map.Entry<String, List<String>> header : t.getRequestHeaders().entrySet()) {
-                System.err.println(header.getKey() + ":");
-                for (String value : header.getValue()) {
-                    System.err.println(value);
-                }
-            }
-
-            DiskFileItemFactory d = new DiskFileItemFactory();
-
-            try {
-                ServletFileUpload up = new ServletFileUpload(d);
-                new ServletFileUpload();
-                List<FileItem> result = up.parseRequest(new RequestContext() {
-
-                    @Override
-                    public String getCharacterEncoding() {
-                        return "UTF-8";
-                    }
-
-                    @Override
-                    public int getContentLength() {
-                        return 0; //tested to work with 0 as return
-                    }
-
-                    @Override
-                    public String getContentType() {
-                        return t.getRequestHeaders().getFirst("Content-type");
-                    }
-
-                    @Override
-                    public InputStream getInputStream() throws IOException {
-                        return t.getRequestBody();
-                    }
-
-                });
-                t.getResponseHeaders().add("Content-type", "text/html");
-                t.sendResponseHeaders(200, 0);
-
-                OutputStream os = t.getResponseBody();
-                HashMap<String, String> inputFiles = new HashMap<>();
-                for(FileItem fi : result) {
-                    try {
-                        if (fi.getSize() > 0) {
-                            String fileName = fi.getName();
-                            int dotIndex = fileName.indexOf(".");
-                            String prefix = fileName.substring(0, dotIndex);
-                            String suffix = fileName.substring(dotIndex);
-                            File temp = File.createTempFile(prefix, suffix);
-                            temp.deleteOnExit();
-                            fi.write(temp);
-                            System.out.println("Temp file path: " + temp.getAbsolutePath());
-                            inputFiles.put(fi.getFieldName(), temp.getAbsolutePath());
-                        }
-                        /*
-                        os.write(fi.getName().getBytes());
-                        os.write("\r\n".getBytes());
-                        */
-
-                        int ticket = ticketManager.getNewTicket();
-                        String url = "/ticket?id=" + String.valueOf(ticket);
-                        String response = "Ticket URL";
-                        response = "<a href='" + url + ">" + response + "</a>";
-                        response = "<body>" + response + "</body>";
-                        response = "<html>" + response + "</html>";
-                        os.write(response.getBytes());
-
-                        System.out.println("File-Item: " + fi.getFieldName() + " = " + fi.getName());
-                        System.out.println("Contents:");
-                        System.out.println(fi.getString());
-                    }
-                    catch (NullPointerException e) {
-                        continue;
-                    }
-                }
-                os.close();
-                if (inputFiles.containsKey("receptor") && inputFiles.containsKey("ligand")) {
-                    LZerDController c = Cortex.of(LZerDController.class)
-                            .getNodes().get(0);
-                    int ticket = ticketManager.getNewTicket();
-                    c.runLzerdFlow(inputFiles.get("receptor"), inputFiles.get("ligand")).then((r2, e2) -> {
-                        ticketManager.set(ticket, r2);
-                        c.sendEmail(ticket);
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
      * Jumpstart a quick HTTPServer atop the PFPController
      * Yes! We can turn the PFPController into an Executor,
      * and then apply parallelism or any API onto it.
@@ -233,7 +136,6 @@ public class Main {
             // Test LZerDController;
         });
         context.getFilters().add(new ParameterFilter());
-        server.createContext("/fileupload", new UploadHandler());
 
         ticketManager = new TicketManager<>();
         int testId1 = ticketManager.getNewTicket();
