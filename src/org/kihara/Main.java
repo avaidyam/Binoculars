@@ -32,6 +32,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.kihara.util.FileWatcher;
 import org.kihara.util.ParameterFilter;
 import org.kihara.util.TicketManager;
 
@@ -39,6 +40,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.WatchEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +58,17 @@ public class Main {
     /**
      * Initialize the Cortex, and start the HTTP server and shell.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Log.get().setSeverity(Log.Severity.DEBUG);
         // Cortex<PFPController> cortex = Cortex.of(PFPController.class);
+
+        FileWatcher fw = FileWatcher.watch((p, e) -> {
+            for (WatchEvent<?> event : e) {
+                Path file = p.resolve((Path) event.context());
+                System.out.println("Notified: " + event.kind() + " on file: " + file);
+            }
+        }, "/Users/andrew/Desktop");
+
         Cortex<LZerDController> cortex = Cortex.of(LZerDController.class);
         try {
             // PFPController main = cortex.getNodes().get(0);
