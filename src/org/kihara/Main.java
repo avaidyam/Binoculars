@@ -67,7 +67,7 @@ public class Main {
                 Path file = p.resolve((Path) event.context());
                 System.out.println("Notified: " + event.kind() + " on file: " + file);
             }
-        }, "/var/www/binoculars/upload");
+        }, "/bio/kihara-web/www/binoculars/upload");
 
         Cortex<LZerDController> cortex = Cortex.of(LZerDController.class);
         try {
