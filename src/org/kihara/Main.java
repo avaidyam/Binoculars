@@ -67,13 +67,13 @@ public class Main {
                 Path file = p.resolve((Path) event.context());
                 System.out.println("Notified: " + event.kind() + " on file: " + file);
             }
-        }, "/Users/andrew/Desktop");
+        }, "/var/www/binoculars/upload");
 
         Cortex<LZerDController> cortex = Cortex.of(LZerDController.class);
         try {
             // PFPController main = cortex.getNodes().get(0);
             LZerDController main = cortex.getNodes().get(0);
-            startHTTP(8080, main);
+            // startHTTP(8080, main);
             startShell(cortex.getNodes());
         } catch (Exception e) {
             Log.e("Main", "Could not begin application.", e);
