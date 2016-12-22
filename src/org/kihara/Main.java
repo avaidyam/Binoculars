@@ -28,21 +28,21 @@ import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.FileWatcher;
+import org.kihara.util.MigrationVisitor;
 import org.kihara.util.ParameterFilter;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * Entry point for the sample application (PFP).
@@ -57,14 +57,14 @@ public class Main {
      * For every added folder, grab the manifest.mf file and translate it
      * into a map (which contains POST and FILES data for the job.
      *
-     * @param p
-     * @param e
+     * @param source
+     * @param events
      * @return
      */
-    private static List<Map<String, String>> jobWatcher(Path p, List<WatchEvent<?>> e, String jobType) {
+    private static List<Map<String, String>> jobWatcher(Path source, List<WatchEvent<?>> events, String jobType, Path jobDest) {
         List<Map<String, String>> jobs = new LinkedList<>();
-        for (WatchEvent<?> event : e) {
-            Path file = p.resolve((Path) event.context());
+        for (WatchEvent<?> event : events) {
+            Path file = source.resolve((Path) event.context());
             if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                 try {
                     Map<String, String> m = Files.lines(file.resolve("manifest.mf")).map(s -> {
@@ -72,9 +72,15 @@ public class Main {
                         return new AbstractMap.SimpleEntry<>(parts[0], parts[1]);
                     }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                     if (Objects.equals(m.get("service"), jobType)) {
+                        Path end = jobDest.resolve(file.getFileName()).toAbsolutePath();
+                        MigrationVisitor.migrate(file, end, true, REPLACE_EXISTING);
+                        m.put("_path", end.toString());
+                        Log.d("JOB", "Job Discovered [" + jobType + "] = " + m.toString());
                         jobs.add(m);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return jobs;
@@ -85,9 +91,14 @@ public class Main {
      *
      * @throws Exception
      */
-    private static void runJob() throws Exception {
-        Main.plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
-                        "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb").await();
+    private static void runJob(Map<String, String> manifest) throws Exception {
+        if (Main.plps.hasState().await() || manifest == null) {
+            throw new RuntimeException("Can't do that!");
+        }
+
+        String path = manifest.get("_path");
+        Main.plps.provideInputs(path, "PLPSSample2", path + manifest.get("receptor"),
+                                path + manifest.get("ligand"), manifest.get("email")).await();
         Main.plps.generateInputs().await();
         Main.plps.prepareReceptor().await();
         //Main.plps.prepareLigands().await();
@@ -98,10 +109,28 @@ public class Main {
                     e.printStackTrace();
                 } else {
                     Log.d("Main", "Finished task!");
-                    Runtime.getRuntime().exec("cat \"file.txt\" | mail -s \"Job Submission\" avaidyam@purdue.edu");
+                    Runtime.getRuntime().exec("echo \"JOB DONE\" | mail -s \"Job Results\" avaidyam@purdue.edu");
+                    Main.plps.clearState();
+                    Main.plps.setConfiguration(null);
+                    notifyJob();
                 }
-            } catch(Exception ignored) {}
+            } catch(Exception e2) {
+                e2.printStackTrace();
+            }
         });
+    }
+
+    private static void notifyJob() {
+        if (!Main.plps.hasState().await()) {
+            try {
+                Map<String, String> job = allJobs.pop();
+                if (job != null) {
+                    runJob(job);
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -112,7 +141,8 @@ public class Main {
         Main.allJobs = new LinkedList<>();
         Main.plps = Nucleus.of(PLPatchSurferController.class);
         Main.watcher = FileWatcher.watch((p, e) -> {
-            allJobs.addAll(Main.jobWatcher(p, e, "plps"));
+            allJobs.addAll(Main.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
+            notifyJob();
         }, "/bio/kihara-web/www/binoculars/upload/");
     }
 

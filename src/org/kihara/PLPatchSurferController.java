@@ -151,8 +151,9 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             /*5*/ COMPLETE;
         }
 
-        UUID uuid = null;
         String path = "";
+        String db = "";
+        String email = "";
         Stage stage = Stage.INITIALIZED;
 
         String receptorFilePDB = ""; //ex: rec.pdb
@@ -162,8 +163,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         @Override
         public String toString() {
             return "State{" +
-                    "uuid=" + uuid +
-                    ", path='" + path + '\'' +
+                    "path='" + path + '\'' +
                     ", stage=" + stage +
                     ", receptorFilePDB='" + receptorFilePDB + '\'' +
                     ", xtalLigand='" + xtalLigand + '\'' +
@@ -176,16 +176,28 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             State state = (State) o;
-            return uuid.equals(state.uuid);
+            if (!path.equals(state.path)) return false;
+            if (!db.equals(state.db)) return false;
+            if (!email.equals(state.email)) return false;
+            if (!receptorFilePDB.equals(state.receptorFilePDB)) return false;
+            if (!xtalLigand.equals(state.xtalLigand)) return false;
+            return outputFile.equals(state.outputFile);
+
         }
 
         @Override
         public int hashCode() {
-            return uuid.hashCode();
+            int result = path.hashCode();
+            result = 31 * result + db.hashCode();
+            result = 31 * result + email.hashCode();
+            result = 31 * result + receptorFilePDB.hashCode();
+            result = 31 * result + xtalLigand.hashCode();
+            result = 31 * result + outputFile.hashCode();
+            return result;
         }
     }
 
-
+    /* TODO */
     static class Task implements Serializable {
         UUID uuid = null;
         String path = "";
@@ -231,10 +243,17 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         self().state = null;
     }
 
+    /*
+    @Override
+    public void init() {
+        Log.d(TAG, "Init executed!");
+    }
+
     @Override
     public void deinit() {
         Log.d(TAG, "Deinit executed!");
     }
+    //*/
 
     // --------------------------------------------------------------------
     // Helper lambda to concisely produce processes for PLPatchSurfer.
@@ -262,7 +281,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    public Future<Void> begin(String receptorFile, String xtalLigand) throws Exception {
+    public Future<Void> provideInputs(String root, String db, String receptorFile, String xtalLigand, String email) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (self().state != null && self().configuration != null) {
             return new CompletableFuture<>(new RuntimeException("Can't start another task!"));
@@ -272,8 +291,10 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
 
         // Initialize the state (job context).
         State st = new State();
-        st.uuid = UUID.randomUUID();
-        st.path = tilde(conf.workingPath) + st.uuid.toString().replaceAll("-", "") + "/";
+        st.path = tilde(root);
+        st.email = email;
+        st.db = "/net/kihara/avaidyam/PLPSSample2/PLPSSample2.list";
+        //tilde(conf.workingPath) + st.uuid.toString().replaceAll("-", "") + "/";
 
         // Create the directory and move input files over.
         Path path = Paths.get(st.path);
@@ -324,7 +345,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         String s3 = "PLPS_path\t" + conf.plpsPath + "\nreceptor_file\t" + rfSSIC;
         String s4 = "receptor_file\t" + rfSSIC + "\noutput_file\tout.rank";
 
-        try (Stream<String> lines = Files.lines(Paths.get(conf.databaseSet))) {
+        try (Stream<String> lines = Files.lines(Paths.get(st.db))) {
             String set = lines
                     .map((lig) -> "\nligand_dir\t" + lig)
                     .reduce((r, s) -> r + s)
@@ -439,7 +460,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         }
         self().state.stage = State.Stage.COMPARE_LIGANDS;
 
-        String db = self().configuration.databaseSet;
+        String db = self().state.db;
         String par = Paths.get(db).getParent().toString();
         try (Stream<String> lines = Files.lines(Paths.get(db))) {
             lines.forEach((s) -> {
@@ -483,7 +504,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
 
         // Iteration things over here.
         final int[] idx = {0};
-        String db = self().configuration.databaseSet;
+        String db = self().state.db;
         String dbSource = Paths.get(db).getParent().toString();
         String rank = tilde(self().configuration.plpsPath) + "/out.rank";
 
@@ -505,7 +526,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
 
         // Write the results HTML output.
         String out = a + htmls.toString() + b + jss.toString() + c;
-        Files.write(Paths.get(tilde(self().configuration.plpsPath) + "/results.html"), out.getBytes());
+        Files.write(Paths.get(tilde(self().state.path) + "/results.html"), out.getBytes());
 
         self().state.stage = State.Stage.COMPLETE;
         promise.complete();
