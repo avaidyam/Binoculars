@@ -36,42 +36,84 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Entry point for the sample application (PFP).
  */
 public class Main {
 
+    private static FileWatcher watcher;
+    private static LinkedList<Map<String, String>> allJobs;
+    private static PLPatchSurferController plps;
+
+    /**
+     * For every added folder, grab the manifest.mf file and translate it
+     * into a map (which contains POST and FILES data for the job.
+     *
+     * @param p
+     * @param e
+     * @return
+     */
+    private static List<Map<String, String>> jobWatcher(Path p, List<WatchEvent<?>> e, String jobType) {
+        List<Map<String, String>> jobs = new LinkedList<>();
+        for (WatchEvent<?> event : e) {
+            Path file = p.resolve((Path) event.context());
+            if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                try {
+                    Map<String, String> m = Files.lines(file.resolve("manifest.mf")).map(s -> {
+                        String parts[] = s.split(": ");
+                        return new AbstractMap.SimpleEntry<>(parts[0], parts[1]);
+                    }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    if (Objects.equals(m.get("service"), jobType)) {
+                        jobs.add(m);
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+        return jobs;
+    }
+
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    private static void runJob() throws Exception {
+        Main.plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
+                        "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb").await();
+        Main.plps.generateInputs().await();
+        Main.plps.prepareReceptor().await();
+        //Main.plps.prepareLigands().await();
+        Main.plps.compareSeedsDB().await();
+        Main.plps.compareLigands().then((r, e) -> {
+            try {
+                if (e != null) {
+                    e.printStackTrace();
+                } else {
+                    Log.d("Main", "Finished task!");
+                    Runtime.getRuntime().exec("cat \"file.txt\" | mail -s \"Job Submission\" avaidyam@purdue.edu");
+                }
+            } catch(Exception ignored) {}
+        });
+    }
+
     /**
      * Initialize the Cortex, and start the HTTP server and shell.
      */
     public static void main(String[] args) throws Exception {
         Log.get().setSeverity(Log.Severity.DEBUG);
-        FileWatcher fw = FileWatcher.watch((p, e) -> {
-            for (WatchEvent<?> event : e) {
-                Path file = p.resolve((Path) event.context());
-                System.out.println("Notified: " + event.kind() + " on file: " + file);
-            }
-        }, "/Users/aditya/Desktop/");
-
-        PLPatchSurferController plps = Nucleus.of(PLPatchSurferController.class);
-        plps.begin("~/PatchSurfer/example/1_prepare_receptor/rec.pdb",
-                "~/PatchSurfer/example/1_prepare_receptor/xtal-lig.pdb").await();
-        plps.generateInputs().await();
-        plps.prepareReceptor().await();
-        //plps.prepareLigands().await();
-        plps.compareSeedsDB().await();
-        plps.compareLigands().then((r, e) -> {
-            Log.d("Main", "Finished task!", e);
-            e.printStackTrace();
-        });
-        //*/
+        Main.allJobs = new LinkedList<>();
+        Main.plps = Nucleus.of(PLPatchSurferController.class);
+        Main.watcher = FileWatcher.watch((p, e) -> {
+            allJobs.addAll(Main.jobWatcher(p, e, "plps"));
+        }, "/bio/kihara-web/www/binoculars/upload/");
     }
 
     /*public static void main(String[] args) {
