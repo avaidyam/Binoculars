@@ -67,6 +67,8 @@ public class Main {
             Path file = source.resolve((Path) event.context());
             if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                 try {
+                    Thread.sleep(500); // pls die already
+
                     Map<String, String> m = Files.lines(file.resolve("manifest.mf")).map(s -> {
                         String parts[] = s.split(": ");
                         return new AbstractMap.SimpleEntry<>(parts[0], parts[1]);
@@ -74,7 +76,7 @@ public class Main {
                     if (Objects.equals(m.get("service"), jobType)) {
                         Path end = jobDest.resolve(file.getFileName()).toAbsolutePath();
                         MigrationVisitor.migrate(file, end, true, REPLACE_EXISTING);
-                        m.put("_path", end.toString());
+                        m.put("_path", end.toString() + "/");
                         Log.d("JOB", "Job Discovered [" + jobType + "] = " + m.toString());
                         jobs.add(m);
                     }
@@ -96,41 +98,49 @@ public class Main {
             throw new RuntimeException("Can't do that!");
         }
 
+        // Queue and run the job on the daemon.
         String path = manifest.get("_path");
-        Main.plps.provideInputs(path, "PLPSSample2", path + manifest.get("receptor"),
-                                path + manifest.get("ligand"), manifest.get("email")).await();
+        Main.plps.provideInputs(path, "debug_2", manifest.get("email"), manifest.get("chain"),
+                                manifest.get("ligand"), manifest.get("receptor")).await();
         Main.plps.generateInputs().await();
+        Main.plps.splitXtalLigand().await();
         Main.plps.prepareReceptor().await();
-        //Main.plps.prepareLigands().await();
         Main.plps.compareSeedsDB().await();
-        Main.plps.compareLigands().then((r, e) -> {
-            try {
-                if (e != null) {
-                    e.printStackTrace();
-                } else {
-                    Log.d("Main", "Finished task!");
-                    Runtime.getRuntime().exec("echo \"JOB DONE\" | mail -s \"Job Results\" avaidyam@purdue.edu");
-                    Main.plps.clearState();
-                    Main.plps.setConfiguration(null);
-                    notifyJob();
-                }
-            } catch(Exception e2) {
-                e2.printStackTrace();
-            }
-        });
+        Main.plps.compareLigands(10).await();
+
+        // Notify the job results and pull from the queue if possible.
+        try {
+            Log.d("MAIN", "Finished task, sending results.");
+
+            // Move the results to the outbox.
+            String outbox = "/bio/kihara-web/www/binoculars/outbox";
+            Path start = Paths.get(manifest.get("_path")).resolve("output");
+            Path end = Paths.get(outbox);
+            MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
+
+            // Send the results being available as an email.
+            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
+            Path body = Files.createTempFile("plps_", "_mail");
+            Files.write(body, ("Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.").getBytes());
+            new ProcessBuilder("mailx", "-r", "Kihara Lab <sbit-admin@bio.purdue.edu>", "-s", "PL-PatchSurfer2 Job Results", manifest.get("email"))
+                    .redirectInput(body.toFile()) // should be file
+                    .start().waitFor();
+            Files.deleteIfExists(body);
+
+            Main.plps.clearState();
+            Main.plps.setConfiguration(null);
+            notifyJob();
+        } catch(Exception e2) {
+            e2.printStackTrace();
+        }
     }
 
-    private static void notifyJob() {
-        if (!Main.plps.hasState().await()) {
-            try {
-                Map<String, String> job = allJobs.pop();
-                if (job != null) {
-                    runJob(job);
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
+    /**
+     *
+     */
+    private static void notifyJob() throws Exception {
+        if (!Main.plps.hasState().await() && allJobs.size() > 0)
+            runJob(allJobs.pop());
     }
 
     /**
@@ -142,7 +152,7 @@ public class Main {
         Main.plps = Nucleus.of(PLPatchSurferController.class);
         Main.watcher = FileWatcher.watch((p, e) -> {
             allJobs.addAll(Main.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
-            notifyJob();
+            try { notifyJob(); } catch(Exception e2) { e2.printStackTrace(); }
         }, "/bio/kihara-web/www/binoculars/upload/");
     }
 

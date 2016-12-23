@@ -26,7 +26,6 @@ public class MigrationVisitor extends SimpleFileVisitor<Path> {
      */
     public static void migrate(Path origin, Path destination, boolean move, CopyOption... copyOption) throws IOException {
         Files.walkFileTree(origin, new MigrationVisitor(origin, destination, move, copyOption));
-        if (move) Files.deleteIfExists(origin);
     }
 
     /**
@@ -64,6 +63,16 @@ public class MigrationVisitor extends SimpleFileVisitor<Path> {
         if (this.move)
             Files.move(file, to, copyOption);
         else Files.copy(file, to, copyOption);
+        return FileVisitResult.CONTINUE;
+    }
+
+    /**
+     *
+     */
+    @Override
+    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        if (this.move)
+            Files.deleteIfExists(dir);
         return FileVisitResult.CONTINUE;
     }
 }

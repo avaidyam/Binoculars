@@ -89,23 +89,33 @@
                     <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
                         <iframe name="_result" width="0" height="0" border="0" style="display: none;"></iframe>
                         <form id="form" method="POST" enctype="multipart/form-data" action="fileupload.php" target="_result">
-                            <label for="receptor">Receptor:</label>
-                            <input type="file" id="receptor" name="receptor" />
-                            <br />
-                            <label for="ligand">Ligand:</label>
-                            <input type="file" id="ligand" name="ligand" />
-                            <br />
-                            <label for="db">Database:</label>
-                            <select id="db" name="db">
-                                <option value="chembl_19">chembl_19</option>
-                                <option value="zinc_druglike">zinc_druglike</option>
-                            </select>
-                            <br />
-                            <label for="email">Email:</label>
-                            <input type="email" name="email">
-                            <br />
-                            <input type="hidden" name="service" value="plps" />
-                            <input id="form-submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick='alert("Job submitted!"); document.forms["form"].submit();' type="reset" value="Submit Job" />
+                            <div style="height: 28px;">
+                                <label for="receptor">Receptor:</label>
+                                <input type="file" id="receptor" name="receptor" />
+                            </div>
+                            <div style="height: 28px;">
+                                <label for="chain">Chain ID:</label>
+                                <input type="text" name="chain" style="width: 48px;" />
+                                <label for="ligand">Ligand ID:</label>
+                                <input type="text" name="ligand" style="width: 48px;" />
+                            </div>
+                            <div style="height: 28px;">
+                                <label for="db">Database:</label>
+                                <select id="db" name="db">
+                                    <option value="chembl_19">chembl_19</option>
+                                    <option value="zinc_druglike">zinc_druglike</option>
+                                    <option value="debug_1">debug_1</option>
+                                    <option value="debug_2">debug_2</option>
+                                </select>
+                            </div>
+                            <div style="height: 28px;">
+                                <label for="email">Email:</label>
+                                <input type="email" name="email" />
+                            </div>
+                            <div style="height: 28px;">
+                                <input type="hidden" name="service" value="plps" />
+                                <input id="form-submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick='alert("Job submitted!"); document.forms["form"].submit();' type="reset" value="Submit Job" />
+                            </div>
                         </form>
                     </div>
                 </div>
