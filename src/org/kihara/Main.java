@@ -28,12 +28,11 @@ import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.FileWatcher;
+import org.kihara.util.Mailer;
 import org.kihara.util.MigrationVisitor;
 import org.kihara.util.ParameterFilter;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.file.*;
 import java.util.*;
@@ -97,19 +96,19 @@ public class Main {
         if (Main.plps.hasState().await() || manifest == null) {
             throw new RuntimeException("Can't do that!");
         }
-
-        // Queue and run the job on the daemon.
-        String path = manifest.get("_path");
-        Main.plps.provideInputs(path, "debug_2", manifest.get("email"), manifest.get("chain"),
-                                manifest.get("ligand"), manifest.get("receptor")).await();
-        Main.plps.generateInputs().await();
-        Main.plps.splitXtalLigand().await();
-        Main.plps.prepareReceptor().await();
-        Main.plps.compareSeedsDB().await();
-        Main.plps.compareLigands(10).await();
-
-        // Notify the job results and pull from the queue if possible.
         try {
+
+            // Queue and run the job on the daemon.
+            String path = manifest.get("_path");
+            Main.plps.provideInputs(path, manifest.get("db"), manifest.get("email"), manifest.get("chain"),
+                    manifest.get("ligand"), manifest.get("receptor")).await();
+            Main.plps.generateInputs().await();
+            Main.plps.splitXtalLigand().await();
+            Main.plps.prepareReceptor().await();
+            Main.plps.compareSeedsDB().await();
+            Main.plps.compareLigands(10).await();
+
+            // Notify the job results and pull from the queue if possible.
             Log.d("MAIN", "Finished task, sending results.");
 
             // Move the results to the outbox.
@@ -120,18 +119,24 @@ public class Main {
 
             // Send the results being available as an email.
             String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
-            Path body = Files.createTempFile("plps_", "_mail");
-            Files.write(body, ("Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.").getBytes());
-            new ProcessBuilder("mailx", "-r", "Kihara Lab <sbit-admin@bio.purdue.edu>", "-s", "PL-PatchSurfer2 Job Results", manifest.get("email"))
-                    .redirectInput(body.toFile()) // should be file
-                    .start().waitFor();
-            Files.deleteIfExists(body);
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Results",
+                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
 
             Main.plps.clearState();
             Main.plps.setConfiguration(null);
             notifyJob();
         } catch(Exception e2) {
-            e2.printStackTrace();
+            Log.e("MAIN", "Failed to complete task.", e2);
+            StringWriter sw = new StringWriter();
+            e2.printStackTrace(new PrintWriter(sw));
+
+            // Send the job failed message as an email.
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Failed",
+                        "Your PL-PatchSurfer job failed to complete. Please contact us for support.\n\n" + sw.toString() + "\n");
+
+            Main.plps.clearState();
+            Main.plps.setConfiguration(null);
+            notifyJob();
         }
     }
 
