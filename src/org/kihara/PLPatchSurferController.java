@@ -26,6 +26,7 @@ import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.util.Log;
+import org.kihara.util.MigrationVisitor;
 
 import java.io.File;
 import java.io.Serializable;
@@ -150,12 +151,13 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
          * needed from distant nodes.
          */
         enum Stage implements Serializable {
+            /*X*/ FAILED, // TODO
             /*0*/ INITIALIZED,
             /*1*/ SPLIT_XTAL,
             /*2*/ PREPARE_RECEPTOR,
             /*3*/ COMPARE_SEEDS,
             /*4*/ COMPARE_LIGANDS,
-            /*5*/ COMPLETE;
+            /*5*/ COMPLETE,
         }
 
         Stage stage = Stage.INITIALIZED;
@@ -462,14 +464,23 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
 
         String db = self().configuration.databaseSet.get(self().state.db);
         String par = Paths.get(db).getParent().toString();
+        Path seedsDir = Paths.get(self().state.path).resolve("seeds");
+        Files.createDirectory(seedsDir);
+
+        // Iterate every ligand in the database. Create a temp directory for the
+        // conformation intermediate files and delete immediately after the summary
+        // is generated (because the files are massive).
         try (Stream<String> lines = Files.lines(Paths.get(db))) {
             lines.forEach((s) -> {
                 try {
+                    Files.createDirectory(seedsDir.resolve(s));
 
                     // Run script on the generated input.
                     String loc = self().configuration.plpsPath + "scripts/compare_seeds_indiv.py";
-                    _plps.apply(new String[]{"python", loc, self().state.path + "s3.in", par + "/" + s, "" + self().configuration.n_conf})
+                    _plps.apply(new String[]{"python", loc, self().state.path + "s3.in", par + "/" + s, "" + self().configuration.n_conf, self().state.path + "seeds"})
                             .start().waitFor();
+
+                    MigrationVisitor.deleteAll(seedsDir.resolve(s));
                 } catch(Exception ignored) {}
             });
         }

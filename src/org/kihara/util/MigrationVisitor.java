@@ -3,6 +3,7 @@ package org.kihara.util;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Comparator;
 
 /**
  * The MigrationVisitor allows traversing the entire directory and completely
@@ -15,6 +16,11 @@ public class MigrationVisitor extends SimpleFileVisitor<Path> {
     private final CopyOption copyOption[];
     private final boolean move;
 
+    private static void deletePath(Path p) {
+        try { Files.delete(p);
+        } catch (IOException ignored) {}
+    }
+
     /**
      *
      *
@@ -26,6 +32,18 @@ public class MigrationVisitor extends SimpleFileVisitor<Path> {
      */
     public static void migrate(Path origin, Path destination, boolean move, CopyOption... copyOption) throws IOException {
         Files.walkFileTree(origin, new MigrationVisitor(origin, destination, move, copyOption));
+    }
+
+    /**
+     * Acts like `rm -rf` on the given root path.
+     *
+     * @param root the Path to delete indiscriminately.
+     * @throws IOException
+     */
+    public static void deleteAll(Path root) throws IOException {
+        Files.walk(root, FileVisitOption.FOLLOW_LINKS)
+                .sorted(Comparator.reverseOrder())
+                .forEach(MigrationVisitor::deletePath);
     }
 
     /**
