@@ -21,7 +21,7 @@ public class RefChain {
 	
 	public static class B extends Nucleus<A> {
 		C c;
-		public void init(ConnectibleNucleus<Nucleus> connectable) {
+		public void start(ConnectibleNucleus<Nucleus> connectable) {
 			connectable.connect().then((Nucleus c) -> this.c = (C)c);
 		}
 		public Future<C> getC() {
@@ -41,6 +41,11 @@ public class RefChain {
 		A a = Nucleus.of(A.class);
 		B b = Nucleus.of(B.class);
 		C c = Nucleus.of(C.class);
+
+		System.out.println(c.hello(" test").await());
+		System.exit(0);
+
+		//
 		
 		new TCPPublisher(a, 4001).publish();
 		new TCPPublisher(b, 4002).publish();
@@ -49,7 +54,7 @@ public class RefChain {
 		ConnectibleNucleus cConnect = new TCPConnectible(C.class, "localhost", 4003);
 		ConnectibleNucleus bConnect = new TCPConnectible(B.class, "localhost", 4002);
 		
-		b.init(cConnect);
+		b.start(cConnect);
 		Thread.sleep(500); // don't program like this, init should return promise ..
 		
 		a.showChain(bConnect).await();
