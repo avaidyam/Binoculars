@@ -640,11 +640,10 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             String pdbSource = parts[0] + ".pdb";
             Path source = Paths.get(dbSource).resolve(pdbSource);
             Path dest = Paths.get(dbDest).resolve(pdbSource);
-            try {
-                Files.copy(source, dest);
-            } catch (Exception e) {
-                Log.e(TAG, "Copy from " + source + " to " + dest + " resulted in an error: ", e);
-            }
+            try { Files.copy(source, dest);
+            } catch (FileNotFoundException e) {
+                Log.e(TAG, "Copy from " + source + " to " + dest + " failed because source was not found.");
+            } catch (Exception ignored) {}
 
             // Makeshift templating engine here...
             String temp = inside;
