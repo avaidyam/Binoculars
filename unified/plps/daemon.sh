@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # modify this command to select what tool to daemonize.
-CMD=/usr/lib/jvm/java-8-oracle/bin/java -jar Binoculars.jar
+CMD="/usr/lib/jvm/java-8-oracle/bin/java -jar Binoculars.jar"
 
 # daemonizer: 
 case "$1" in
