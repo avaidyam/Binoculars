@@ -3,21 +3,21 @@
 # modify this command to select what tool to daemonize.
 CMD="/usr/lib/jvm/java-8-oracle/bin/java -jar Binoculars.jar"
 
-# daemonizer: 
-case "$1" in
-    start) # start daemon
+# start daemon
+start() {
     if [ -e "daemon.lock" ]; 
     
     # daemon has already been started!
     then echo "daemon has already been started!";
     else
-        nohup $CMD >> daemon.log 2>&1 &
+        nohup $CMD > daemon.log 2>&1 &
         echo $! > daemon.lock
         echo "daemon started"
     fi
-    ;;
+}
 
-    stop) # stop daemon
+# stop daemon
+stop() {
     if [ -e "daemon.lock" ]; then
         if ps -p `cat daemon.lock` > /dev/null; then
             kill -9 `cat daemon.lock`
@@ -29,7 +29,13 @@ case "$1" in
     
     # daemon was never started!
     else echo "daemon was never started!"; fi
-    ;;
+}
+
+# driver 
+case "$1" in
+    start) start ;;
+    stop) stop ;;
+    restart) stop; start ;;
     
     *) # print usage
     echo "usage: ./daemon.sh [start|stop] [command]"

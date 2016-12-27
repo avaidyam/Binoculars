@@ -310,7 +310,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             self().prepareReceptor().await();
             self().compareSeedsDB().await();
             self().compareLigands().await();
-            self().reportCompletion(false, 10).await();
+            self().reportCompletion(10).await();
 
             // Notify the job results and pull from the queue if possible.
             Log.d("MAIN", "Finished task, sending results.");
@@ -335,8 +335,9 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             e2.printStackTrace(new PrintWriter(sw));
 
             // Send the job failed message as an email.
+            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
             Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Failed",
-                    "Your PL-PatchSurfer job failed to complete. Please contact us for support.\n\n" + sw.toString() + "\n");
+                    "Your PL-PatchSurfer job (" + jobName + ") failed to complete. Please contact us for support and provide the below trace message.\n\n" + sw.toString() + "\n");
 
             self().clearState();
             self().setConfiguration(null);
@@ -452,7 +453,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     }
 
     // Step 1:
-    
+
     /**
      *
      * @return
@@ -594,7 +595,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    public Future<Void> reportProgress(int current, int total) throws Exception {
+    public Future<Void> reportProgress(int current, int total, boolean failed) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         promise.complete();
         return promise;
@@ -603,19 +604,19 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     /**
      *
      *
-     * @param failed
+     * @param num_preview
      * @return
      * @throws Exception
      */
-    public Future<Void> reportCompletion(boolean failed, int num_preview) throws Exception {
+    public Future<Void> reportCompletion(int num_preview) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
         //
         InputStream t = getClass().getResourceAsStream("/templates/visualizer_template.html");
         String template = new BufferedReader(new InputStreamReader(t))
                 .lines().collect(Collectors.joining("\n"));
-        final String inside = template.substring(template.indexOf("<!--START-->") + 1,
-                template.indexOf("<!--END-->"));
+        final String inside = template.replaceAll("[\\s\\S]*(<!--START-->)|(<!--END-->)[\\s\\S]*", "");
+        Log.d(TAG, "Formed template inner: " + inside);
 
         final int[] idx = {0};
         String output[] = {""};
@@ -637,24 +638,27 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
 
             // Copy any PDB files we need (~600kB) to the outbox.
             String pdbSource = parts[0] + ".pdb";
+            Path source = Paths.get(dbSource).resolve(pdbSource);
+            Path dest = Paths.get(dbDest).resolve(pdbSource);
             try {
-                Files.copy(Paths.get(dbSource).resolve(pdbSource),
-                        Paths.get(dbDest).resolve(pdbSource));
-            } catch (Exception ignored) {}
+                Files.copy(source, dest);
+            } catch (Exception e) {
+                Log.e(TAG, "Copy from " + source + " to " + dest + " resulted in an error: ", e);
+            }
 
             // Makeshift templating engine here...
             String temp = inside;
-            temp = inside.replace("${NUM}", "" + idx[0]);
-            temp = inside.replace("${NAME}", parts[0]);
-            temp = inside.replace("${SCORE}", parts[1]);
-            temp = inside.replace("${PATH}", "../" + pdbSource);
+            temp = temp.replace("![NUM]", "" + idx[0]);
+            temp = temp.replace("![NAME]", parts[0]);
+            temp = temp.replace("![SCORE]", parts[1]);
+            temp = temp.replace("![PATH]", "../" + pdbSource);
 
             output[0] += temp;
             idx[0]++;
         });
 
         // Write the results HTML output.
-        String out = template;
+        String out = template.replaceFirst("(<!--START-->)[\\s\\S]*(<!--END-->)", output[0]);
         Files.write(Paths.get(dbDest).resolve(folder).resolve("index.html"), out.getBytes());
 
         promise.complete();

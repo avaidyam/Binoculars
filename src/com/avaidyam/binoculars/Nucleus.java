@@ -47,7 +47,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Baseclass for nuclei implementations. Note that actors are not created using constructors.
+ * Base-class for nuclei implementations. Note that actors are not created using constructors.
  * Use Nucleus.of(..) to instantiate an nuclei instance. To pass initialization parameter,
  * define an init method in your implementation and call it from the instantiating instance.
  * <p>
@@ -65,8 +65,19 @@ import java.util.function.Supplier;
  * <p>
  * Code inside an nuclei is not allowed to ever block the current thread (networking etc.).
  * Use Nucleus.Exec in case you need to do blocking calls (e.g. synchronous requests)
- *
+ * --
  * Note that there is no supervision or monitoring; to do so, you can introspect qualities yourself.
+ * --
+ * Define as in: `public class Test extends Nucleus<Test> { ... }`
+ * Don't define a constructor! Use the init() and deinit() functions instead.
+ * --
+ * You can also inherit from other Nuclei, and if generics throw a fit, include the following:
+ * `@Override Nucleus self() { return super.self() }`
+ * --
+ * Only the following are free async methods: void xyz(...), Signal<...> xyz(...)
+ * METHOD OVERLOADING IS NOT SUPPORTED FOR NUCLEI!
+ * USE this FOR VARIABLES AND SYNC METHODS, USE self() for ASYNC METHODS!
+ *
  */
 public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, AutoCloseable {
 
