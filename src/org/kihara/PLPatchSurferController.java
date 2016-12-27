@@ -66,69 +66,6 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     State state = null;
 
     /**
-     *
-     *
-     * @throws Exception
-     */
-    public void runJob(Map<String, String> manifest) throws Exception {
-        if (this.hasState().await() || manifest == null) {
-            throw new RuntimeException("Can't do that!");
-        }
-        try {
-
-            // Queue and run the job on the daemon.
-            String path = manifest.get("_path");
-            this.provideInputs(path, manifest.get("db"), manifest.get("email"), manifest.get("chain"),
-                    manifest.get("ligand"), manifest.get("receptor")).await();
-            this.generateInputs().await();
-            this.splitXtalLigand().await();
-            this.prepareReceptor().await();
-            this.compareSeedsDB().await();
-            this.compareLigands().await();
-            this.reportCompletion(false, 10).await();
-
-            // Notify the job results and pull from the queue if possible.
-            Log.d("MAIN", "Finished task, sending results.");
-
-            // Move the results to the outbox.
-            String outbox = "/bio/kihara-web/www/binoculars/outbox";
-            Path start = Paths.get(manifest.get("_path")).resolve("output");
-            Path end = Paths.get(outbox);
-            MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
-
-            // Send the results being available as an email.
-            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
-            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Results",
-                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
-
-            this.clearState();
-            this.setConfiguration(null);
-            notifyJob();
-        } catch(Exception e2) {
-            Log.e("MAIN", "Failed to complete task.", e2);
-            StringWriter sw = new StringWriter();
-            e2.printStackTrace(new PrintWriter(sw));
-
-            // Send the job failed message as an email.
-            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Failed",
-                        "Your PL-PatchSurfer job failed to complete. Please contact us for support.\n\n" + sw.toString() + "\n");
-
-            this.clearState();
-            this.setConfiguration(null);
-            notifyJob();
-        }
-    }
-
-    /**
-     *
-     */
-    @Domain.Local
-    public void notifyJob() throws Exception {
-        if (!this.hasState().await() && allJobs.size() > 0)
-            this.runJob(allJobs.pop());
-    }
-
-    /**
      * The Configuration of a PLPatchSurferController defines its tool locations
      * and working directory; this rarely needs to be changed, and if it does,
      * it will invalidate the state of every instance of the controller with it.
@@ -148,7 +85,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         int n_conf = 50; // max n_conf for the database
 
         Configuration() {
-            HashMap<String, String> m = this.databaseSet;
+            HashMap<String, String> m = databaseSet;
             m.put("zinc_druglike",  "/net/kihara/shin183/DATA-scratch/zinc_druglike_90/druglike.list");
             m.put("chembl_19",      "/net/kihara/shin183/DATA-scratch/chembl/chembl_19/chembl.list");
             m.put("debug_1",        "/net/kihara/avaidyam/PLPSSample/PLPSSample.list");
@@ -297,7 +234,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @param configuration
      */
     public void setConfiguration(Configuration configuration) {
-        self().configuration = configuration;
+        this.configuration = configuration;
     }
 
     /**
@@ -305,7 +242,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @param state
      */
     public void setState(State state) {
-        self().state = state;
+        this.state = state;
     }
 
     /**
@@ -313,14 +250,14 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      */
     public Future<Boolean> hasState() {
-        return new CompletableFuture<>((self().state != null));
+        return new CompletableFuture<>((this.state != null));
     }
 
     /**
      *
      */
     public void clearState() {
-        self().state = null;
+        this.state = null;
     }
 
     /* // FIXME
@@ -339,19 +276,82 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     // Helper lambda to concisely produce processes for PLPatchSurfer.
     Function<String[], ProcessBuilder> _plps = (String ... args) -> {
         System.out.println("Running " + Arrays.toString(args));
-        String log = self().state.path + "log.txt";
+        String log = this.state.path + "log.txt";
         ProcessBuilder pb = new ProcessBuilder(args)
-                .directory(new File(self().state.path))
+                .directory(new File(this.state.path))
                 .redirectOutput(appendTo(Paths.get(log).toFile()))//INHERIT)
                 .redirectError(appendTo(Paths.get(log).toFile()));//INHERIT);
-        pb.environment().put("LD_LIBRARY_PATH", self().configuration.apbsPath + "lib/");
-        pb.environment().put("OE_LICENSE", self().configuration.omegaLicense);
+        pb.environment().put("LD_LIBRARY_PATH", this.configuration.apbsPath + "lib/");
+        pb.environment().put("OE_LICENSE", this.configuration.omegaLicense);
         return pb;
     };
     private static String tilde(String path) {
         return path.replaceFirst("^~", System.getProperty("user.home"));
     }
     // --------------------------------------------------------------------
+
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    public void runJob(Map<String, String> manifest) throws Exception {
+        if (self().hasState().await() || manifest == null) {
+            throw new RuntimeException("Can't do that!");
+        }
+        try {
+
+            // Queue and run the job on the daemon.
+            String path = manifest.get("_path");
+            self().provideInputs(path, manifest.get("db"), manifest.get("email"), manifest.get("chain"),
+                    manifest.get("ligand"), manifest.get("receptor")).await();
+            self().generateInputs().await();
+            self().splitXtalLigand().await();
+            self().prepareReceptor().await();
+            self().compareSeedsDB().await();
+            self().compareLigands().await();
+            self().reportCompletion(false, 10).await();
+
+            // Notify the job results and pull from the queue if possible.
+            Log.d("MAIN", "Finished task, sending results.");
+
+            // Move the results to the outbox.
+            String outbox = "/bio/kihara-web/www/binoculars/outbox";
+            Path start = Paths.get(manifest.get("_path")).resolve("output");
+            Path end = Paths.get(outbox);
+            MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
+
+            // Send the results being available as an email.
+            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Results",
+                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
+
+            self().clearState();
+            self().setConfiguration(null);
+            self().notifyJob();
+        } catch(Exception e2) {
+            Log.e("MAIN", "Failed to complete task.", e2);
+            StringWriter sw = new StringWriter();
+            e2.printStackTrace(new PrintWriter(sw));
+
+            // Send the job failed message as an email.
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Failed",
+                    "Your PL-PatchSurfer job failed to complete. Please contact us for support.\n\n" + sw.toString() + "\n");
+
+            self().clearState();
+            self().setConfiguration(null);
+            self().notifyJob();
+        }
+    }
+
+    /**
+     *
+     */
+    @Domain.Local
+    public void notifyJob() throws Exception {
+        if (!self().hasState().await() && allJobs.size() > 0)
+            self().runJob(allJobs.pop());
+    }
 
     /**
      *
@@ -368,13 +368,13 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     public Future<Void> provideInputs(String root, String db, String email,
                                       String chainID, String ligandID, String pdb) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-        if (self().state != null && self().configuration != null) {
+        if (this.state != null && this.configuration != null) {
             return new CompletableFuture<>(new RuntimeException("Can't start another task!"));
         }
 
         // Initialize the configutation.
         Configuration conf = new Configuration();
-        self().configuration = conf;
+        this.configuration = conf;
 
         // Initialize the state (job context).
         State st = new State();
@@ -392,7 +392,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
 
             st.inputFile = "input.pdb";
         } else st.inputFile = pdb;
-        self().state = st;
+        this.state = st;
 
         // Wrap up and exit.
         Log.d(TAG, "PLPS State = " + st.toString());
@@ -410,8 +410,8 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      */
     public Future<Void> generateInputs() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-        Configuration conf = self().configuration;
-        State st = self().state;
+        Configuration conf = this.configuration;
+        State st = this.state;
 
         // Expand all tildes once for effectiveness.
         String pdb2pqrPath = conf.pdb2pqrPath;
@@ -437,7 +437,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     .reduce((r, s) -> r + s)
                     .orElse("");
 
-            self().state.size = it.get();
+            this.state.size = it.get();
             s4 += set;
         }; s4 += "\n";
 
@@ -460,14 +460,14 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      */
     public Future<Void> splitXtalLigand() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-        if (self().state == null || self().configuration == null) {
+        if (this.state == null || this.configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
-        self().state.stage = State.Stage.SPLIT_XTAL;
+        this.state.stage = State.Stage.SPLIT_XTAL;
 
         // Run script on the generated input.
-        State st = self().state;
-        _plps.apply(new String[]{"python", self().configuration.plpsPath + "scripts/split_lig.py",
+        State st = this.state;
+        _plps.apply(new String[]{"python", this.configuration.plpsPath + "scripts/split_lig.py",
                 st.path + st.inputFile, st.chainID, st.ligandID})
                 .start().waitFor();
 
@@ -487,13 +487,13 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      */
     public Future<Void> prepareReceptor() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-        if (self().state == null || self().configuration == null) {
+        if (this.state == null || this.configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
-        self().state.stage = State.Stage.PREPARE_RECEPTOR;
+        this.state.stage = State.Stage.PREPARE_RECEPTOR;
 
         // Run script on the generated input.
-        _plps.apply(new String[]{"python", self().configuration.plpsPath + "scripts/prepare_receptor.py", self().state.path + "s1.in"})
+        _plps.apply(new String[]{"python", this.configuration.plpsPath + "scripts/prepare_receptor.py", this.state.path + "s1.in"})
                 .start().waitFor();
 
         promise.complete();
@@ -509,13 +509,13 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      */
     public Future<Void> compareSeeds() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-        if (self().state == null || self().configuration == null) {
+        if (this.state == null || this.configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
-        self().state.stage = State.Stage.COMPARE_SEEDS;
+        this.state.stage = State.Stage.COMPARE_SEEDS;
 
         // Run script on the generated input.
-        _plps.apply(new String[]{"python", self().configuration.plpsPath + "scripts/compare_seeds.py", self().state.path + "s3.in"})
+        _plps.apply(new String[]{"python", this.configuration.plpsPath + "scripts/compare_seeds.py", this.state.path + "s3.in"})
                 .start().waitFor();
 
         promise.complete();
@@ -529,14 +529,14 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      */
     public Future<Void> compareSeedsDB() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-        if (self().state == null || self().configuration == null) {
+        if (this.state == null || this.configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
-        self().state.stage = State.Stage.COMPARE_SEEDS;
+        this.state.stage = State.Stage.COMPARE_SEEDS;
 
-        String db = self().configuration.databaseSet.get(self().state.db);
+        String db = this.configuration.databaseSet.get(this.state.db);
         String par = Paths.get(db).getParent().toString();
-        Path seedsDir = Paths.get(self().state.path).resolve("seeds");
+        Path seedsDir = Paths.get(this.state.path).resolve("seeds");
         Files.createDirectory(seedsDir);
         AtomicInteger current = new AtomicInteger(0);
 
@@ -549,8 +549,8 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     Files.createDirectory(seedsDir.resolve(s));
 
                     // Run script on the generated input.
-                    String loc = self().configuration.plpsPath + "scripts/compare_seeds_indiv.py";
-                    _plps.apply(new String[]{"python", loc, self().state.path + "s3.in", par + "/" + s, "" + self().configuration.n_conf, self().state.path + "seeds"})
+                    String loc = this.configuration.plpsPath + "scripts/compare_seeds_indiv.py";
+                    _plps.apply(new String[]{"python", loc, this.state.path + "s3.in", par + "/" + s, "" + this.configuration.n_conf, this.state.path + "seeds"})
                             .start().waitFor();
 
                     current.getAndIncrement();
@@ -572,17 +572,17 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      */
     public Future<Void> compareLigands() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-        if (self().state == null || self().configuration == null) {
+        if (this.state == null || this.configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
         }
-        self().state.stage = State.Stage.COMPARE_LIGANDS;
+        this.state.stage = State.Stage.COMPARE_LIGANDS;
 
         // Run script on the generated input.
-        _plps.apply(new String[]{"python", self().configuration.plpsPath + "scripts/rank_ligands_indiv.py", self().state.path + "s4.in"})
+        _plps.apply(new String[]{"python", this.configuration.plpsPath + "scripts/rank_ligands_indiv.py", this.state.path + "s4.in"})
                 .start().waitFor();
 
 
-        self().state.stage = State.Stage.COMPLETE;
+        this.state.stage = State.Stage.COMPLETE;
         promise.complete();
         return promise;
     }
@@ -621,10 +621,10 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         String output[] = {""};
 
         // Gather state and move things over.
-        String dbDest = self().state.path + "/output";
-        Path folder = Paths.get(self().state.path).getFileName();
-        String dbSource = self().configuration.pdbSources;
-        String rank = self().state.path + "/out.rank";
+        String dbDest = this.state.path + "/output";
+        Path folder = Paths.get(this.state.path).getFileName();
+        String dbSource = this.configuration.pdbSources;
+        String rank = this.state.path + "/out.rank";
 
         //
         Files.createDirectory(Paths.get(dbDest));
