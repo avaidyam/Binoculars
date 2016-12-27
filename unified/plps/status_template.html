@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="10">
+<title>PL-PatchSurfer Progress</title>
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+<style>
+body { font-family: 'Roboto Condensed', sans-serif; }
+hr { width: 50%; }
+.hidden { display: none; }
+.disabled { color: #aaa; }
+.selected { color: #000; font-weight: bold; }
+</style>
+</head>
+<body>
+    <div style="margin-top: 48px; text-align: center;">
+        <h1>PL-PatchSurfer Job Progress</h1>
+        <hr />
+        <p class="disabled">Stage 1: Extract crystalized ligand.</p>
+        <p class="disabled">Stage 2: Prepare receptor pocket site.</p>
+        <p class="selected">Stage 3: Match ligand pocket sites.</p>
+        <progress value="48" max="100"></progress>
+        <div class="disabled">0 of 0</div>
+        <p class="disabled">Stage 4: Compare receptor-ligand matches.</p>
+        <p class="disabled">Stage 5: Generate ranking.</p>
+        <p class="selected hidden">Complete!</p>
+    </div>
+</body>
+</html>

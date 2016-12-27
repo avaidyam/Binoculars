@@ -28,15 +28,15 @@ import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.util.Log;
 import org.kihara.util.MigrationVisitor;
 
-import java.io.File;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.ProcessBuilder.Redirect.appendTo;
@@ -161,13 +161,13 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         }
 
         Stage stage = Stage.INITIALIZED;
+        int size = 0; // counts number of ligands in db
         String path = "";
         String db = "";
         String email = "";
         String chainID = "";
         String ligandID = "";
         String inputFile = "";
-        String outputFile = ""; //ex: lcs.rank
 
         @Override
         public String toString() {
@@ -179,7 +179,6 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     ", chainID='" + chainID + '\'' +
                     ", ligandID='" + ligandID + '\'' +
                     ", inputFile='" + inputFile + '\'' +
-                    ", outputFile='" + outputFile + '\'' +
                     '}';
         }
 
@@ -193,8 +192,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             if (!email.equals(state.email)) return false;
             if (!chainID.equals(state.chainID)) return false;
             if (!ligandID.equals(state.ligandID)) return false;
-            if (!inputFile.equals(state.inputFile)) return false;
-            return outputFile.equals(state.outputFile);
+            return inputFile.equals(state.inputFile);
         }
 
         @Override
@@ -205,17 +203,17 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
             result = 31 * result + chainID.hashCode();
             result = 31 * result + ligandID.hashCode();
             result = 31 * result + inputFile.hashCode();
-            result = 31 * result + outputFile.hashCode();
             return result;
         }
     }
 
-    /* TODO */
+    /* // TODO
     static class Task implements Serializable {
         UUID uuid = null;
         String path = "";
         State.Stage stage = State.Stage.INITIALIZED;
     }
+    //*/
 
     /**
      *
@@ -256,8 +254,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         self().state = null;
     }
 
-    // FIXME
-    /*
+    /* // FIXME
     @Override
     public void init() {
         Log.d(TAG, "Init executed!");
@@ -362,10 +359,16 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         // Map all the ligands from the selected database into the python input files.
         Path dbloc = Paths.get(conf.databaseSet.get(st.db));
         try (Stream<String> lines = Files.lines(dbloc)) {
+            AtomicInteger it = new AtomicInteger(0);
             String set = lines
-                    .map((lig) -> "\nligand_dir\t" + lig)
+                    .map((lig) -> {
+                        it.getAndIncrement(); // keep track of number of db items
+                        return "\nligand_dir\t" + lig;
+                    })
                     .reduce((r, s) -> r + s)
                     .orElse("");
+
+            self().state.size = it.get();
             s4 += set;
         }; s4 += "\n";
 
@@ -466,6 +469,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         String par = Paths.get(db).getParent().toString();
         Path seedsDir = Paths.get(self().state.path).resolve("seeds");
         Files.createDirectory(seedsDir);
+        AtomicInteger current = new AtomicInteger(0);
 
         // Iterate every ligand in the database. Create a temp directory for the
         // conformation intermediate files and delete immediately after the summary
@@ -480,6 +484,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
                     _plps.apply(new String[]{"python", loc, self().state.path + "s3.in", par + "/" + s, "" + self().configuration.n_conf, self().state.path + "seeds"})
                             .start().waitFor();
 
+                    current.getAndIncrement();
                     MigrationVisitor.deleteAll(seedsDir.resolve(s));
                 } catch(Exception ignored) {}
             });
@@ -496,7 +501,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    public Future<Void> compareLigands(int num_preview) throws Exception {
+    public Future<Void> compareLigands() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (self().state == null || self().configuration == null) {
             return new CompletableFuture<>(new RuntimeException("No task in progress!"));
@@ -507,54 +512,82 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
         _plps.apply(new String[]{"python", self().configuration.plpsPath + "scripts/rank_ligands_indiv.py", self().state.path + "s4.in"})
                 .start().waitFor();
 
-        // Templating sources...
-        final String a = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>PL-PatchSurfer Results</title><script src=\"http://3dmol.csb.pitt.edu/build/3Dmol-min.js\"></script></head><body>";
-        final String b = "<script>$(document).ready(function() {";
-        final String c = "});</script></body></html>";
-        final StringBuilder htmls = new StringBuilder();
-        final StringBuilder jss = new StringBuilder();
 
-        // Iteration things over here.
-        // Create the output directory and copy the rank file.
-        // In ./output/: all *.pdb files for rendering.
-        // In ./output/plps_XXXX/: index.html, out.rank.
+        self().state.stage = State.Stage.COMPLETE;
+        promise.complete();
+        return promise;
+    }
+
+    /**
+     *
+     * @param current
+     * @param total
+     * @return
+     * @throws Exception
+     */
+    public Future<Void> reportProgress(int current, int total) throws Exception {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+        promise.complete();
+        return promise;
+    }
+
+    /**
+     *
+     *
+     * @param failed
+     * @return
+     * @throws Exception
+     */
+    public Future<Void> reportCompletion(boolean failed, int num_preview) throws Exception {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        //
+        InputStream t = getClass().getResourceAsStream("/templates/visualizer_template.html");
+        String template = new BufferedReader(new InputStreamReader(t))
+                .lines().collect(Collectors.joining("\n"));
+        final String inside = template.substring(template.indexOf("<!--START-->") + 1,
+                template.indexOf("<!--END-->"));
+
         final int[] idx = {0};
+        String output[] = {""};
+
+        // Gather state and move things over.
         String dbDest = self().state.path + "/output";
-        Files.createDirectory(Paths.get(dbDest));
         Path folder = Paths.get(self().state.path).getFileName();
-        Files.createDirectory(Paths.get(dbDest).resolve(folder));
         String dbSource = self().configuration.pdbSources;
         String rank = self().state.path + "/out.rank";
+
+        //
+        Files.createDirectory(Paths.get(dbDest));
+        Files.createDirectory(Paths.get(dbDest).resolve(folder));
         Files.copy(Paths.get(rank), Paths.get(dbDest).resolve(folder).resolve("out.rank"));
 
         // Iterate and transform each rank listing <mol2> <score> into a visualization.
         Files.lines(Paths.get(rank)).limit(num_preview).forEachOrdered((s) -> {
-            String in1 = "<div id='m${NUM}' style=\"height: 512px; width: 512px;\" class='viewer_3Dmoljs' data-href='${PATH}' data-backgroundcolor='0xffffff' data-style='stick'></div>";
-            String in2 = "$3Dmol.viewers['m${NUM}'].addLabel(\"Distance: ${SCORE}\", {position: {x:0, y:0, z:0}, backgroundColor: 0x000000, backgroundOpacity: 0.8});";
             String parts[] = s.split("\\s+");
 
             // Copy any PDB files we need (~600kB) to the outbox.
             String pdbSource = parts[0] + ".pdb";
             try {
                 Files.copy(Paths.get(dbSource).resolve(pdbSource),
-                           Paths.get(dbDest).resolve(pdbSource));
+                        Paths.get(dbDest).resolve(pdbSource));
             } catch (Exception ignored) {}
 
             // Makeshift templating engine here...
-            in1 = in1.replace("${NUM}", "" + idx[0]);
-            in1 = in1.replace("${PATH}", "../" + pdbSource);
-            in2 = in2.replace("${NUM}", "" + idx[0]);
-            in2 = in2.replace("${SCORE}", parts[1]);
-            htmls.append(in1);
-            jss.append(in2);
+            String temp = inside;
+            temp = inside.replace("${NUM}", "" + idx[0]);
+            temp = inside.replace("${NAME}", parts[0]);
+            temp = inside.replace("${SCORE}", parts[1]);
+            temp = inside.replace("${PATH}", "../" + pdbSource);
+
+            output[0] += temp;
             idx[0]++;
         });
 
         // Write the results HTML output.
-        String out = a + htmls.toString() + b + jss.toString() + c;
+        String out = template;
         Files.write(Paths.get(dbDest).resolve(folder).resolve("index.html"), out.getBytes());
 
-        self().state.stage = State.Stage.COMPLETE;
         promise.complete();
         return promise;
     }

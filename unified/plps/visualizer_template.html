@@ -4,11 +4,24 @@
 <meta charset="UTF-8">
 <title>PL-PatchSurfer Results</title>
 <script src="http://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+<style>
+body { font-family: 'Roboto Condensed', sans-serif; }
+hr { width: 50%; }
+.hidden { display: none; }
+.disabled { color: #aaa; }
+.selected { color: #000; font-weight: bold; }
+</style>
 </head>
 <body>
+    <div style="margin-top: 48px; text-align: center;">
+        <h1>PL-PatchSurfer Job Results</h1>
+        <hr /><br />
 <!--START-->
-<div id='n${NUM}'>${NAME} (${SCORE})</div>
-<div id='m${NUM}' style="height: 512px; width: 512px;" class='viewer_3Dmoljs' data-href='${PATH}' data-backgroundcolor='0xffffff' data-style='stick'></div>
+        <div id='n${NUM}'>${NAME} (${SCORE})</div>
+        <div id='m${NUM}' style="height: 512px; width: 512px;" class='viewer_3Dmoljs' data-href='${PATH}' data-backgroundcolor='0xffffff' data-style='stick'></div>
+        <hr /><br />
 <!--END-->
+    </div>
 </body>
 </html>

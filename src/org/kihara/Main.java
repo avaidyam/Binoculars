@@ -106,7 +106,8 @@ public class Main {
             Main.plps.splitXtalLigand().await();
             Main.plps.prepareReceptor().await();
             Main.plps.compareSeedsDB().await();
-            Main.plps.compareLigands(10).await();
+            Main.plps.compareLigands().await();
+            Main.plps.reportCompletion(false, 10).await();
 
             // Notify the job results and pull from the queue if possible.
             Log.d("MAIN", "Finished task, sending results.");
