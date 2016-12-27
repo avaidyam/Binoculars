@@ -22,10 +22,12 @@
 
 package org.kihara;
 
+import com.avaidyam.binoculars.Domain;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.util.Log;
+import org.kihara.util.Mailer;
 import org.kihara.util.MigrationVisitor;
 
 import java.io.*;
@@ -34,12 +36,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.ProcessBuilder.Redirect.appendTo;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 /*
@@ -55,9 +60,73 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
  */
 public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     public static final String TAG = "[PLPatchSurferController]";
+    public static LinkedList<Map<String, String>> allJobs = new LinkedList<>();
 
     Configuration configuration = null;
     State state = null;
+
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    public void runJob(Map<String, String> manifest) throws Exception {
+        if (this.hasState().await() || manifest == null) {
+            throw new RuntimeException("Can't do that!");
+        }
+        try {
+
+            // Queue and run the job on the daemon.
+            String path = manifest.get("_path");
+            this.provideInputs(path, manifest.get("db"), manifest.get("email"), manifest.get("chain"),
+                    manifest.get("ligand"), manifest.get("receptor")).await();
+            this.generateInputs().await();
+            this.splitXtalLigand().await();
+            this.prepareReceptor().await();
+            this.compareSeedsDB().await();
+            this.compareLigands().await();
+            this.reportCompletion(false, 10).await();
+
+            // Notify the job results and pull from the queue if possible.
+            Log.d("MAIN", "Finished task, sending results.");
+
+            // Move the results to the outbox.
+            String outbox = "/bio/kihara-web/www/binoculars/outbox";
+            Path start = Paths.get(manifest.get("_path")).resolve("output");
+            Path end = Paths.get(outbox);
+            MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
+
+            // Send the results being available as an email.
+            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Results",
+                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
+
+            this.clearState();
+            this.setConfiguration(null);
+            notifyJob();
+        } catch(Exception e2) {
+            Log.e("MAIN", "Failed to complete task.", e2);
+            StringWriter sw = new StringWriter();
+            e2.printStackTrace(new PrintWriter(sw));
+
+            // Send the job failed message as an email.
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Failed",
+                        "Your PL-PatchSurfer job failed to complete. Please contact us for support.\n\n" + sw.toString() + "\n");
+
+            this.clearState();
+            this.setConfiguration(null);
+            notifyJob();
+        }
+    }
+
+    /**
+     *
+     */
+    @Domain.Local
+    public void notifyJob() throws Exception {
+        if (!this.hasState().await() && allJobs.size() > 0)
+            this.runJob(allJobs.pop());
+    }
 
     /**
      * The Configuration of a PLPatchSurferController defines its tool locations

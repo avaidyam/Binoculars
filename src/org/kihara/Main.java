@@ -28,11 +28,13 @@ import com.avaidyam.binoculars.util.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.FileWatcher;
-import org.kihara.util.Mailer;
 import org.kihara.util.MigrationVisitor;
 import org.kihara.util.ParameterFilter;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.*;
 import java.util.*;
@@ -47,10 +49,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * Entry point for the sample application (PFP).
  */
 public class Main {
-
-    private static FileWatcher watcher;
-    private static LinkedList<Map<String, String>> allJobs;
-    private static PLPatchSurferController plps;
 
     /**
      * For every added folder, grab the manifest.mf file and translate it
@@ -88,81 +86,43 @@ public class Main {
     }
 
     /**
-     *
-     *
-     * @throws Exception
-     */
-    private static void runJob(Map<String, String> manifest) throws Exception {
-        if (Main.plps.hasState().await() || manifest == null) {
-            throw new RuntimeException("Can't do that!");
-        }
-        try {
-
-            // Queue and run the job on the daemon.
-            String path = manifest.get("_path");
-            Main.plps.provideInputs(path, manifest.get("db"), manifest.get("email"), manifest.get("chain"),
-                    manifest.get("ligand"), manifest.get("receptor")).await();
-            Main.plps.generateInputs().await();
-            Main.plps.splitXtalLigand().await();
-            Main.plps.prepareReceptor().await();
-            Main.plps.compareSeedsDB().await();
-            Main.plps.compareLigands().await();
-            Main.plps.reportCompletion(false, 10).await();
-
-            // Notify the job results and pull from the queue if possible.
-            Log.d("MAIN", "Finished task, sending results.");
-
-            // Move the results to the outbox.
-            String outbox = "/bio/kihara-web/www/binoculars/outbox";
-            Path start = Paths.get(manifest.get("_path")).resolve("output");
-            Path end = Paths.get(outbox);
-            MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
-
-            // Send the results being available as an email.
-            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
-            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Results",
-                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
-
-            Main.plps.clearState();
-            Main.plps.setConfiguration(null);
-            notifyJob();
-        } catch(Exception e2) {
-            Log.e("MAIN", "Failed to complete task.", e2);
-            StringWriter sw = new StringWriter();
-            e2.printStackTrace(new PrintWriter(sw));
-
-            // Send the job failed message as an email.
-            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Failed",
-                        "Your PL-PatchSurfer job failed to complete. Please contact us for support.\n\n" + sw.toString() + "\n");
-
-            Main.plps.clearState();
-            Main.plps.setConfiguration(null);
-            notifyJob();
-        }
-    }
-
-    /**
-     *
-     */
-    private static void notifyJob() throws Exception {
-        if (!Main.plps.hasState().await() && allJobs.size() > 0)
-            runJob(allJobs.pop());
-    }
-
-    /**
      * Initialize the Cortex, and start the HTTP server and shell.
      */
     public static void main(String[] args) throws Exception {
         Log.get().setSeverity(Log.Severity.DEBUG);
-        Main.allJobs = new LinkedList<>();
-        Main.plps = Nucleus.of(PLPatchSurferController.class);
-        Main.watcher = FileWatcher.watch((p, e) -> {
-            allJobs.addAll(Main.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
-            try { notifyJob(); } catch(Exception e2) { e2.printStackTrace(); }
+
+        PLPatchSurferController controller = Nucleus.of(PLPatchSurferController.class);
+        FileWatcher watcher = FileWatcher.watch((p, e) -> {
+            PLPatchSurferController.allJobs.addAll(Main.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
+
+            try {
+                controller.notifyJob();
+            } catch(Exception e2) {
+                e2.printStackTrace();
+            }
         }, "/bio/kihara-web/www/binoculars/upload/");
     }
 
-    /*public static void main(String[] args) {
+
+
+
+
+    /**
+     *
+     *
+     * THE FOLLOWING IS LEGACY CODE AND WILL BE REMOVED.
+     *
+     *
+     */
+
+
+
+
+
+    /**
+     * Legacy from PFPController.
+     */
+    public static void mainOld(String[] args) {
         Log.get().setSeverity(Log.Severity.DEBUG);
         Cortex<PFPController> cortex = Cortex.of(PFPController.class);
         PFPController main = cortex.getNodes().get(0);
@@ -193,7 +153,7 @@ public class Main {
             Log.e("Main", "Could not begin application.", e);
             System.exit(-1);
         }
-    }*/
+    }
 
     /**
      * Jumpstart a quick HTTPServer atop the PFPController
