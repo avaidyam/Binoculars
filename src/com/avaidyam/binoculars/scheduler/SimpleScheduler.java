@@ -48,7 +48,7 @@ public class SimpleScheduler implements Scheduler {
 	public static long BLOCKED_MS_TIL_WARN = 5000;
 	public static int DEFQSIZE = 32768; // will be alligned to 2^x
 	
-	protected BackOffStrategy backOffStrategy = new BackOffStrategy();
+	protected SchedulingStrategy schedulingStrategy = new SchedulingStrategy();
 	protected Dispatcher myThread;
 	int qsize = DEFQSIZE;
 	
@@ -84,7 +84,7 @@ public class SimpleScheduler implements Scheduler {
 	
 	@Override
 	public void pollDelay(int count) {
-		backOffStrategy.yield(count);
+		schedulingStrategy.yield(count);
 	}
 	
 	@Override
@@ -94,7 +94,7 @@ public class SimpleScheduler implements Scheduler {
 		boolean warningPrinted = false;
 		while(!q.offer(o)) {
 			pollDelay(count++);
-			if(backOffStrategy.isYielding(count)) {
+			if(schedulingStrategy.isYielding(count)) {
 				Nucleus sendingNucleus = Nucleus.sender.get();
 				if(receiver instanceof Nucleus && ((Nucleus) receiver).__stopped) {
 					String dl;
@@ -109,7 +109,7 @@ public class SimpleScheduler implements Scheduler {
 				}
 				if(sendingNucleus != null && sendingNucleus.__throwExAtBlock)
 					throw Exceptions.NucleusBlockedException.INSTANCE;
-				if(backOffStrategy.isSleeping(count)) {
+				if(schedulingStrategy.isSleeping(count)) {
 					if(sleepStart == 0) {
 						sleepStart = System.currentTimeMillis();
 					} else if(!warningPrinted && System.currentTimeMillis() - sleepStart > BLOCKED_MS_TIL_WARN) {
@@ -267,8 +267,8 @@ public class SimpleScheduler implements Scheduler {
 	}
 	
 	@Override
-	public BackOffStrategy getBackoffStrategy() {
-		return backOffStrategy;
+	public SchedulingStrategy getBackoffStrategy() {
+		return schedulingStrategy;
 	}
 	
 	@Override

@@ -61,7 +61,7 @@ public class ElasticScheduler implements Scheduler {
     public static Timer delayedCalls = new Timer();
     final Dispatcher threads[];
     final Object balanceLock = new Object();
-    protected BackOffStrategy backOffStrategy = new BackOffStrategy();
+    protected SchedulingStrategy schedulingStrategy = new SchedulingStrategy();
     protected ExecutorService exec = Executors.newFixedThreadPool(MAX_EXTERNAL_THREADS_POOL_SIZE);
     int maxThread = Runtime.getRuntime().availableProcessors();
     int defQSize = DEFQSIZE;
@@ -109,7 +109,7 @@ public class ElasticScheduler implements Scheduler {
 
     @Override
     public void pollDelay(int count) {
-        backOffStrategy.yield(count);
+        schedulingStrategy.yield(count);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class ElasticScheduler implements Scheduler {
                     }
                 }
             }
-            if (backOffStrategy.isYielding(count)) {
+            if (schedulingStrategy.isYielding(count)) {
                 Nucleus sendingNucleus = Nucleus.sender.get();
                 if (receiver instanceof Nucleus && ((Nucleus) receiver).__stopped) {
                     String dl;
@@ -161,7 +161,7 @@ public class ElasticScheduler implements Scheduler {
                 }
                 if (sendingNucleus != null && sendingNucleus.__throwExAtBlock)
                     throw Exceptions.NucleusBlockedException.INSTANCE;
-                if (backOffStrategy.isSleeping(count)) {
+                if (schedulingStrategy.isSleeping(count)) {
                     if (!warningPrinted) {
                         warningPrinted = true;
                         String receiverString;
@@ -508,8 +508,8 @@ public class ElasticScheduler implements Scheduler {
     }
 
     @Override
-    public BackOffStrategy getBackoffStrategy() {
-        return backOffStrategy;
+    public SchedulingStrategy getBackoffStrategy() {
+        return schedulingStrategy;
     }
 
     class CallbackInvokeHandler implements InvocationHandler {
