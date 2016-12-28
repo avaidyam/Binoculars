@@ -28,7 +28,7 @@ import com.avaidyam.binoculars.asyncio.AsyncSocketConnection;
 import com.avaidyam.binoculars.asyncio.QueuingAsyncSocketConnection;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 
 import org.nustaq.offheap.BinaryQueue;
 

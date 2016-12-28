@@ -26,7 +26,7 @@ import com.avaidyam.binoculars.Export;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.kihara.util.Mailer;
 import org.kihara.util.MigrationVisitor;
 

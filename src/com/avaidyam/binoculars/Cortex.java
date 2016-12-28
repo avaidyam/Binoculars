@@ -26,9 +26,8 @@ import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
 import com.avaidyam.binoculars.remoting.tcp.TCPPublisher;
-import com.avaidyam.binoculars.util.Eponym;
-import com.avaidyam.binoculars.util.Log;
 import org.kihara.tasks.TaskScheduler;
+import org.kihara.util.Heartbeat;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -98,7 +97,7 @@ public class Cortex<T extends Nucleus> {
     };
 
     private final String broadcastType;
-    private final String broadcastName = "endpoint-" + Eponym.eponymate("-", 4);
+    private final String broadcastName = "endpoint-" + (int)(Math.random() * 100);
     private final int broadcastPort = 30003;//getLocalPort(); // TODO: Allocate this port.
 
     private final Class<T> actorClass;

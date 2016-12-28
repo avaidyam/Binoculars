@@ -24,7 +24,7 @@ package org.kihara;
 
 import com.avaidyam.binoculars.Cortex;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.FileWatcher;

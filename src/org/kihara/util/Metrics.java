@@ -20,13 +20,14 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars.util;
+package org.kihara.util;
+
+import com.sun.management.OperatingSystemMXBean;
 
 import java.io.File;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import com.sun.management.OperatingSystemMXBean;
 
 public class Metrics implements Serializable {
     public static class CPU extends Metrics {

@@ -30,8 +30,7 @@ import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
 import com.avaidyam.binoculars.scheduler.ElasticScheduler;
 import com.avaidyam.binoculars.scheduler.Scheduler;
-import com.avaidyam.binoculars.util.Log;
-import com.avaidyam.binoculars.util.WrapperExecutorService;
+import com.avaidyam.binoculars.asyncio.WrapperExecutorService;
 import external.jaq.mpsc.MpscConcurrentQueue;
 
 import java.io.Serializable;

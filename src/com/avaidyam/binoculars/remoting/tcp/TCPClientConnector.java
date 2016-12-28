@@ -29,7 +29,7 @@ import com.avaidyam.binoculars.remoting.base.ObjectFlow;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.nustaq.serialization.util.FSTUtil;
 
 import java.io.EOFException;

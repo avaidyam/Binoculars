@@ -26,7 +26,7 @@ import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.remoting.encoding.Coding;
 import com.avaidyam.binoculars.remoting.encoding.SerializerType;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.nustaq.serialization.FSTConfiguration;
 
 import java.util.List;

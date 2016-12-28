@@ -24,7 +24,7 @@ package com.avaidyam.binoculars.asyncio;
 
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.nustaq.offheap.BinaryQueue;
 import org.nustaq.offheap.bytez.niobuffers.ByteBufferBasicBytez;
 import org.nustaq.offheap.bytez.onheap.HeapBytez;

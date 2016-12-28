@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars.util;
+package org.kihara.util;
 
 import java.util.*;
 import java.util.stream.Collectors;

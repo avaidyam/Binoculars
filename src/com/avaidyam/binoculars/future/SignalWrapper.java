@@ -24,7 +24,7 @@ package com.avaidyam.binoculars.future;
 
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import com.avaidyam.binoculars.remoting.base.RemotedCallback;
 
 import java.io.Serializable;

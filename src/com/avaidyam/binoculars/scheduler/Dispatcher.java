@@ -25,7 +25,7 @@ package com.avaidyam.binoculars.scheduler;
 import com.avaidyam.binoculars.Exceptions;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;

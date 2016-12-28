@@ -26,7 +26,7 @@ import com.avaidyam.binoculars.remoting.base.ObjectFlow;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.remoting.base.RemotedCallback;
 import com.avaidyam.binoculars.future.Signal;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.nustaq.serialization.FSTBasicObjectSerializer;
 import org.nustaq.serialization.FSTClazzInfo;
 import org.nustaq.serialization.FSTObjectInput;

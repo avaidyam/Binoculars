@@ -30,7 +30,7 @@ import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.SignalWrapper;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

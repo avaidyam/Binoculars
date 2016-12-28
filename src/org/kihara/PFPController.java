@@ -27,8 +27,8 @@ import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.FutureLatch;
 import com.avaidyam.binoculars.Cortex;
-import com.avaidyam.binoculars.util.Eponym;
-import com.avaidyam.binoculars.util.Log;
+import org.kihara.util.Eponym;
+import com.avaidyam.binoculars.Log;
 import org.kihara.util.SeekableFile;
 
 import java.io.*;

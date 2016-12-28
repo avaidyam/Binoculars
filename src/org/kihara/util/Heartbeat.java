@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars;
+package org.kihara.util;
 
 import java.io.Serializable;
 import java.util.Date;

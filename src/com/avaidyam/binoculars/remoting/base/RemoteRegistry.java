@@ -30,7 +30,7 @@ import com.avaidyam.binoculars.remoting.RemoteConnection;
 import com.avaidyam.binoculars.future.*;
 import com.avaidyam.binoculars.remoting.encoding.*;
 import com.avaidyam.binoculars.scheduler.RemoteScheduler;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.nustaq.serialization.FSTConfiguration;
 import org.nustaq.serialization.util.FSTUtil;
 
