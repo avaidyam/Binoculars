@@ -351,15 +351,6 @@ public class Dispatcher extends Thread {
                     Nucleus nucleus = (Nucleus) invocation.getTarget();
                     nucleus.__stopped = true;
                     removeNucleusImmediate(nucleus.getNucleusRef());
-// FIXME: Many Testcases fail if uncommented. Rethink
-//                    if (invocation.getFutureCB() != null)
-//                        invocation.getFutureCB().complete(null, e);
-//                    else
-//                        Log.Warn(this,e,"");
-//                    if (invocation.getFutureCB() != null)
-//                        invocation.getFutureCB().complete(null, e);
-//                    else
-//                        Log.Warn(this,e,"");
                     return true;
                 }
                 if (e instanceof InvocationTargetException) {
@@ -370,8 +361,10 @@ public class Dispatcher extends Thread {
                     if (DUMP_EXCEPTIONS)
                         e.printStackTrace();
                     invocation.getFutureCB().complete(null, e);
-                } else
-                    Log.w(this.toString(), "" + invocation + Arrays.toString(invocation.getArgs()), e);
+                } else {
+                    Log.w(this.toString(), "invocation: " + invocation + "\nargs: " + Arrays.toString(invocation.getArgs()), e);
+                    e.printStackTrace();
+                }
             }
         }
         return false;

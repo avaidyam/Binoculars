@@ -70,7 +70,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * and working directory; this rarely needs to be changed, and if it does,
      * it will invalidate the state of every instance of the controller with it.
      */
-    static class Configuration implements Serializable {
+    public static class Configuration implements Serializable {
 
         String plpsPath = tilde("~/PatchSurfer/");
         String workingPath = tilde("~/PatchSurferFiles/");
@@ -149,7 +149,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * and redistributing the job amongst distant nodes and relies on an
      * underlying distributed file system (like MooseFS) to operate.
      */
-    static class State implements Serializable {
+    public static class State implements Serializable {
 
         /**
          * The State.Stage describes the current step in processing that the

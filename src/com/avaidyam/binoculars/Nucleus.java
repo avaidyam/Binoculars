@@ -26,7 +26,7 @@ import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.*;
 import com.avaidyam.binoculars.management.NucleusStatusMXBean;
-import com.avaidyam.binoculars.remoting.ExperimentalNucleusProxyFactory;
+import com.avaidyam.binoculars.remoting.NucleusProxifier;
 import com.avaidyam.binoculars.remoting.RemoteConnection;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
@@ -300,9 +300,8 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     public static class NucleiImpl {
 
         protected ConcurrentLinkedQueue deadLetters = new ConcurrentLinkedQueue();
-        protected ExperimentalNucleusProxyFactory factory = new ExperimentalNucleusProxyFactory();
-
-        public ExperimentalNucleusProxyFactory getFactory() {
+        protected NucleusProxifier factory = new NucleusProxifier();
+        public NucleusProxifier getFactory() {
             return factory;
         }
 
@@ -806,7 +805,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     // dispatch an outgoing call to the target nuclei queue. Runs in Caller Thread
     @Domain.CallerSide
     public Object __enqueueCall(Nucleus receiver, String methodName, Object args[], boolean isCB) {
-        System.out.println("INVOKE " + methodName + " (" + args.length + ") ON " + receiver);
+        //System.out.println("INVOKE " + methodName + " (" + args.length + ") ON " + receiver);
         if (__stopped) {
             if (methodName.equals("stop")) // ignore double stop
                 return null;
