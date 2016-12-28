@@ -79,6 +79,12 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     public volatile boolean __stopped = false;
     public Nucleus __self; // the proxy
     public int __remoteId;
+
+    /**
+     * tell the execution machinery to throw an NucleusBlockedException in case the nuclei is blocked trying to
+     * put a message on an overloaded nuclei's inbox/queue. Useful e.g. when dealing with actors representing
+     * a remote client (might block or lag due to connection issues).
+     */
     public boolean __throwExAtBlock = false;
     // a list of connection required to be notified on close
     public volatile ConcurrentLinkedQueue<RemoteConnection> __connections;
@@ -128,7 +134,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     public static ThreadLocal<RemoteConnection> connection = new ThreadLocal<>();
 
     /**
-     * create an new nuclei. If this is called outside an nuclei, a new DispatcherThread will be scheduled. If
+     * create an new nuclei. If this is called outside an nuclei, a new Dispatcher will be scheduled. If
      * called from inside nuclei code, the new nuclei will share the thread+queue with the caller.
      *
      * @param actorClazz Class of nuclei
@@ -141,7 +147,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     }
 
     /**
-     * create an new nuclei. If this is called outside an nuclei, a new DispatcherThread will be scheduled. If
+     * create an new nuclei. If this is called outside an nuclei, a new Dispatcher will be scheduled. If
      * called from inside nuclei code, the new nuclei will share the thread+queue with the caller.
      *
      * @param actorClazz
@@ -154,7 +160,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     }
 
     /**
-     * create an new nuclei dispatched in the given DispatcherThread
+     * create an new nuclei dispatched in the given Dispatcher
      *
      * @param actorClazz
      * @param <T>
@@ -166,7 +172,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     }
 
     /**
-     * create an new nuclei dispatched in the given DispatcherThread
+     * create an new nuclei dispatched in the given Dispatcher
      *
      * @param actorClazz
      * @param <T>
@@ -177,6 +183,50 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
         T a = (T) Nucleus.newProxy(actorClazz, scheduler, qsize);
 		a.init(); // queues a constructor call
 		return a;
+    }
+
+    /**
+     * Actually create the proxy and bind the instance to it.
+     *
+     * @param clz
+     * @param sched
+     * @param qsize
+     * @param <T>
+     * @return
+     */
+    private static <T extends Nucleus> T newProxy(Class<T> clz, Scheduler sched, int qsize) {
+        if (sched == null && Thread.currentThread() instanceof Dispatcher)
+            sched = ((Dispatcher) Thread.currentThread()).getScheduler();
+        try {
+            if (sched == null)
+                sched = new ElasticScheduler(1, qsize);
+            if (qsize < 1)
+                qsize = sched.getDefaultQSize();
+            Dispatcher disp = sched.assignDispatcher(70);
+
+            if (qsize <= 100)
+                qsize = disp.getScheduler().getDefaultQSize();
+
+            T realNucleus = clz.newInstance();
+            T selfproxy = NucleusProxifier.instantiateProxy(realNucleus);
+
+            realNucleus.__channel = new Channel(qsize);
+            realNucleus.__scheduler = disp.getScheduler();
+            realNucleus.__dispatcher = disp;
+            realNucleus.__self = selfproxy;
+
+            selfproxy.__channel = realNucleus.__channel;
+            selfproxy.__scheduler = disp.getScheduler();
+            selfproxy.__dispatcher = disp;
+            selfproxy.__self = selfproxy;
+
+            disp.addNucleus(realNucleus);
+            return selfproxy;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -244,6 +294,8 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 	}
 
     /**
+     * `self()` provides access to the Nucleus Proxy.
+     *
      * use this to call public methods using nuclei-dispatch instead of direct in-thread call.
      * Important: When passing references out of your nuclei, always pass 'self()' instead of this !
      *
@@ -480,28 +532,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
         return __connections != null && __connections.peek() != null;
     }
 
-////////////////////////////// internals ///////////////////////////////////////////////////////////////////
-
-    protected boolean getThrowExWhenBlocked() {
-        return __throwExAtBlock;
-    }
-
-    /**
-     * tell the execution machinery to throw an NucleusBlockedException in case the nuclei is blocked trying to
-     * put a message on an overloaded nuclei's inbox/queue. Useful e.g. when dealing with actors representing
-     * a remote client (might block or lag due to connection issues).
-     *
-     * @param b
-     * @return
-     */
-
-    public SELF setThrowExWhenBlocked(boolean b) {
-        getNucleusRef().__throwExAtBlock = b;
-        getNucleus().__throwExAtBlock = b;
-        return (SELF) this;
-    }
-
-
     public void __addStopHandler(Signal<SELF> cb) {
         if (__stopHandlers == null) {
             getNucleusRef().__stopHandlers = new ConcurrentLinkedQueue();
@@ -511,7 +541,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
         if(!__stopHandlers.contains(cb))
             __stopHandlers.add(cb);
     }
-
 
     public void __addRemoteConnection(RemoteConnection con) {
         if (__connections == null) {
@@ -523,13 +552,11 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 	    }
     }
 
-
     public void __removeRemoteConnection(RemoteConnection con) {
         if (__connections != null) {
             __connections.remove(con);
         }
     }
-
 
     public void __stop() {
 	    Log.d(this.toString(), "stopping nuclei " + getClass().getSimpleName());
@@ -580,7 +607,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 
     // FIXME: would be much better to do lookup at method invoke time INSIDE nuclei thread instead of doing it on callside (contended)
     ConcurrentHashMap<String, Method> methodCache;
-
     public Method __getCachedMethod(String methodName, Nucleus nucleus) {
 	    if ( methodCache == null ) {
 		    methodCache = new ConcurrentHashMap<>(7);
@@ -598,49 +624,5 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
             }
         }
         return method;
-    }
-
-    public static <T extends Nucleus> T makeProxy(Class<T> clz, Dispatcher disp, int qs) {
-        try {
-            if (qs <= 100)
-                qs = disp.getScheduler().getDefaultQSize();
-
-            T realNucleus = clz.newInstance();
-            T selfproxy = NucleusProxifier.instantiateProxy(realNucleus);
-
-            realNucleus.__channel = new Channel(qs);
-            realNucleus.__scheduler = disp.getScheduler();
-            realNucleus.__dispatcher = disp;
-            realNucleus.__self = selfproxy;
-
-            selfproxy.__channel = realNucleus.__channel;
-            selfproxy.__scheduler = disp.getScheduler();
-            selfproxy.__dispatcher = disp;
-            selfproxy.__self = selfproxy;
-
-            disp.addNucleus(realNucleus);
-            return selfproxy;
-        } catch (Exception e) {
-            if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T extends Nucleus> T newProxy(Class<T> clz, Scheduler sched, int qsize) {
-        if (sched == null && Thread.currentThread() instanceof Dispatcher)
-            sched = ((Dispatcher) Thread.currentThread()).getScheduler();
-
-        try {
-            if (sched == null)
-                sched = new ElasticScheduler(1, qsize);
-            if (qsize < 1)
-                qsize = sched.getDefaultQSize();
-            return makeProxy(clz, sched.assignDispatcher(70), qsize);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
