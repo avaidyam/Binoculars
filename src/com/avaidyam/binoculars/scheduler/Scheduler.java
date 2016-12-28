@@ -35,28 +35,6 @@ import java.util.concurrent.Callable;
  */
 public interface Scheduler {
 
-	/**
-     * The default mailbox size.
-     */
-    int getDefaultQSize();
-
-    // FIXME: REMOVE
-    void threadStopped(Dispatcher th);
-
-    /**
-     * yield during polling/spinlooping
-     */
-    // FIXME: REMOVE
-    void pollDelay(int count);
-
-    // FIXME: REMOVE
-    void put2QueuePolling(Queue q, boolean isCBQ, Object o, Object sender);
-
-    Object enqueueCall(RemoteRegistry registry, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB);
-
-    // FIXME: REMOVE
-    InvocationHandler getInvoker(Nucleus dispatcher, Object toWrap);
-
     /**
      * Creates a wrapper on the given object enqueuing allOf calls to INTERFACE methods of the given object to the given actors's queue.
      * This is used to enable processing of resulting callback's in the callers thread.
@@ -72,14 +50,35 @@ public interface Scheduler {
 
     <T> void runBlockingCall(Nucleus emitter, Callable<T> toCall, Signal<T> resultHandler);
 
+    Object enqueueCall(RemoteRegistry registry, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB);
+
+
+
+
+    // FIXME: REMOVE
+    int getDefaultQSize();
+
+    // FIXME: REMOVE
+    void threadStopped(Dispatcher th);
+
+    /**
+     * yield during polling/spinlooping
+     */
+    // FIXME: REMOVE
+    void pollDelay(int count);
+
+    // FIXME: REMOVE
+    void put2QueuePolling(Queue q, boolean isCBQ, Object o, Object sender);
+
+    // FIXME: REMOVE
+    InvocationHandler getInvoker(Nucleus dispatcher, Object toWrap);
+
     // FIXME: REMOVE
     Dispatcher assignDispatcher(int minLoadPerc);
 
     /**
      * called from inside overloaded thread with load
      * allOf actors assigned to the calling thread therefore can be safely moved
-     *
-     * @param dispatcher
      */
     // FIXME: REMOVE
     void rebalance(Dispatcher dispatcher);

@@ -400,6 +400,8 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	}
 	
 	public void receiveCBResult(ObjectFlow.Source chan, int id, Object result, Object error) throws Exception {
+
+		// If we have a facade nucleus, make sure this method is executed inside of it.
 		if (facadeNucleus !=null) {
 			Thread debug = facadeNucleus.__dispatcher;
 			if ( Thread.currentThread() != debug ) {
@@ -415,6 +417,8 @@ public abstract class RemoteRegistry implements RemoteConnection {
 				return;
 			}
 		}
+
+		// The actual method is as follows:
 		RemoteCallEntry rce = new RemoteCallEntry(0, id, null, new Object[] {result,error});
 		rce.setQueue(rce.CBQ);
 		writeObject(chan, rce);

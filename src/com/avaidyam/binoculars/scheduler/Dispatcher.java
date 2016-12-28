@@ -23,12 +23,12 @@
 package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Exceptions;
-import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.Log;
-import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
+import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import external.jaq.mpsc.MpscConcurrentQueue;
 
 import java.lang.reflect.InvocationTargetException;
@@ -138,7 +138,7 @@ public class Dispatcher extends Thread {
     /**
      * The Dispatcher's assigned Nuclei.
      */
-    private Nucleus nuclei[] = new Nucleus[0]; // always refs
+    Nucleus nuclei[] = new Nucleus[0]; // always refs
 
     /**
      * Poll all nuclei in the queue in a round robin manner.
@@ -261,13 +261,13 @@ public class Dispatcher extends Thread {
         try {
             while (!isShutDown) {
                 try {
-                    if (pollQs()) {
+                    if (pollQs(nuclei)) {
 
                         // Successful poll!
                         emptyCount = 0;
                         if (System.nanoTime() - scheduleTickTime > SCHEDULE_TICK_NANOS) {
                             if (emptySinceLastCheck == 0) // no idle during last interval
-                                checkForSplit();
+                                possiblyRebalance();
                             emptySinceLastCheck = 0;
                             scheduleTickTime = System.nanoTime();
                             schedulePendingAdds();
@@ -360,16 +360,6 @@ public class Dispatcher extends Thread {
     }
 
     /**
-     * Returns whether messages exist for any Nuclei in the Dispatcher.
-     *
-     * @return whether messages exist
-     */
-    // TODO RENAME
-    public boolean pollQs() {
-        return pollQs(nuclei);
-    }
-
-    /**
      * Returns whether messages exist for any Nuclei given.
      *
      * @return whether messages exist
@@ -457,7 +447,7 @@ public class Dispatcher extends Thread {
     /**
      * Rebalance the Dispatcher from the Scheduler if the current load is over-limit.
      */
-    private void checkForSplit() {
+    private void possiblyRebalance() {
         if (getLoad() > QUEUE_PERCENTAGE_TRIGGERING_REBALANCE && nuclei.length > 1 &&
                 System.currentTimeMillis() - created > MILLIS_AFTER_CREATION_BEFORE_REBALANCING)
             scheduler.rebalance(this);
@@ -491,24 +481,46 @@ public class Dispatcher extends Thread {
      * @param until
      */
     public void defer(long until) {
-        Scheduler scheduler = this.getScheduler();
-        boolean term = false;
         int idleCount = 0;
+        boolean term = false;
         while ( ! term ) {
-            boolean hadSome = this.pollQs();
+            boolean hadSome = this.pollQs(nuclei);
             if ( ! hadSome ) {
                 idleCount++;
                 scheduler.pollDelay(idleCount);
                 if ( until == 0 ) {
                     term = true;
                 }
-            } else {
-                idleCount = 0;
-            }
+            } else idleCount = 0;
+
             if ( until != 0 && System.currentTimeMillis() > until ) {
                 term = true;
             }
         }
+    }
+
+    /**
+     * Special version of defer() used by Future.
+     *
+     * @param until
+     * @param future
+     */
+    public void defer2(long until, CompletableFuture future) {
+        int idleCount = 0;
+        this.__stack.add(future);
+        while (!future.isComplete()) {
+            if (!this.pollQs(nuclei)) {
+                idleCount++;
+                scheduler.pollDelay(idleCount);
+            } else idleCount = 0;
+
+            if ( until != 0 && System.currentTimeMillis() > until ) {
+                future.timedOut(CompletableFuture.Timeout.INSTANCE);
+                break;
+            }
+        }
+
+        this.__stack.remove(this.__stack.size() - 1);
     }
 
     /**

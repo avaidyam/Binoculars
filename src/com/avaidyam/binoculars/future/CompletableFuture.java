@@ -24,7 +24,6 @@ package com.avaidyam.binoculars.future;
 
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
-import com.avaidyam.binoculars.scheduler.Scheduler;
 import com.avaidyam.binoculars.scheduler.ElasticScheduler;
 
 import java.lang.reflect.InvocationTargetException;
@@ -553,23 +552,7 @@ public class CompletableFuture<T> implements Future<T> {
 
         if (Thread.currentThread() instanceof Dispatcher) {
             Dispatcher dt = (Dispatcher)Thread.currentThread();
-            Scheduler scheduler = dt.getScheduler();
-
-            int idleCount = 0;
-            dt.__stack.add(this);
-            while (!isComplete()) {
-                if (!dt.pollQs()) {
-                    idleCount++;
-                    scheduler.pollDelay(idleCount);
-                } else idleCount = 0;
-
-                if ( endtime != 0 && System.currentTimeMillis() > endtime ) {
-                    timedOut(Timeout.INSTANCE);
-                    break;
-                }
-            }
-
-            dt.__stack.remove(dt.__stack.size() - 1);
+            dt.defer2(endtime, this);
             return this;
         } else { // if outside of nuclei machinery, just block (warning actually polls)
             // FIXME: Switch to CountDownLatch
