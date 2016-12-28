@@ -297,10 +297,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     public static class NucleiImpl {
 
         protected ConcurrentLinkedQueue deadLetters = new ConcurrentLinkedQueue();
-        protected NucleusProxifier factory = new NucleusProxifier();
-        public NucleusProxifier getFactory() {
-            return factory;
-        }
 
         public ConcurrentLinkedQueue getDeadLetters() {
             return deadLetters;
@@ -316,7 +312,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
                 realNucleus.__mbCapacity = ((MpscConcurrentQueue) realNucleus.__mailbox).getCapacity();
                 realNucleus.__cbQueue = createQueue(qs);
 
-                Nucleus selfproxy = getFactory().instantiateProxy(realNucleus);
+                Nucleus selfproxy = NucleusProxifier.instantiateProxy(realNucleus);
                 realNucleus.__self = selfproxy;
                 selfproxy.__self = selfproxy;
 
@@ -401,10 +397,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
      */
     protected SELF self() {
         return (SELF)__self;
-    }
-
-    public Object getFactory() {
-        return instance.getFactory();
     }
 
     /**

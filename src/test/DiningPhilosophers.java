@@ -1,5 +1,6 @@
 package test;
 
+import com.avaidyam.binoculars.Export;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
 import com.avaidyam.binoculars.remoting.tcp.TCPServerConnector;
@@ -15,11 +16,14 @@ public class DiningPhilosophers {
 	public static class Table extends Nucleus<Table> {
 		ArrayList<CompletableFuture> forks[] = new ArrayList[5];
 
-		public Table() {
+		@Export
+		@Override
+		public void init() {
 			for (int i = 0; i < forks.length; i++)
 				forks[i] = new ArrayList<>();
 		}
 
+		@Export
 		public Future getFork(int num) {
 			num %= 5;
 			CompletableFuture res = forks[num].size() == 0 ? new CompletableFuture("void") : new CompletableFuture();
@@ -27,6 +31,7 @@ public class DiningPhilosophers {
 			return res;
 		}
 
+		@Export
 		public void returnFork(int num) {
 			num %= 5;
 			forks[num].remove(0);
@@ -43,6 +48,7 @@ public class DiningPhilosophers {
 		String state;
 		int eatCount;
 
+		@Export
 		public void start(String name, int nr, Table table) {
 			this.name = name;
 			this.nr = nr;
@@ -51,6 +57,7 @@ public class DiningPhilosophers {
 			live();
 		}
 
+		@Export
 		public void live() {
 			state = "Think";
 			long thinkTime = randomTimeMS();
@@ -78,6 +85,7 @@ public class DiningPhilosophers {
 			});
 		}
 
+		@Export
 		public Future<String> getState() {
 			return new CompletableFuture<>(name + " " + state + " eaten:" + eatCount);
 		}
@@ -102,6 +110,7 @@ public class DiningPhilosophers {
 	}
 
 	static void runClient() throws Exception {
+		//noinspection unchecked
 		new TCPConnectible(Table.class, "localhost", 6789)
 				.connect()
 				.then((table, error) -> {
@@ -119,7 +128,8 @@ public class DiningPhilosophers {
 			//case 1: runClient(); break;
 			default:
 				// run them in process
-				runPhilosophers(Nucleus.of(Table.class));
+				//runPhilosophers(Nucleus.of(Table.class));
+				runServer();runClient();
 		}
 	}
 

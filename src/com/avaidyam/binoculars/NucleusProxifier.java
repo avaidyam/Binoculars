@@ -1,5 +1,7 @@
 package com.avaidyam.binoculars;
 
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Future;
 import javassist.Modifier;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;
@@ -27,14 +29,13 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * target. That is, the generated proxy intercepts all method calls and queues them
  * for the underlying target's invocation later.
  */
-public class NucleusProxifier {
-    public NucleusProxifier() {}
+public enum NucleusProxifier {;
 
     /**
      * When generating proxy classes, cache them so we don't generate colliding
      * classes (i.e. if they need to be remoted).
      */
-    private HashMap<Class, Class> _pregenerated = new HashMap<>();
+    private static final HashMap<Class, Class> _pregenerated = new HashMap<>();
 
     /**
      * Set the proxy instance's underlying target. This is the actual object that
@@ -77,7 +78,7 @@ public class NucleusProxifier {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public <T extends Nucleus> T instantiateProxy(T target) throws Exception {
+    public static <T extends Nucleus> T instantiateProxy(T target) throws Exception {
         Class<? extends Nucleus> targetClass = target.getClass();
 
         // The nucleus class MUST be public, non-inner if static, and non-anonymous.
@@ -109,10 +110,13 @@ public class NucleusProxifier {
                             .and(not(isFinal()))
                             .and(not(isStatic()))
                             .and(not(named("self")))
+                            .and(returns(void.class)
+                                    .or(returns(Future.class))
+                                    .or(returns(CompletableFuture.class)))
                             .and(isAnnotatedWith(Export.class)))
                     .intercept(MethodDelegation.to(ProxyInterceptor.class))
                     .make()
-                    .load(getClass().getClassLoader(), WRAPPER)
+                    .load(targetClass.getClassLoader(), WRAPPER)
                     .getLoaded();
 
             _pregenerated.put(targetClass, proxyClass);
@@ -148,6 +152,10 @@ public class NucleusProxifier {
                     }
                 }
             }
+
+            // TODO: Use MethodHandle instead.
+            //MethodHandle m = MethodHandles.lookup().unreflect(method);
+            //Object res = m.invokeExact(allArguments);
 
             Export a = method.getAnnotation(Export.class);
             boolean isSignal = a != null && a.signalPriority();
