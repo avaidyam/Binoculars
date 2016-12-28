@@ -22,7 +22,7 @@
 
 package com.avaidyam.binoculars;
 
-import com.avaidyam.binoculars.asyncio.WrapperExecutorService;
+import com.avaidyam.binoculars.remoting.asyncio.WrapperExecutorService;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.Signal;

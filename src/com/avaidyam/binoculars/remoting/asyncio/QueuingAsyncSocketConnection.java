@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars.asyncio;
+package com.avaidyam.binoculars.remoting.asyncio;
 
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.Future;

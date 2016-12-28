@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars.asyncio;
+package com.avaidyam.binoculars.remoting.asyncio;
 
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.remoting.base.ObjectFlow;

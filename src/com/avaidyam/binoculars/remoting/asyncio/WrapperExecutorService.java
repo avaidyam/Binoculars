@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.avaidyam.binoculars.asyncio;
+package com.avaidyam.binoculars.remoting.asyncio;
 
 import java.util.Collection;
 import java.util.List;

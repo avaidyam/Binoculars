@@ -21,11 +21,9 @@
  * THE SOFTWARE.
  */
 
-package org.kihara.util;
+package com.avaidyam.binoculars.remoting.asyncio;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.asyncio.AsyncSocketConnection;
-import com.avaidyam.binoculars.asyncio.QueuingAsyncSocketConnection;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.Log;
@@ -48,7 +46,7 @@ import java.util.function.BiFunction;
  * ALPHA has serious issues.
  *
  */
-public class _AsyncClientSocket implements Runnable {
+public class AsyncClientSocket implements Runnable {
 
     SocketChannel channel;
     Selector selector;
@@ -163,10 +161,10 @@ public class _AsyncClientSocket implements Runnable {
 
 
     public static class CLSNucleus extends Nucleus<CLSNucleus> {
-        _AsyncClientSocket sock;
+        AsyncClientSocket sock;
 
         public void connect() {
-            sock = new _AsyncClientSocket();
+            sock = new AsyncClientSocket();
             sock.connect("localhost",8080, (key,channel) ->
                 new QueuingAsyncSocketConnection( key, channel ) {
                     @Override
