@@ -1,0 +1,43 @@
+#LZerD
+The program LZerD uses geometric hashing to generate ligand orientations using the 3D Zernike
+descriptor as the shape matching criteria. Scoring is based on as shape complementarity term
+defined by the local shape Zernike and orientation of the surface normals. In addition a
+clash penalty term and buried surface area have also been incorporated.
+
+#DETAILS
+This distribution includes exectutable files for LZerD1.0 and other utilities required by the program.
+(GETPOINTS, LZD32, mark_sur, points, SASA.rc, PDBGEN, runLZerD.sh, example). All files have been compiled on a 
+GenuineIntel Pentium 4 processor(http://www.intel.com/products/processor/pentium4/) running on a 
+LINUX (Ubuntu 8.04.2) operating system. The current version of LZerD requires around 1.5GB RAM, so please ensure 
+that the system has sufficient memory resources. Docking times range between 1.5 to 6 hours depending on 
+the size of the protein and the number of surface points considered. 
+
+NOTE: The program has only been tested on machines running LINUX.
+
+#USAGE
+To run the program please use the "runlzerd.sh" script by providing it with two pdb files i.e.
+the receptor and ligand.
+Parameters for the run have been preset.
+At the end of the docking run, the program outputs the top 3 orientations as judged by the LZerD score.
+An example has been provided for the protein 1PPE in the "example" directory.
+
+Example:
+./runlzerd.sh 1PPE_r_b.pdb 1PPE_l_b.pdb
+ATTENTION: Both ligand and receptor PDB files must be in the "lzerddistribution"  directory i.e.
+in the same directory as the executables.
+It is advised to copy the proteins to be docked into the "lzerddistribution" folder and then run the 
+script as shown above.
+Users may need to make the shell script executable and this can be done by executing the command
+"chmod +x runlzerd.sh" on the console.
+
+#OUTPUT
+The first line of the output is the translation and random rotation applied to the ligand.
+The transformations are output as a set of 12 numbers, the first 9 forming the 3 rows of a
+rotation matrix and the other 3, the translation to be applied after rotation. The last column
+is the score for the given orientation. Solutions are ranked based on the score from highest to lowest.
+
+#UPDATE
+2014-12-12, updated a new version of "LZD32" program. fixed "NaN" and "inf" bugs.
+
+#CONTACT
+Please report comments and bugs to dkihara@purdue.edu

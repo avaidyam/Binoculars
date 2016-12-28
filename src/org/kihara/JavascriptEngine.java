@@ -51,47 +51,47 @@ public final class JavascriptEngine {
 
     private static final String SHELL_INIT_JS =
             "Object.defineProperty(this, \"input\", {\n" +
-            "    value: function input(endMarker, prompt) {\n" +
-            "        if (!endMarker) {\n" +
-            "            endMarker = \"\";\n" +
-            "        }\n" +
-            "\n" +
-            "        if (!prompt) {\n" +
-            "            prompt = \" >> \";\n" +
-            "        }\n" +
-            "\n" +
-            "        var imports = new JavaImporter(java.io, java.lang);\n" +
-            "        var str = \"\";\n" +
-            "        with (imports) {\n" +
-            "            var reader = new BufferedReader(new InputStreamReader(System['in']));\n" +
-            "            var line;\n" +
-            "            while (true) {\n" +
-            "                System.out.print(prompt);\n" +
-            "                line = reader.readLine();\n" +
-            "                if (line == null || line == endMarker) {\n" +
-            "                    break;\n" +
-            "                }\n" +
-            "                str += line + \"\\n\";\n" +
-            "            }\n" +
-            "        }\n" +
-            "\n" +
-            "        return str;\n" +
-            "    },\n" +
-            "    enumerable: false,\n" +
-            "    writable: true,\n" +
-            "    configurable: true\n" +
-            "});\n" +
-            "\n" +
-            "Object.defineProperty(this, \"evalinput\", {\n" +
-            "    value: function evalinput(endMarker, prompt) {\n" +
-            "        var code = input(endMarker, prompt);\n" +
-            "        // make sure everything is evaluated in global scope!\n" +
-            "        return this.eval(code);\n" +
-            "    },\n" +
-            "    enumerable: false,\n" +
-            "    writable: true,\n" +
-            "    configurable: true\n" +
-            "});\n";
+                    "    value: function input(endMarker, prompt) {\n" +
+                    "        if (!endMarker) {\n" +
+                    "            endMarker = \"\";\n" +
+                    "        }\n" +
+                    "\n" +
+                    "        if (!prompt) {\n" +
+                    "            prompt = \" >> \";\n" +
+                    "        }\n" +
+                    "\n" +
+                    "        var imports = new JavaImporter(java.io, java.lang);\n" +
+                    "        var str = \"\";\n" +
+                    "        with (imports) {\n" +
+                    "            var reader = new BufferedReader(new InputStreamReader(System['in']));\n" +
+                    "            var line;\n" +
+                    "            while (true) {\n" +
+                    "                System.out.print(prompt);\n" +
+                    "                line = reader.readLine();\n" +
+                    "                if (line == null || line == endMarker) {\n" +
+                    "                    break;\n" +
+                    "                }\n" +
+                    "                str += line + \"\\n\";\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "\n" +
+                    "        return str;\n" +
+                    "    },\n" +
+                    "    enumerable: false,\n" +
+                    "    writable: true,\n" +
+                    "    configurable: true\n" +
+                    "});\n" +
+                    "\n" +
+                    "Object.defineProperty(this, \"evalinput\", {\n" +
+                    "    value: function evalinput(endMarker, prompt) {\n" +
+                    "        var code = input(endMarker, prompt);\n" +
+                    "        // make sure everything is evaluated in global scope!\n" +
+                    "        return this.eval(code);\n" +
+                    "    },\n" +
+                    "    enumerable: false,\n" +
+                    "    writable: true,\n" +
+                    "    configurable: true\n" +
+                    "});\n";
 
     // CLI Exit Codes
     public static final int SUCCESS = 0;
