@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package org.kihara;
+package org.kihara.util;
 
 import jdk.nashorn.api.scripting.ClassFilter;
 import jdk.nashorn.api.scripting.NashornException;
