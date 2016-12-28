@@ -1,7 +1,5 @@
-package com.avaidyam.binoculars.internal;
+package com.avaidyam.binoculars;
 
-import com.avaidyam.binoculars.Domain;
-import com.avaidyam.binoculars.Nucleus;
 import javassist.Modifier;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;

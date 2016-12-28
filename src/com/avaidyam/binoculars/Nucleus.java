@@ -25,7 +25,6 @@ package com.avaidyam.binoculars;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.*;
-import com.avaidyam.binoculars.internal.NucleusProxifier;
 import com.avaidyam.binoculars.remoting.RemoteConnection;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.scheduler.Dispatcher;

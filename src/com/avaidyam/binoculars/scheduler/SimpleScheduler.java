@@ -39,9 +39,11 @@ import java.util.Queue;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
+/**
+ *
+ */
 public class SimpleScheduler implements Scheduler {
-	
-	public static final boolean DEBUG_SCHEDULING = true;
+
 	/**
 	 * time ms until a warning is printed once a sender is blocked by a full nuclei queue
 	 */
