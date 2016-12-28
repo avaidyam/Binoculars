@@ -100,7 +100,7 @@ public enum NucleusProxifier {;
                         }
                     })
                     .subclass(targetClass)
-                    .implement(Externalizable.class, Nucleus.NucleusProxy.class)
+                    .implement(Externalizable.class, Nucleus.Proxy.class)
                     .defineField("__target", targetClass, PUBLIC)
                     .method(returns(Nucleus.class).and(isPublic()).and(named("getNucleus")))
                     .intercept(FieldAccessor.ofField("__target"))

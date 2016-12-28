@@ -22,6 +22,7 @@
 
 package com.avaidyam.binoculars;
 
+import com.avaidyam.binoculars.asyncio.WrapperExecutorService;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.*;
@@ -30,7 +31,6 @@ import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
 import com.avaidyam.binoculars.scheduler.ElasticScheduler;
 import com.avaidyam.binoculars.scheduler.Scheduler;
-import com.avaidyam.binoculars.asyncio.WrapperExecutorService;
 import external.jaq.mpsc.MpscConcurrentQueue;
 
 import java.io.Serializable;
@@ -39,7 +39,6 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -78,36 +77,27 @@ import java.util.function.Supplier;
  */
 public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, AutoCloseable {
 
-    public static final int MAX_EXTERNAL_THREADS_POOL_SIZE = 1000; // max threads used when externalizing blocking api
-	public static ThreadPoolExecutor exec;
-	static {
-		exec = new ThreadPoolExecutor(
-				MAX_EXTERNAL_THREADS_POOL_SIZE, MAX_EXTERNAL_THREADS_POOL_SIZE,
-				1L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<>()
-		);
-		exec.allowCoreThreadTimeOut(true);
-	}
     public static NucleiImpl instance = new NucleiImpl(); // public for testing
-    public static Timer delayedCalls = new Timer();
-    public static Supplier<Scheduler> defaultScheduler = () -> new ElasticScheduler(1);//new SimpleScheduler();
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // static API
+    public static Timer delayedCalls = new Timer();
+
+    /**
+     * The default Nucleus Scheduler.
+     */
+    public static Supplier<Scheduler> defaultScheduler = () -> new ElasticScheduler(1);
 
 	/**
 	 * A tagging interface to identify Nucleus proxies. {@link Nucleus#of(Class)}
-	 * internally generates an {@link NucleusProxy} which translates each method
+	 * internally generates an {@link Proxy} which translates each method
 	 * call into a message to be enqueued by the elastic scheduler to the
 	 * underlying nuclei instance.
 	 *
 	 * @param <T> the type of the Nucleus proxied
 	 */
-	public interface NucleusProxy<T extends Nucleus> {
+	public interface Proxy<T extends Nucleus> {
 
 		/**
-		 * Returns the underlying Nucleus behind this NucleusProxy. Can be
+		 * Returns the underlying Nucleus behind this Proxy. Can be
 		 * used to verify if an Object is the real nuclei, or a proxy,
 		 * like so: {@code nuclei.getNucleus() == nuclei}.
 		 *
@@ -115,27 +105,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 		 */
 		Nucleus<T> getNucleus();
 	}
-
-    public static void addDeadLetter(String s) {
-        Log.w(null, s);
-        deadLetters().add(s);
-    }
-
-    /**
-     * in case called from an nuclei, wraps the given interface instance into a proxy such that
-     * a calls on the interface get scheduled on the actors thread (avoids accidental multithreading
-     * when handing out callback/listener interfaces from an nuclei)
-     *
-     * @param anInterface
-     * @param <T>
-     * @return
-     */
-    public static <T> T inThread(T anInterface) {
-        Nucleus sender = Nucleus.sender.get();
-        if (sender != null)
-            return sender.getScheduler().inThread(sender.getNucleus(), anInterface);
-        else return anInterface;
-    }
 
     /**
      * messages that have been dropped or have been sent to stopped actors
@@ -288,12 +257,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     //
     // helper
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Throwable> void throwException(Throwable exception) throws T {
-        throw (T) exception;
-    }
-
-
     public static class NucleiImpl {
 
         protected ConcurrentLinkedQueue deadLetters = new ConcurrentLinkedQueue();
@@ -302,17 +265,17 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
             return deadLetters;
         }
 
-        public Nucleus makeProxy(Class<? extends Nucleus> clz, Dispatcher disp, int qs) {
+        public <T extends Nucleus> T makeProxy(Class<T> clz, Dispatcher disp, int qs) {
             try {
                 if (qs <= 100)
                     qs = disp.getScheduler().getDefaultQSize();
 
-                Nucleus realNucleus = clz.newInstance();
+                T realNucleus = clz.newInstance();
                 realNucleus.__mailbox = createQueue(qs);
                 realNucleus.__mbCapacity = ((MpscConcurrentQueue) realNucleus.__mailbox).getCapacity();
                 realNucleus.__cbQueue = createQueue(qs);
 
-                Nucleus selfproxy = NucleusProxifier.instantiateProxy(realNucleus);
+                T selfproxy = NucleusProxifier.instantiateProxy(realNucleus);
                 realNucleus.__self = selfproxy;
                 selfproxy.__self = selfproxy;
 
@@ -339,7 +302,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
             return new MpscConcurrentQueue(qSize);
         }
 
-        public Nucleus newProxy(Class<? extends Nucleus> clz, Scheduler sched, int qsize) {
+        public <T extends Nucleus> T newProxy(Class<T> clz, Scheduler sched, int qsize) {
             if (sched == null && Thread.currentThread() instanceof Dispatcher)
                     sched = ((Dispatcher) Thread.currentThread()).getScheduler();
 
@@ -380,7 +343,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     public RemoteConnection __clientConnection; // remoteconnection this in case of remote ref
 
 	Thread _t; // debug
-	protected TicketMachine __ticketMachine;
 
 
 	/**
@@ -403,7 +365,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
      * @return if this is an actorproxy, return the underlying nuclei instance, else return this
      */
     public SELF getNucleus() {
-        return (SELF)this;
+        return (SELF)null;
     }
 
     /**
@@ -625,25 +587,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     }
 
 	/**
-	 * Debug method.
-	 * can be called to check nuclei code is actually single threaded.
-	 * By using custom callbacks/other threading bugs accidental multi threading
-	 * can be detected that way.
-	 *
-	 * WARNING: only feasable when running in dev on single threaded scheduler (ElasticScheduler with a single thread),
-	 * else false alarm might occur
-	 */
-	protected final void checkThread() {
-		if (_t == null) {
-			_t = Thread.currentThread();
-		} else {
-			if (_t != Thread.currentThread()) {
-				throw new RuntimeException("Wrong Thread");
-			}
-		}
-	}
-
-	/**
 	 * closes associated remote connection(s) if present. NOP otherwise.
 	 * Close refers to "unmapping" the nuclei, underlying network connections will not be
 	 * closed (else server down on single client disconnect)
@@ -686,28 +629,6 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
         return __connections != null && __connections.peek() != null;
     }
 
-
-    /**
-     * enforce serial execution of asynchronous tasks. The 'toRun' closure must call '.signal()' on the given future
-     * to signal his processing has finished and the next item locked on 'transactionKey' can be processed.
-     *
-     * @param transactionKey
-     * @param toRun
-     */
-    protected void serialOn(Object transactionKey, Consumer<Future> toRun) {
-        if (isProxy())
-            throw new RuntimeException("cannot call on nuclei proxy object");
-        if (__ticketMachine == null) {
-            __ticketMachine = new TicketMachine();
-        }
-        __ticketMachine.getTicket(transactionKey).onResult(finSig -> {
-            try {
-                toRun.accept(finSig);
-            } catch (Throwable th) {
-                Log.w(Nucleus.this.toString(), "", th);
-            }
-        });
-    }
 
 	public Dispatcher getCurrentDispatcher() {
 		return (Dispatcher) __currentDispatcher;
@@ -811,7 +732,8 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
         String senderString = sender.get() == null ? "null" : sender.get().getClass().getName();
         String s = "DEAD LETTER: sender:" + senderString + " receiver::msg:" + receiver.getClass().getSimpleName() + "::" + methodName;
         s = s.replace("_NucleusProxy", "");
-        addDeadLetter(s);
+        Log.w("NONE", s);
+        deadLetters().add(s);
     }
 
     // FIXME: would be much better to do lookup at method invoke time INSIDE nuclei thread instead of doing it on callside (contended)

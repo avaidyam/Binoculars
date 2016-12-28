@@ -532,12 +532,17 @@ public class CompletableFuture<T> implements Future<T> {
             return get();
 
         if (getError() instanceof Throwable)
-            Nucleus.throwException(getError());
+            throwException(getError());
         else if (getError() == Timeout.INSTANCE)
             throw new TimeoutException();
         else
             throw new ExecutionException(getError().toString());
         return null; // never reached
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Throwable> void throwException(Throwable exception) throws T {
+        throw (T) exception;
     }
 
     @Override

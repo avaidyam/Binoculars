@@ -38,11 +38,25 @@ import java.lang.reflect.Proxy;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
  */
 public class SimpleScheduler implements Scheduler {
+
+	public static final int MAX_EXTERNAL_THREADS_POOL_SIZE = 1000; // max threads used when externalizing blocking api
+	public static ThreadPoolExecutor exec;
+	static {
+		exec = new ThreadPoolExecutor(
+				MAX_EXTERNAL_THREADS_POOL_SIZE, MAX_EXTERNAL_THREADS_POOL_SIZE,
+				1L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<>()
+		);
+		exec.allowCoreThreadTimeOut(true);
+	}
 
 	/**
 	 * time ms until a warning is printed once a sender is blocked by a full nuclei queue
@@ -250,7 +264,7 @@ public class SimpleScheduler implements Scheduler {
 	@Override
 	public <T> void runBlockingCall(Nucleus emitter, Callable<T> toCall, Signal<T> resultHandler) {
 		final SignalWrapper<T> resultWrapper = new SignalWrapper<>(emitter, resultHandler);
-		Nucleus.exec.execute(() -> {
+		SimpleScheduler.exec.execute(() -> {
 			try {
 				resultWrapper.complete(toCall.call(), null);
 			} catch(Throwable th) {

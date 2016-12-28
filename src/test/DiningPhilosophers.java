@@ -17,7 +17,6 @@ public class DiningPhilosophers {
 		ArrayList<CompletableFuture> forks[] = new ArrayList[5];
 
 		@Export
-		@Override
 		public void init() {
 			for (int i = 0; i < forks.length; i++)
 				forks[i] = new ArrayList<>();

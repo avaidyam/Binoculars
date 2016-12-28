@@ -23,8 +23,8 @@
 package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.Queue;
@@ -62,6 +62,15 @@ public interface Scheduler {
      * see also @InThread annotation.
      *
      * @param callback
+     * @param <T>
+     * @return
+     */
+    /**
+     * in case called from an nuclei, wraps the given interface instance into a proxy such that
+     * a calls on the interface get scheduled on the actors thread (avoids accidental multithreading
+     * when handing out callback/listener interfaces from an nuclei)
+     *
+     * @param anInterface
      * @param <T>
      * @return
      */

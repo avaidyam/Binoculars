@@ -26,7 +26,7 @@ import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.Future;
 
 /**
- * A RemoteConnection facilitates a registry mapping of NucleusProxy to IDs
+ * A RemoteConnection facilitates a registry mapping of Proxy to IDs
  * and can have a custom ClassLoader.
  */
 public interface RemoteConnection extends AutoCloseable {

@@ -88,8 +88,8 @@ public class RemoteInvocation<T> implements Message<T> {
 
 //    public Message withTarget(T newTarget, boolean copyArgs) {
 //        Nucleus targetNucleus = null;
-//        if ( newTarget instanceof NucleusProxy )
-//            newTarget = (T) ((NucleusProxy) newTarget).getNucleus();
+//        if ( newTarget instanceof Proxy )
+//            newTarget = (T) ((Proxy) newTarget).getNucleus();
 //        if ( newTarget instanceof Nucleus) {
 //            targetNucleus = (Nucleus) newTarget;
 //        }
