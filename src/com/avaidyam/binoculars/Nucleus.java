@@ -423,7 +423,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     public void stop() {
         if(isRemote())
             throw new RuntimeException("Cannot stop a remote nuclei!");
-        self().ping().then((Runnable)() -> self().asyncStop());
+        self().ping().then(() -> self().asyncStop());
     }
 
 	// internal. tweak to check for remote ref before sending

@@ -532,7 +532,7 @@ public class CompletableFuture<T> implements Future<T> {
             return get();
 
         if (getError() instanceof Throwable)
-            Nucleus.throwException((Throwable) getError());
+            Nucleus.throwException(getError());
         else if (getError() == Timeout.INSTANCE)
             throw new TimeoutException();
         else

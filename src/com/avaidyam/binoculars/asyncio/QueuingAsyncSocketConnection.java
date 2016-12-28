@@ -105,8 +105,8 @@ public abstract class QueuingAsyncSocketConnection extends AsyncSocketConnection
                 queueDataAvailableCompletableFuture.then((Signal)(res, err) -> {
                     if ( err != null ) {
                         if (err instanceof Throwable ) {
-                            Log.e(this.toString(), "write failure",  (Throwable) err);
-                            closed((Throwable) err);
+                            Log.e(this.toString(), "write failure", err);
+                            closed(err);
                         } else {
 	                        Log.e(this.toString(), "write failure:"+err);
                             closed( new IOException(""+err));

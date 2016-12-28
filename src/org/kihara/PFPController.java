@@ -309,8 +309,8 @@ public class PFPController extends Nucleus<PFPController> {
 			});
 			promise.complete();
 		}).onError(t -> {
-			Log.e(TAG, "Encountered error!", (Throwable)t);
-			promise.completeExceptionally((Throwable)t);
+			Log.e(TAG, "Encountered error!", t);
+			promise.completeExceptionally(t);
 		});//.then(promise);
 		return promise;
 	}

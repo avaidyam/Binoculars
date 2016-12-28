@@ -95,7 +95,7 @@ public abstract class ObjectAsyncSourceConnection extends QueuingAsyncSocketConn
     }
 
     @Override
-    public void flush() throws IOException, Exception {
+    public void flush() throws Exception {
         if ( theExecutingThread != Thread.currentThread() ) {
             if ( myNucleus == null )
                 return;
