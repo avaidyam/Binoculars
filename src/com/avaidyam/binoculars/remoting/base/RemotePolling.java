@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * Note for transparent websocket/longpoll reconnect:
  * Terminated / Disconnected remote actors (registries) are removed from the entry list,
- * so regular nuclei messages sent to a terminated remote nuclei queue up in its mailbox.
+ * so regular nuclei messages sent to a terminated remote nuclei queue up in its inbox.
  * Callbacks/Future results from exported callbacks/futures still reach the object socket
  * as these are redirected directly inside serializers. Those queue up in the webobjectsocket's list,
  * as flush is not called anymore because of removement from SendLoop list.
@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * In case of TCP remoting, an NucleusStopped Exception is thrown if an attempt is made to send a message to a
  * disconnected remote nuclei.
  *
- * in short: regular messages to disconected remote actors queue up in mailbox, callbacks in object socket buffer
+ * in short: regular messages to disconected remote actors queue up in inbox, callbacks in object socket buffer
  *
  * For typical client/server alike use cases, there are never remote references as most client api's do
  * not support handing out client remoterefs to servers (javascript, kontraktor bare)

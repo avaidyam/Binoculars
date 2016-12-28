@@ -321,7 +321,7 @@ public class AsyncFile {
             @Override
             public void completed(Integer result, ByteBuffer attachment) {
                 if ( source.remaining() > 0 ) {
-                    // just retry (will enqueue new message/job to nuclei mailbox)
+                    // just retry (will enqueue new message/job to nuclei inbox)
                     fileChannel.write(source,filePosition,source,this);
                 } else {
                     long newPos = filePosition + finalTarget.limit() - bufferStartPos;

@@ -308,7 +308,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 				Log.e(this.toString(), "registry:" + System.identityHashCode(this) + " no nuclei found for key " + read);
 				return true;
 			}
-			if (targetNucleus.isStopped() || targetNucleus.getScheduler() == null ) {
+			if (targetNucleus.isStopped() || targetNucleus.__scheduler == null ) {
 				Log.e(this.toString(), "nuclei found for key " + read + " is stopped and/or has no scheduler set");
 				receiveCBResult(objSocket, read.getFutureKey(), null, Exceptions.InternalNucleusStoppedException.INSTANCE);
 				return true;
@@ -319,7 +319,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 				return false;
 			}
 			try {
-				Object future = targetNucleus.getScheduler().enqueueCallFromRemote(this, null, targetNucleus, read.getMethod(), read.getArgs(), false);
+				Object future = targetNucleus.__scheduler.enqueueCallFromRemote(this, null, targetNucleus, read.getMethod(), read.getArgs(), false);
 				if ( future instanceof Future) {
 					CompletableFuture p = null;
 					if ( createdFutures != null ) {
@@ -401,8 +401,8 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	
 	public void receiveCBResult(ObjectFlow.Source chan, int id, Object result, Object error) throws Exception {
 		if (facadeNucleus !=null) {
-			Thread debug = facadeNucleus.getCurrentDispatcher();
-			if ( Thread.currentThread() != facadeNucleus.getCurrentDispatcher() ) {
+			Thread debug = facadeNucleus.__dispatcher;
+			if ( Thread.currentThread() != facadeNucleus.__dispatcher ) {
 				facadeNucleus.execute( () -> {
 					try {
 						if ( Thread.currentThread() != debug )
@@ -469,10 +469,10 @@ public abstract class RemoteRegistry implements RemoteConnection {
 			for (Iterator<Nucleus> iterator = remoteNuclei.iterator(); iterator.hasNext(); ) {
 				Nucleus remoteNucleus = iterator.next();
 				boolean cb = false; // true; FIXME
-				RemoteInvocation ce = (RemoteInvocation) remoteNucleus.__cbQueue.poll();
+				RemoteInvocation ce = (RemoteInvocation) remoteNucleus.__channel.outbox.poll();
 				if ( ce == null ) {
 					cb = false;
-					ce = (RemoteInvocation) remoteNucleus.__mailbox.poll();
+					ce = (RemoteInvocation) remoteNucleus.__channel.inbox.poll();
 				}
 				if ( ce != null) {
 					if ( ce.getMethod().getName().equals("close") ) {

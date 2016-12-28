@@ -220,7 +220,7 @@ public class Dispatcher extends Thread {
      * @param nucleus the nucleus to add
      */
     public void addNucleus(Nucleus nucleus) {
-        nucleus.getNucleusRef().__currentDispatcher = nucleus.getNucleus().__currentDispatcher = this;
+        nucleus.getNucleusRef().__dispatcher = nucleus.getNucleus().__dispatcher = this;
         toAdd.offer(nucleus.getNucleusRef());
     }
 
@@ -349,10 +349,10 @@ public class Dispatcher extends Thread {
                 currentPolledNucleus = 0;
 
             Nucleus nucleus2Poll = nuclei[currentPolledNucleus];
-            res = (RemoteInvocation)nucleus2Poll.__cbQueue.poll();
+            res = (RemoteInvocation)nucleus2Poll.__channel.outbox.poll();
 
             if (res == null)
-                res = (RemoteInvocation)nucleus2Poll.__mailbox.poll();
+                res = (RemoteInvocation)nucleus2Poll.__channel.inbox.poll();
             currentPolledNucleus++;
             count++;
         }
@@ -472,17 +472,43 @@ public class Dispatcher extends Thread {
         int res = 0;
         final Nucleus nuclei[] = this.nuclei;
         for (Nucleus aNuclei : nuclei) {
-            MpscConcurrentQueue queue = (MpscConcurrentQueue) aNuclei.__mailbox;
+            MpscConcurrentQueue queue = (MpscConcurrentQueue) aNuclei.__channel.inbox;
             int load = queue.size() * 100 / queue.getCapacity();
             if (load > res)
                 res = load;
 
-            queue = (MpscConcurrentQueue) aNuclei.__cbQueue;
+            queue = (MpscConcurrentQueue) aNuclei.__channel.outbox;
             load = queue.size() * 100 / queue.getCapacity();
             if (load > res)
                 res = load;
         }
         return res;
+    }
+
+    /**
+     * Yield the Dispatcher until the given time.
+     *
+     * @param until
+     */
+    public void defer(long until) {
+        Scheduler scheduler = this.getScheduler();
+        boolean term = false;
+        int idleCount = 0;
+        while ( ! term ) {
+            boolean hadSome = this.pollQs();
+            if ( ! hadSome ) {
+                idleCount++;
+                scheduler.pollDelay(idleCount);
+                if ( until == 0 ) {
+                    term = true;
+                }
+            } else {
+                idleCount = 0;
+            }
+            if ( until != 0 && System.currentTimeMillis() > until ) {
+                term = true;
+            }
+        }
     }
 
     /**
@@ -494,7 +520,7 @@ public class Dispatcher extends Thread {
         int res = 0;
         final Nucleus nuclei[] = this.nuclei;
         for (Nucleus aNuclei : nuclei) {
-            res += aNuclei.getQSizes();
+            res += aNuclei.__channel.getQSizes();
         }
         return res;
     }
@@ -508,8 +534,8 @@ public class Dispatcher extends Thread {
         int res = 0;
         final Nucleus nuclei[] = this.nuclei;
         for (Nucleus a : nuclei) {
-            res += a.__mailbox.size();
-            res += a.__cbQueue.size();
+            res += a.__channel.inbox.size();
+            res += a.__channel.outbox.size();
         }
         return res;
     }
@@ -537,7 +563,7 @@ public class Dispatcher extends Thread {
      */
     public boolean isEmpty() {
         for (Nucleus n : nuclei) {
-            if (!n.__mailbox.isEmpty() || !n.__cbQueue.isEmpty())
+            if (!n.__channel.inbox.isEmpty() || !n.__channel.outbox.isEmpty())
                 return false;
         }
         return true;
@@ -583,6 +609,6 @@ public class Dispatcher extends Thread {
             throw new RuntimeException("Must invoke this method from the Dispatcher!");
 
         return (receiver instanceof Nucleus) &&
-                (((Nucleus) receiver).__currentDispatcher == this);
+                (((Nucleus) receiver).__dispatcher == this);
     }
 }

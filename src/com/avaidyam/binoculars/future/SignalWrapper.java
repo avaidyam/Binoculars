@@ -74,7 +74,7 @@ public class SignalWrapper<T> implements Future<T>, Serializable {
         } else {
             RemoteInvocation ce = new RemoteInvocation<>(realSignal, receiveRes, new Object[]{result, error},
                                            Nucleus.sender.get(), targetNucleus, true);
-            targetNucleus.__scheduler.put2QueuePolling(targetNucleus.__cbQueue, true, ce, targetNucleus);
+            targetNucleus.__scheduler.put2QueuePolling(targetNucleus.__channel.outbox, true, ce, targetNucleus);
         }
     }
 

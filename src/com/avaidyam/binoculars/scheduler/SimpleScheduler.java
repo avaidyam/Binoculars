@@ -132,10 +132,10 @@ public class SimpleScheduler implements Scheduler {
 						String receiverString;
 						warningPrinted = true;
 						if(receiver instanceof Nucleus) {
-							if(q == ((Nucleus) receiver).__cbQueue) {
-								receiverString = receiver.getClass().getSimpleName() + " callbackQ";
-							} else if(q == ((Nucleus) receiver).__mailbox) {
-								receiverString = receiver.getClass().getSimpleName() + " mailbox";
+							if(q == ((Nucleus) receiver).__channel.outbox) {
+								receiverString = receiver.getClass().getSimpleName() + " outbox";
+							} else if(q == ((Nucleus) receiver).__channel.inbox) {
+								receiverString = receiver.getClass().getSimpleName() + " inbox";
 							} else {
 								receiverString = receiver.getClass().getSimpleName() + " unknown queue";
 							}
@@ -160,7 +160,7 @@ public class SimpleScheduler implements Scheduler {
 		} else
 			fut = null;
 		Nucleus targetNucleus = e.getTargetNucleus();
-		put2QueuePolling(e.isCallback() ? targetNucleus.__cbQueue : targetNucleus.__mailbox, false, e, targetNucleus);
+		put2QueuePolling(e.isCallback() ? targetNucleus.__channel.outbox : targetNucleus.__channel.inbox, false, e, targetNucleus);
 		return fut;
 	}
 	
@@ -228,7 +228,7 @@ public class SimpleScheduler implements Scheduler {
 				return method.invoke(proxy, args); // toString, hashCode etc. invoke sync (DANGER if hashcode accesses mutable local state)
 			if(target != null) {
 				RemoteInvocation ce = new RemoteInvocation(target, method, args, Nucleus.sender.get(), targetNucleus, true);
-				put2QueuePolling(targetNucleus.__cbQueue, true, ce, targetNucleus);
+				put2QueuePolling(targetNucleus.__channel.outbox, true, ce, targetNucleus);
 			}
 			return null;
 		}
