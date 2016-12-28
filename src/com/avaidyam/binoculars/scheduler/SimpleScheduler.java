@@ -285,7 +285,7 @@ public class SimpleScheduler implements Scheduler {
 	
 	@Override
 	public int getNumNuclei() {
-		return myThread.getNucleiNoCopy().length;
+		return myThread.getNuclei().length;
 	}
 }
 
