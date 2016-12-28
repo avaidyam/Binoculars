@@ -3,7 +3,7 @@ package test;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.scheduler.ElasticScheduler;
 import com.avaidyam.binoculars.future.CompletableFuture;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 
 import java.util.ArrayList;
 import java.util.List;

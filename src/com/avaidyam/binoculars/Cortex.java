@@ -22,25 +22,34 @@
 
 package com.avaidyam.binoculars;
 
+import com.avaidyam.binoculars.future.CompletableFuture;
+import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.remoting.tcp.TCPConnectible;
-import org.kihara.tasks.TaskScheduler;
 import com.avaidyam.binoculars.remoting.tcp.TCPPublisher;
-import com.avaidyam.binoculars.util.Eponym;
-import external.zeroconf.discovery.*;
-import com.avaidyam.binoculars.util.Log;
+import org.kihara.tasks.TaskScheduler;
+import org.kihara.util.Heartbeat;
 
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+// TODO: Relay of Interests
+// TODO: Indirect, Direct, Relay connections
 
 public class Cortex<T extends Nucleus> {
 
-    private static ZeroConf zeroConf;
+    private static JmDNS zeroConf;
     static {
         try {
-            zeroConf = ZeroConf.create();
+            zeroConf = JmDNS.create();
             //zeroConf = ZeroConfMulti.Factory.getInstance();
         } catch(Exception e) {
             Log.i(Runtime.getRuntime().toString(), "ZeroConf disabled. Error details: " + e.getMessage() + ".");
@@ -88,8 +97,8 @@ public class Cortex<T extends Nucleus> {
     };
 
     private final String broadcastType;
-    private final String broadcastName = "endpoint-" + Eponym.eponymate("-", 4);
-    private final int broadcastPort = getLocalPort();
+    private final String broadcastName = "endpoint-" + (int)(Math.random() * 100);
+    private final int broadcastPort = 30003;//getLocalPort(); // TODO: Allocate this port.
 
     private final Class<T> actorClass;
     private final List<T> nodes = new ArrayList<>();
@@ -151,15 +160,7 @@ public class Cortex<T extends Nucleus> {
             e.printStackTrace();
         } finally {
             publish();
-            discover((h, p) -> {
-                try {
-	                new TCPConnectible(this.actorClass, h, p).connect().then((node, error) -> {
-	                    this.nodes.add((T)node);
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }, (h, p) -> {
+            discover(this::manuallyConnect, (h, p) -> {
                 Log.i("[Cortex]", "Node dropped at " + h + ":" + p);
                 //
             });
@@ -266,6 +267,21 @@ public class Cortex<T extends Nucleus> {
         zeroConf.addServiceListener(broadcastType, listener);
     }
 
+    public boolean manuallyConnect(String host, int port) {
+        try {
+            new TCPConnectible(this.actorClass, host, port).connect().onResult(node -> {
+                Log.i("Cortex", "Adding node from \"" + host + ":" + port + "\".");
+                this.nodes.add((T)node);
+            }).onError(error -> {
+                Log.e("Cortex", "Couldn't manually connect to \"" + host + ":" + port + "\"!");
+            });
+        } catch (Exception e) {
+            Log.e("Cortex", "Couldn't manually connect to \"" + host + ":" + port + "\"!", e);
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Evaluates a local port that is open and available.
      *
@@ -278,6 +294,111 @@ public class Cortex<T extends Nucleus> {
         } catch(IOException e) {
             e.printStackTrace();
             return 0;
+        }
+    }
+
+
+
+
+
+    //
+    //
+    // INTERESTS API:
+    //
+    //
+
+
+
+
+
+    // For Interests support.
+    private HashMap<String, List<T>> interests = new HashMap<>();
+
+    /**
+     *
+     * @param interest
+     * @param receiver
+     */
+    public void addInterest(String interest,  T receiver) {
+        List<T> list = this.interests.get(interest);
+        if (list == null) {
+            list = new ArrayList<>();
+            this.interests.put(interest, list);
+        }
+        list.add(receiver);
+    }
+
+    /**
+     *
+     * @param interest
+     * @param receiver
+     */
+    public void removeInterest(String interest, T receiver) {
+        List<T> receiverActors = this.interests.get(interest);
+        if (receiverActors != null) {
+            for (Iterator<T> iterator = receiverActors.iterator(); iterator.hasNext(); ) {
+                T receiverActor = iterator.next();
+                if (receiverActor.equals(receiver))
+                    iterator.remove();
+            }
+        }
+    }
+
+    /**
+     *
+     * @param receiver
+     */
+    public void removeAllInterests(T receiver) {
+        this.interests.forEach((interest, list) -> this.removeInterest(interest, receiver));
+    }
+
+    //
+    /*
+    public void syncInterests() {
+        //
+    }*/
+
+    /**
+     *
+     * @param sender
+     * @param interest
+     * @param contents
+     */
+    public void notifyInterest(T sender, String interest, Object contents) {
+        List<T> subscriber = this.interests.get(interest);
+        if ( subscriber != null ) {
+            subscriber.stream()
+                    .filter(subs -> !subs.equals(sender))
+                    .forEach(subs -> subs.tell(interest, contents));
+        }
+    }
+
+    /**
+     *
+     *
+     * Note: WILL BLOCK THREAD OF NOT INVOKED FROM A NUCLEUS CONTEXT!
+     *
+     * @param sender
+     * @param interest
+     * @param contents
+     * @param receipt
+     */
+    public void requestInterest(T sender, String interest, Object contents, Signal receipt) {
+        List<T> subscriber = this.interests.get(interest);
+        if ( subscriber != null ) {
+            List<CompletableFuture> results = subscriber.stream()
+                    .filter(subs -> !subs.equals(sender))
+                    .map(subs -> (CompletableFuture)subs.ask(interest, contents))
+                    .collect(Collectors.toList());
+
+            try {
+                CompletableFuture.allOf((List)results).await(5000, TimeUnit.MILLISECONDS); // is non-blocking
+            } catch (Exception ex) {
+                // timeout goes here
+                Log.i("Notification", "timeout in broadcast");
+            }
+            results.forEach(promise -> receipt.stream(promise.get()));
+            receipt.complete(); // important to release callback mapping in remoting !
         }
     }
 }

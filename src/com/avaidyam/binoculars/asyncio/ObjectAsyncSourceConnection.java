@@ -24,12 +24,11 @@ package com.avaidyam.binoculars.asyncio;
 
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.remoting.base.ObjectFlow;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.nustaq.offheap.BinaryQueue;
 import org.nustaq.serialization.FSTConfiguration;
 import org.nustaq.serialization.util.FSTUtil;
 
-import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ public abstract class ObjectAsyncSourceConnection extends QueuingAsyncSocketConn
     }
 
     @Override
-    public void flush() throws IOException, Exception {
+    public void flush() throws Exception {
         if ( theExecutingThread != Thread.currentThread() ) {
             if ( myNucleus == null )
                 return;

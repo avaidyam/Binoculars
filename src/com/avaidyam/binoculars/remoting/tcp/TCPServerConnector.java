@@ -28,7 +28,7 @@ import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.remoting.base.*;
 import com.avaidyam.binoculars.remoting.encoding.Coding;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 
 import java.io.EOFException;
 import java.io.IOException;

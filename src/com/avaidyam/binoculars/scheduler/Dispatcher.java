@@ -24,9 +24,8 @@ package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Exceptions;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.management.DispatcherStatusMXBean;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
@@ -40,23 +39,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * Implements the default dispatcher/scheduling of actors.
- * For each nuclei created from "outside" (not from within another nuclei). A new DispatcherThread is created
- * automatically. An nuclei created from within another nuclei inherits the dispatcher of the enclosing nuclei
- * by default.
- * Calls from actors sharing the same dispatcher are done directly (no queueing). Calls across actors in
- * different dispatchers are put to the Channel of the receiving dispatcher. Note that cross-dispatcher calls
- * are like 1000 times slower than inbound calls.
+ * Implements the default dispatcher/scheduling of actors. For each nucleus created
+ * "outside" (not from within another nuclei), a new Dispatcher is created automatically.
+ * A nucleus created from within another nuclei inherits the dispatcher of the enclosing nucleus.
  *
- * Each dispatcher owns exactly one single thread.
- * Note that dispatchers must be terminated if not needed any longer, as a thread is associated with them.
+ * Invocations from nuclei sharing the same Dispatcher are done directly without enqueueing.
+ * Calls across nuclei in different Dispatchers are put to the Channel of the receiving
+ * dispatcher. Note that cross-Dispatcher calls are much slower than inbound calls.
  *
- * For more sophisticated applications it might be appropriate to manually set up dispatchers (Nucleus.assignDispatcher()).
- * The Nucleus.Channel method allows to specifiy a dedicated dispatcher on which to run the nuclei. This way it is possible
- * to exactly balance and control the number of threads created and which thread operates a set of actors.
+ * Each Dispatcher owns exactly one single thread. Note that Dispatchers must be terminated
+ * if not needed any longer, as a thread is associated with them, and it would be wasteful.
  *
+ * For more sophisticated applications it might be appropriate to manually set up Dispatchers
+ * using Scheduler.assignDispatcher(). The Nucleus.assign(...) method allows specifying a
+ * dedicated Dispatcher on which to run the nuclei. This way it is possible to exactly balance
+ * and control the number of threads created and which thread operates a set of nuclei.
  */
+// FIXME Nucleus.assign(...)
 public class Dispatcher extends Thread {
+    private static final String TAG = "Dispatcher";
 
 	/**
      * Invokes printStackTrace() on any uncaught exceptions from a Future.
@@ -129,19 +130,47 @@ public class Dispatcher extends Thread {
 	 */
     /*package*/ long created = System.currentTimeMillis();
 
+    /**
+     * The Dispatcher's attached Scheduler.
+     */
     private Scheduler scheduler;
+
+    /**
+     * The Dispatcher's assigned Nuclei.
+     */
     private Nucleus nuclei[] = new Nucleus[0]; // always refs
 
+    /**
+     * Poll all nuclei in the queue in a round robin manner.
+     */
+    int currentPolledNucleus = 0;
+
+    /**
+     * Create a new Dispatcher bound to the given Scheduler.
+     *
+     * @param scheduler the Scheduler to bind to
+     */
     public Dispatcher(Scheduler scheduler) {
         this.scheduler = scheduler;
         setName("Dispatcher" + dtcount.incrementAndGet());
     }
 
+    /**
+     * Create a new Dispatcher bound to the given Scheduler.
+     *
+     * @param scheduler the Scheduler to bind to
+     * @param autoShutdown shut down when done
+     */
     public Dispatcher(Scheduler scheduler, boolean autoShutdown) {
         this(scheduler);
         this.autoShutdown = autoShutdown;
     }
 
+    /**
+     * Returns the string representation of the Dispatcher.
+     *
+     * @return the string representation of the Dispatcher.
+     */
     @Override
     public String toString() {
         return "Dispatcher{" +
@@ -149,58 +178,96 @@ public class Dispatcher extends Thread {
                 '}';
     }
 
+    /**
+     * Returns whether this Dispatcher is isolated.
+     *
+     * @return whether this Dispatcher is isolated
+     */
     public boolean isIsolated() {
         return isIsolated;
     }
 
-    public void setIsolated(boolean isIsolated) {
-        this.isIsolated = isIsolated;
+    /**
+     * Set whether this Dispatcher is isolated.
+     *
+     * @param isolated whether this Dispatcher is isolated
+     */
+    public void setIsolated(boolean isolated) {
+        this.isIsolated = isolated;
     }
 
+    /**
+     * Returns whether this Dispatcher shuts down automatically.
+     *
+     * @return whether this Dispatcher shuts down automatically
+     */
     public boolean isAutoShutdown() {
         return autoShutdown;
     }
 
+    /**
+     * Set whether this Dispatcher shuts down automatically.
+     *
+     * @param autoShutdown whether this Dispatcher shuts down automatically
+     */
     public void setAutoShutdown(boolean autoShutdown) {
         this.autoShutdown = autoShutdown;
     }
 
-    public void addNucleus(Nucleus act) {
-        act.getNucleusRef().__currentDispatcher = act.getNucleus().__currentDispatcher = this;
-        toAdd.offer(act.getNucleusRef());
+    /**
+     * Adds the Nucleus provided to the Dispatcher.
+     *
+     * @param nucleus the nucleus to add
+     */
+    public void addNucleus(Nucleus nucleus) {
+        nucleus.getNucleusRef().__currentDispatcher = nucleus.getNucleus().__currentDispatcher = this;
+        toAdd.offer(nucleus.getNucleusRef());
     }
 
-    // removes immediate must be called from this thread
-    void removeNucleusImmediate(Nucleus act) {
+    /**
+     * Remove the given Nucleus immediately.
+     *
+     * NOTE: This MUST be called from the Dispatcher thread.
+     *
+     * @param nucleus the nucleus to remove
+     */
+    void removeNucleusImmediate(Nucleus nucleus) {
         if (Thread.currentThread() != this)
-            throw new RuntimeException("wrong thread");
+            throw new RuntimeException("Must invoke this method from the Dispatcher!");
+
         Nucleus newAct[] = new Nucleus[nuclei.length - 1];
         int idx = 0;
-        for (int i = 0; i < nuclei.length; i++) {
-            Nucleus nucleus = nuclei[i];
-            if (nucleus != act)
-                newAct[idx++] = nucleus;
+        for (Nucleus nucleus2 : nuclei) {
+            if (nucleus2 != nucleus)
+                newAct[idx++] = nucleus2;
         }
+
         if (idx != newAct.length)
-            throw new RuntimeException("could not remove nuclei");
+            throw new RuntimeException("Could not remove nucleus!");
         nuclei = newAct;
     }
 
+    /**
+     * The main worker thread component of the Dispatcher.
+     */
     public void run() {
+
+        // Reset Dispatcher state.
         int emptyCount = 0;
         long scheduleTickTime = System.nanoTime();
         boolean isShutDown = false;
         activeDispatchers.incrementAndGet();
+
         try {
             while (!isShutDown) {
                 try {
                     if (pollQs()) {
+
+                        // Successful poll!
                         emptyCount = 0;
                         if (System.nanoTime() - scheduleTickTime > SCHEDULE_TICK_NANOS) {
                             if (emptySinceLastCheck == 0) // no idle during last interval
-                            {
                                 checkForSplit();
-                            }
                             emptySinceLastCheck = 0;
                             scheduleTickTime = System.nanoTime();
                             schedulePendingAdds();
@@ -211,45 +278,48 @@ public class Dispatcher extends Thread {
                         scheduler.pollDelay(emptyCount);
                         if (shutDown) // access volatile only when idle
                             isShutDown = true;
+
+                        // See if the Scheduler wants us to stop the Dispatcher.
                         if (scheduler.getBackoffStrategy().isSleeping(emptyCount)) {
                             scheduleTickTime = 0;
                             schedulePendingAdds();
                             if (autoShutdown && System.currentTimeMillis() - created > 5000) {
-                                if (nuclei.length == 0 && toAdd.peek() == null) {
+                                if (nuclei.length == 0 && toAdd.peek() == null)
                                     shutDown();
-                                } else {
-                                    scheduler.tryStopThread(this);
-                                }
+                                else scheduler.tryStopThread(this);
                             }
                         }
                     }
-                } catch (Throwable th) {
-                    Log.w(this.toString(), "from main poll loop", th);
+                } catch (Throwable e) {
+                    Log.w(TAG, "Exception from main poll loop: ", e);
                 }
             }
+
+            // The Dispatcher has been shut down.
             scheduler.threadStopped(this);
             LockSupport.parkNanos(1000 * 1000 * 1000);
             if (nuclei.length > 0 || toAdd.peek() != null) {
                 if (ElasticScheduler.DEBUG_SCHEDULING)
-                    Log.w(this.toString(), "Severe: zombie dispatcher thread detected, but can be a debugger artifact.");
+                    Log.w(TAG, "Severe: zombie dispatcher thread detected, but can be a debugger artifact.");
                 scheduler.tryStopThread(this);
             }
+
             if (ElasticScheduler.DEBUG_SCHEDULING)
-                Log.i(this.toString(), "dispatcher thread terminated " + getName());
+                Log.i(TAG, "Dispatcher terminated: " + getName());
         } finally {
             activeDispatchers.decrementAndGet();
         }
     }
 
     /**
-     * add actors which have been marked to be scheduled on this
+     * Add all Nuclei which have been marked to be scheduled on this Dispatcher.
      */
     public void schedulePendingAdds() {
         ArrayList<Nucleus> newOnes = new ArrayList<>();
         Nucleus a;
-        while ((a = toAdd.poll()) != null) {
+        while ((a = toAdd.poll()) != null)
             newOnes.add(a);
-        }
+
         if (newOnes.size() > 0) {
             Nucleus newQueue[] = new Nucleus[newOnes.size() + nuclei.length];
             System.arraycopy(nuclei, 0, newQueue, 0, nuclei.length);
@@ -262,23 +332,27 @@ public class Dispatcher extends Thread {
 
     }
 
-    // poll all actors in queue arr round robin
-    int currentPolledNucleus = 0;
-    protected RemoteInvocation pollQueues(Nucleus[] nuclei) {
-        if ( nuclei.length == 0 ) {
+    /**
+     * Returns the first RemoteInvocation available for the given Nuclei.
+     *
+     * @param nuclei the Nuclei to poll
+     * @return an available RemoteInvocation
+     */
+    protected RemoteInvocation pollQueues(final Nucleus[] nuclei) {
+        if (nuclei.length == 0)
             return null;
-        }
-        RemoteInvocation res = null;
-        int alen  = nuclei.length;
+
         int count = 0;
-        while( res == null && count < alen ) {
-            if ( currentPolledNucleus >= nuclei.length ) {
+        RemoteInvocation res = null;
+        while (res == null && count < nuclei.length) {
+            if (currentPolledNucleus >= nuclei.length)
                 currentPolledNucleus = 0;
-            }
+
             Nucleus nucleus2Poll = nuclei[currentPolledNucleus];
-            res = (RemoteInvocation) nucleus2Poll.__cbQueue.poll();
-            if ( res == null )
-                res = (RemoteInvocation) nucleus2Poll.__mailbox.poll();
+            res = (RemoteInvocation)nucleus2Poll.__cbQueue.poll();
+
+            if (res == null)
+                res = (RemoteInvocation)nucleus2Poll.__mailbox.poll();
             currentPolledNucleus++;
             count++;
         }
@@ -286,22 +360,28 @@ public class Dispatcher extends Thread {
     }
 
     /**
-     * @return false if no message could be polled
+     * Returns whether messages exist for any Nuclei in the Dispatcher.
+     *
+     * @return whether messages exist
      */
+    // TODO RENAME
     public boolean pollQs() {
         return pollQs(nuclei);
     }
 
     /**
-     * @return false if no message could be polled
+     * Returns whether messages exist for any Nuclei given.
+     *
+     * @return whether messages exist
      */
+    // TODO RENAME
     public boolean pollQs(Nucleus nuclei[]) {
         RemoteInvocation invocation = pollQueues(nuclei);
         if (invocation != null) {
             try {
-                // before calling the nuclei method, set current sender
+                // Before calling the nuclei method, set current sender
                 // to target, so for each method/callback invoked by the nuclei method,
-                // sender has correct value
+                // sender has correct value.
                 Nucleus targetNucleus = invocation.getTargetNucleus();
                 Nucleus.sender.set(targetNucleus);
                 Nucleus.connection.set(invocation.getRemoteRegistry());
@@ -310,101 +390,94 @@ public class Dispatcher extends Thread {
                     return true;
                 }
 
-
+                // Invoke the RemoteInvocation.
                 Object invoke = null;
                 try {
                     invoke = invoke(invocation);
-                } catch (IllegalArgumentException iae) {
-                    // FIXME: boolean is translated wrong by minbin .. this fix is expensive
-                    final Class<?>[] parameterTypes = invocation.getMethod().getParameterTypes();
-                    final Object[] args = invocation.getArgs();
-                    if (args.length == parameterTypes.length) {
-                        for (int i = 0; i < args.length; i++) {
-                            Object arg = args[i];
-                            if ((parameterTypes[i] == boolean.class || parameterTypes[i] == Boolean.class) &&
-                                    arg instanceof Byte) {
-                                args[i] = ((Byte) arg).intValue() != 0;
-                            }
-                        }
-                        invoke = invoke(invocation);
-                    } else {
-                        System.out.println("mismatch when invoking method " + invocation);
-                        for (int i = 0; i < invocation.getArgs().length; i++) {
-                            Object o = invocation.getArgs()[i];
-                            System.out.println("arg " + i + " " + o + (o != null ? " " + o.getClass().getSimpleName() : "") + ",");
-                        }
-                        System.out.println();
-                        throw iae;
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Argument mismatch when invoking method " + invocation);
+                    for (int i = 0; i < invocation.getArgs().length; i++) {
+                        Object o = invocation.getArgs()[i];
+                        System.err.println("arg" + i + "= " + o + (o != null ? o.getClass().getSimpleName() : "[null]") + ", ");
                     }
+                    System.err.println();
+                    throw e;
                 }
+
+                // Handle any attached Futures.
+                // If the invocation returns null instead of a Future, handle it like a Future<Void>.
                 if (invocation.getFutureCB() != null) {
-                    final Future futureCB = invocation.getFutureCB();   // the future of caller side
+                    final Future futureCB = invocation.getFutureCB(); // caller's future
                     final CompletableFuture<Object> invokeResult = (CompletableFuture<Object>)invoke;  // the future returned sync from call
-                    if(invokeResult != null) { //if return null instead a promise, method is handled like void
+                    if(invokeResult != null)
                         invokeResult.then((Signal<Object>)futureCB::complete);
-                    }
                 }
+
                 return true;
             } catch (Throwable e) {
+
+                // The target no longer exists; assume it's dead.
                 if (e instanceof InvocationTargetException && ((InvocationTargetException) e).getTargetException() == Exceptions.InternalNucleusStoppedException.INSTANCE) {
-                    // fixme: rare classcast exception with elasticscheduler seen here when $stop is called from a callback ..
+                    // FIXME: Sometimes ElasticScheduler causes a ClassCastException when stop() is called from a Signal.
                     Nucleus nucleus = (Nucleus) invocation.getTarget();
                     nucleus.__stopped = true;
                     removeNucleusImmediate(nucleus.getNucleusRef());
-// FIXME: Many Testcases fail if uncommented. Rethink
-//                    if (invocation.getFutureCB() != null)
-//                        invocation.getFutureCB().complete(null, e);
-//                    else
-//                        Log.Warn(this,e,"");
-//                    if (invocation.getFutureCB() != null)
-//                        invocation.getFutureCB().complete(null, e);
-//                    else
-//                        Log.Warn(this,e,"");
                     return true;
                 }
-                if (e instanceof InvocationTargetException) {
+
+                // If the invocation caused an exception, pass it to a Future if possible.
+                if (e instanceof InvocationTargetException)
                     e = e.getCause();
-                }
                 if (invocation.getFutureCB() != null) {
-                    Log.w(this.toString(), "Unhandled exception in message: " + invocation + ".\nReturned caught exception to Future.\nEnable DispatcherThread.DUMP_EXCEPTIONS to dump stacktrace.", e);
+                    Log.w(TAG, "Unhandled exception in message: " + invocation + ".\nReturned caught exception to Future.\nEnable Dispatcher.DUMP_EXCEPTIONS to dump stacktrace.", e);
                     if (DUMP_EXCEPTIONS)
                         e.printStackTrace();
                     invocation.getFutureCB().complete(null, e);
-                } else
-                    Log.w(this.toString(), "" + invocation + Arrays.toString(invocation.getArgs()), e);
+                } else {
+                    Log.w(TAG, "Invocation caused an exception: " + invocation + "\nargs: " + Arrays.toString(invocation.getArgs()), e);
+                    e.printStackTrace();
+                }
             }
         }
         return false;
     }
 
-    private Object invoke(RemoteInvocation poll) throws IllegalAccessException, InvocationTargetException {
-        final Object target = poll.getTarget();
-        //RemoteRegistry remoteRefRegistry = poll.getRemoteRegistry();
-        //Nucleus.registry.set(remoteRefRegistry);
-        return poll.getMethod().invoke(target, poll.getArgs());
-    }
-
-    private void checkForSplit() {
-        int load = getLoad();
-        if (load > QUEUE_PERCENTAGE_TRIGGERING_REBALANCE &&
-                nuclei.length > 1 &&
-                System.currentTimeMillis() - created > MILLIS_AFTER_CREATION_BEFORE_REBALANCING) {
-            scheduler.rebalance(this);
-        }
+    /**
+     * Invoke the given RemoteInvocation.
+     *
+     * @param invocation the invocation itself
+     * @return the result of the invocation
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private Object invoke(RemoteInvocation invocation) throws IllegalAccessException, InvocationTargetException {
+        return invocation.getMethod().invoke(invocation.getTarget(), invocation.getArgs());
     }
 
     /**
-     * @return percentage of queue fill of max nuclei
+     * Rebalance the Dispatcher from the Scheduler if the current load is over-limit.
+     */
+    private void checkForSplit() {
+        if (getLoad() > QUEUE_PERCENTAGE_TRIGGERING_REBALANCE && nuclei.length > 1 &&
+                System.currentTimeMillis() - created > MILLIS_AFTER_CREATION_BEFORE_REBALANCING)
+            scheduler.rebalance(this);
+    }
+
+    /**
+     * Returns the percentage of the queue filled per max nuclei.
+     *
+     * @return the percentage of the queue filled per max nuclei
      */
     public int getLoad() {
         int res = 0;
         final Nucleus nuclei[] = this.nuclei;
-        for (int i = 0; i < nuclei.length; i++) {
-            MpscConcurrentQueue queue = (MpscConcurrentQueue) nuclei[i].__mailbox;
+        for (Nucleus aNuclei : nuclei) {
+            MpscConcurrentQueue queue = (MpscConcurrentQueue) aNuclei.__mailbox;
             int load = queue.size() * 100 / queue.getCapacity();
             if (load > res)
                 res = load;
-            queue = (MpscConcurrentQueue) nuclei[i].__cbQueue;
+
+            queue = (MpscConcurrentQueue) aNuclei.__cbQueue;
             load = queue.size() * 100 / queue.getCapacity();
             if (load > res)
                 res = load;
@@ -412,48 +485,29 @@ public class Dispatcher extends Thread {
         return res;
     }
 
-    // FIXME: USE MPSCARRAYQUEUE
-    /*
-
-    public int getLoad() {
-        int res = 0;
-        final Nucleus actors[] = this.actors;
-        for (int i = 0; i < actors.length; i++) {
-            MpscArrayQueue queue = (MpscArrayQueue) actors[i].__mailbox;
-            int load = queue.size() * 100 / actors[i].__mailboxCapacity;
-            if ( load > res )
-                res = load;
-            queue = (MpscArrayQueue) actors[i].__cbQueue;
-            load = queue.size() * 100 / actors[i].__mailboxCapacity;
-            if ( load > res )
-                res = load;
-        }
-        return res;
-    }
-
-    */
-
     /**
-     * accumulated queue sizes of allOf actors
-     * @return
+     * Returns the accumulated queue sizes of all Nuclei.
+     *
+     * @return the accumulated queue sizes of all Nuclei
      */
     public int getAccumulatedQSizes() {
         int res = 0;
         final Nucleus nuclei[] = this.nuclei;
-        for (int i = 0; i < nuclei.length; i++) {
-            res += nuclei[i].getQSizes();
+        for (Nucleus aNuclei : nuclei) {
+            res += aNuclei.getQSizes();
         }
         return res;
     }
 
     /**
-     * @return accumulated q size of allOf dispatched actors
+     * Returns the accumulated queue sizes of all dispatched Nuclei.
+     *
+     * @return the accumulated queue sizes of all dispatched Nuclei
      */
     public int getQSize() {
         int res = 0;
         final Nucleus nuclei[] = this.nuclei;
-        for (int i = 0; i < nuclei.length; i++) {
-            Nucleus a = nuclei[i];
+        for (Nucleus a : nuclei) {
             res += a.__mailbox.size();
             res += a.__cbQueue.size();
         }
@@ -461,87 +515,74 @@ public class Dispatcher extends Thread {
     }
 
     /**
-     * @return true if DispatcherThread is not shut down
+     * Returns whether the Dispatcher has been shut down.
+     *
+     * @return whether the Dispatcher has been shut down
      */
     public boolean isShutDown() {
-        return !shutDown;
+        return shutDown;
     }
 
     /**
-     * terminate operation after emptying Q
+     * Terminate the Dispatcher after current messages are done processing.
      */
     public void shutDown() {
         shutDown = true;
     }
 
     /**
-     * terminate operation immediately. Pending messages in Q are lost
+     * Returns whether there are no messages left in the Dispatcher.
+     *
+     * @return whether there are no messages left in the Dispatcher
      */
-    public void shutDownImmediate() {
-        throw new RuntimeException("unimplemented");
-    }
-
     public boolean isEmpty() {
-        for (int i = 0; i < nuclei.length; i++) {
-            Nucleus act = nuclei[i];
-            if (!act.__mailbox.isEmpty() || !act.__cbQueue.isEmpty())
+        for (Nucleus n : nuclei) {
+            if (!n.__mailbox.isEmpty() || !n.__cbQueue.isEmpty())
                 return false;
         }
         return true;
     }
 
     /**
-     * blocking method, use for debugging only.
+     * Returns the Scheduler this Dispatcher is bound to.
+     *
+     * @return the Scheduler this Dispatcher is bound to.
      */
-    public void waitEmpty(long nanos) {
-        while (!isEmpty())
-            LockSupport.parkNanos(nanos);
-    }
-
     public Scheduler getScheduler() {
         return scheduler;
     }
 
     /**
-     * @return a copy of actors used
+     * Returns a copy of the nuclei assigned to this Dispatcher.
+     *
+     * @return a copy of the nuclei assigned to this Dispatcher
      */
-    public Nucleus[] getNuclei() {
-        Nucleus nuclei[] = this.nuclei;
-        Nucleus res[] = new Nucleus[nuclei.length];
-        System.arraycopy(nuclei, 0, res, 0, res.length);
-        return res;
+    public Nucleus[] copyNuclei() {
+        Nucleus copied[] = new Nucleus[this.nuclei.length];
+        System.arraycopy(this.nuclei, 0, copied, 0, copied.length);
+        return copied;
     }
 
-    Nucleus[] getNucleiNoCopy() {
+    /**
+     * Returns a reference to the nuclei assigned to this Dispatcher.
+     *
+     * @return a reference to the nuclei assigned to this Dispatcher
+     */
+    Nucleus[] getNuclei() {
         return nuclei;
     }
 
     /**
-     * can be called from the dispacther thread itself only
-     * @param receiverRef
+     *
+     *
+     * @param receiver
      * @return
      */
-    public boolean schedules(Object receiverRef) {
-        if (Thread.currentThread() != this) {
-            throw new RuntimeException("cannot call from foreign thread");
-        }
-        if (receiverRef instanceof Nucleus) {
-            // FIXME: think about visibility of scheduler var
-            return ((Nucleus) receiverRef).__currentDispatcher == this;
-//            for (int i = 0; i < actors.length; i++) {
-//                Nucleus nuclei = actors[i];
-//                if (nuclei == receiverRef)
-//                    return true;
-//            }
-        }
-        return false;
-    }
+    public boolean schedules(Object receiver) {
+        if (Thread.currentThread() != this)
+            throw new RuntimeException("Must invoke this method from the Dispatcher!");
 
-	/**
-	 * Returns the MXBean for monitoring of this Dispatcher.
-	 * @return the MXBean for monitoring of this Dispatcher
-	 */
-	public DispatcherStatusMXBean dispatcherStatus() {
-		return new DispatcherStatusMXBean.DispatcherStatus(getName(), nuclei.length, getLoad(), getAccumulatedQSizes());
-	}
+        return (receiver instanceof Nucleus) &&
+                (((Nucleus) receiver).__currentDispatcher == this);
+    }
 }

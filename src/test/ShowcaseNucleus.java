@@ -1,10 +1,9 @@
 package test;
 
-import com.avaidyam.binoculars.Domain;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
+import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.Spore;
 
 import java.net.URL;
@@ -155,8 +154,7 @@ public class ShowcaseNucleus extends Nucleus<ShowcaseNucleus> {
     // synchronous access, threading trickery
     //
 
-    @Domain.CallerSide
-    @Domain.Local
+
     public int getSyncState() {
         return getNucleus().syncState;
     }

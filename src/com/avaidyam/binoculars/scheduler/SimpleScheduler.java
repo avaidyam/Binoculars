@@ -23,15 +23,14 @@
 package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Exceptions;
-import com.avaidyam.binoculars.management.SchedulerStatusMXBean;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.RemoteInvocation;
-import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
-import com.avaidyam.binoculars.future.Signal;
-import com.avaidyam.binoculars.future.SignalWrapper;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.future.SignalWrapper;
+import com.avaidyam.binoculars.remoting.RemoteInvocation;
+import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
+import com.avaidyam.binoculars.Log;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -40,16 +39,18 @@ import java.util.Queue;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
+/**
+ *
+ */
 public class SimpleScheduler implements Scheduler {
-	
-	public static final boolean DEBUG_SCHEDULING = true;
+
 	/**
 	 * time ms until a warning is printed once a sender is blocked by a full nuclei queue
 	 */
 	public static long BLOCKED_MS_TIL_WARN = 5000;
 	public static int DEFQSIZE = 32768; // will be alligned to 2^x
 	
-	protected BackOffStrategy backOffStrategy = new BackOffStrategy();
+	protected SchedulingStrategy schedulingStrategy = new SchedulingStrategy();
 	protected Dispatcher myThread;
 	int qsize = DEFQSIZE;
 	
@@ -85,7 +86,7 @@ public class SimpleScheduler implements Scheduler {
 	
 	@Override
 	public void pollDelay(int count) {
-		backOffStrategy.yield(count);
+		schedulingStrategy.yield(count);
 	}
 	
 	@Override
@@ -95,7 +96,7 @@ public class SimpleScheduler implements Scheduler {
 		boolean warningPrinted = false;
 		while(!q.offer(o)) {
 			pollDelay(count++);
-			if(backOffStrategy.isYielding(count)) {
+			if(schedulingStrategy.isYielding(count)) {
 				Nucleus sendingNucleus = Nucleus.sender.get();
 				if(receiver instanceof Nucleus && ((Nucleus) receiver).__stopped) {
 					String dl;
@@ -110,7 +111,7 @@ public class SimpleScheduler implements Scheduler {
 				}
 				if(sendingNucleus != null && sendingNucleus.__throwExAtBlock)
 					throw Exceptions.NucleusBlockedException.INSTANCE;
-				if(backOffStrategy.isSleeping(count)) {
+				if(schedulingStrategy.isSleeping(count)) {
 					if(sleepStart == 0) {
 						sleepStart = System.currentTimeMillis();
 					} else if(!warningPrinted && System.currentTimeMillis() - sleepStart > BLOCKED_MS_TIL_WARN) {
@@ -268,8 +269,8 @@ public class SimpleScheduler implements Scheduler {
 	}
 	
 	@Override
-	public BackOffStrategy getBackoffStrategy() {
-		return backOffStrategy;
+	public SchedulingStrategy getBackoffStrategy() {
+		return schedulingStrategy;
 	}
 	
 	@Override
@@ -284,11 +285,7 @@ public class SimpleScheduler implements Scheduler {
 	
 	@Override
 	public int getNumNuclei() {
-		return myThread.getNucleiNoCopy().length;
-	}
-
-	public SchedulerStatusMXBean schedulerStatus() {
-		return new SchedulerStatusMXBean.SchedulerStatus(1, getDefaultQSize(), 0);
+		return myThread.getNuclei().length;
 	}
 }
 

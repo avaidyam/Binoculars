@@ -26,7 +26,7 @@ import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.SignalWrapper;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 
 import java.util.*;
 import java.util.concurrent.RejectedExecutionException;

@@ -81,7 +81,7 @@ public interface Scheduler {
      */
     void rebalance(Dispatcher dispatcher);
 
-    BackOffStrategy getBackoffStrategy();
+    SchedulingStrategy getBackoffStrategy();
 
     void tryStopThread(Dispatcher dispatcher);
 

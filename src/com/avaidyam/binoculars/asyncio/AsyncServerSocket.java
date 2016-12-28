@@ -23,9 +23,8 @@
 package com.avaidyam.binoculars.asyncio;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.remoting.tcp.TCPServerConnector;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

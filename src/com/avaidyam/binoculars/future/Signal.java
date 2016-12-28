@@ -39,19 +39,19 @@ public interface Signal<T> extends Serializable {
      */
 	Error CONT = new Error("CNT");
 
-	public static boolean isComplete(Object error) {
+	static boolean isComplete(Object error) {
 		return error == null;
 	}
 
-	public static boolean isCont(Object o) {
+	static boolean isCont(Object o) {
         return CONT.equals(o);
     }
 
-	public static boolean isResult(Object error) {
+	static boolean isResult(Object error) {
 		return isCont(error);
 	}
 
-	public static boolean isError(Object o) {
+	static boolean isError(Object o) {
         return o != null && !CONT.equals(o);
     }
 

@@ -24,7 +24,7 @@ package com.avaidyam.binoculars.asyncio;
 
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 import org.nustaq.offheap.BinaryQueue;
 import org.nustaq.offheap.bytez.niobuffers.ByteBufferBasicBytez;
 import org.nustaq.offheap.bytez.onheap.HeapBytez;
@@ -105,8 +105,8 @@ public abstract class QueuingAsyncSocketConnection extends AsyncSocketConnection
                 queueDataAvailableCompletableFuture.then((Signal)(res, err) -> {
                     if ( err != null ) {
                         if (err instanceof Throwable ) {
-                            Log.e(this.toString(), "write failure",  (Throwable) err);
-                            closed((Throwable) err);
+                            Log.e(this.toString(), "write failure", err);
+                            closed(err);
                         } else {
 	                        Log.e(this.toString(), "write failure:"+err);
                             closed( new IOException(""+err));

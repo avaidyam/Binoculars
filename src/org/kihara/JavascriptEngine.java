@@ -22,39 +22,27 @@
 
 package org.kihara;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-// Internal Nashorn Environment
-import jdk.nashorn.api.scripting.*;
+import jdk.nashorn.api.scripting.ClassFilter;
+import jdk.nashorn.api.scripting.NashornException;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.internal.codegen.Compiler;
 import jdk.nashorn.internal.ir.FunctionNode;
 import jdk.nashorn.internal.ir.debug.ASTWriter;
 import jdk.nashorn.internal.ir.debug.PrintVisitor;
 import jdk.nashorn.internal.objects.Global;
 import jdk.nashorn.internal.parser.Parser;
-import jdk.nashorn.internal.runtime.Context;
-import jdk.nashorn.internal.runtime.ErrorManager;
-import jdk.nashorn.internal.runtime.JSType;
-import jdk.nashorn.internal.runtime.Property;
-import jdk.nashorn.internal.runtime.ScriptEnvironment;
-import jdk.nashorn.internal.runtime.ScriptFunction;
-import jdk.nashorn.internal.runtime.ScriptObject;
-import jdk.nashorn.internal.runtime.ScriptRuntime;
-import jdk.nashorn.internal.runtime.Source;
+import jdk.nashorn.internal.runtime.*;
 import jdk.nashorn.internal.runtime.options.Options;
 
 import javax.script.*;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+// Internal Nashorn Environment
 
 /**
  * Command line Shell for processing JavaScript files.
@@ -63,47 +51,47 @@ public final class JavascriptEngine {
 
     private static final String SHELL_INIT_JS =
             "Object.defineProperty(this, \"input\", {\n" +
-            "    value: function input(endMarker, prompt) {\n" +
-            "        if (!endMarker) {\n" +
-            "            endMarker = \"\";\n" +
-            "        }\n" +
-            "\n" +
-            "        if (!prompt) {\n" +
-            "            prompt = \" >> \";\n" +
-            "        }\n" +
-            "\n" +
-            "        var imports = new JavaImporter(java.io, java.lang);\n" +
-            "        var str = \"\";\n" +
-            "        with (imports) {\n" +
-            "            var reader = new BufferedReader(new InputStreamReader(System['in']));\n" +
-            "            var line;\n" +
-            "            while (true) {\n" +
-            "                System.out.print(prompt);\n" +
-            "                line = reader.readLine();\n" +
-            "                if (line == null || line == endMarker) {\n" +
-            "                    break;\n" +
-            "                }\n" +
-            "                str += line + \"\\n\";\n" +
-            "            }\n" +
-            "        }\n" +
-            "\n" +
-            "        return str;\n" +
-            "    },\n" +
-            "    enumerable: false,\n" +
-            "    writable: true,\n" +
-            "    configurable: true\n" +
-            "});\n" +
-            "\n" +
-            "Object.defineProperty(this, \"evalinput\", {\n" +
-            "    value: function evalinput(endMarker, prompt) {\n" +
-            "        var code = input(endMarker, prompt);\n" +
-            "        // make sure everything is evaluated in global scope!\n" +
-            "        return this.eval(code);\n" +
-            "    },\n" +
-            "    enumerable: false,\n" +
-            "    writable: true,\n" +
-            "    configurable: true\n" +
-            "});\n";
+                    "    value: function input(endMarker, prompt) {\n" +
+                    "        if (!endMarker) {\n" +
+                    "            endMarker = \"\";\n" +
+                    "        }\n" +
+                    "\n" +
+                    "        if (!prompt) {\n" +
+                    "            prompt = \" >> \";\n" +
+                    "        }\n" +
+                    "\n" +
+                    "        var imports = new JavaImporter(java.io, java.lang);\n" +
+                    "        var str = \"\";\n" +
+                    "        with (imports) {\n" +
+                    "            var reader = new BufferedReader(new InputStreamReader(System['in']));\n" +
+                    "            var line;\n" +
+                    "            while (true) {\n" +
+                    "                System.out.print(prompt);\n" +
+                    "                line = reader.readLine();\n" +
+                    "                if (line == null || line == endMarker) {\n" +
+                    "                    break;\n" +
+                    "                }\n" +
+                    "                str += line + \"\\n\";\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "\n" +
+                    "        return str;\n" +
+                    "    },\n" +
+                    "    enumerable: false,\n" +
+                    "    writable: true,\n" +
+                    "    configurable: true\n" +
+                    "});\n" +
+                    "\n" +
+                    "Object.defineProperty(this, \"evalinput\", {\n" +
+                    "    value: function evalinput(endMarker, prompt) {\n" +
+                    "        var code = input(endMarker, prompt);\n" +
+                    "        // make sure everything is evaluated in global scope!\n" +
+                    "        return this.eval(code);\n" +
+                    "    },\n" +
+                    "    enumerable: false,\n" +
+                    "    writable: true,\n" +
+                    "    configurable: true\n" +
+                    "});\n";
 
     // CLI Exit Codes
     public static final int SUCCESS = 0;
@@ -161,13 +149,25 @@ public final class JavascriptEngine {
         scriptContext.setBindings(mirror, ScriptContext.ENGINE_SCOPE);
         bindings.accept(scriptContext.getBindings(ScriptContext.ENGINE_SCOPE));
 
-        // TODO: JDK 1.8u60 method only. Will invoke old call if fails.
+        // TODO: JDK 1.8u65 method only. Will invoke old call if fails.
         try {
-            // ((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"), scriptContext);
-            ((Global)global).initBuiltinObjects(new ScriptEngineManager().getEngineByName("nashorn"));
-        } catch (NoSuchMethodError e) {
-            ((Global)global).setScriptContext(scriptContext);
-        }
+            Global g = ((Global)global);
+            ScriptEngine s = new ScriptEngineManager().getEngineByName("nashorn");
+
+            try {
+                Method m = Global.class.getMethod("initBuiltinObjects", ScriptEngine.class, ScriptContext.class);
+                m.invoke(g, s, scriptContext);
+            } catch (NoSuchMethodException e) {
+                try {
+                    Method m = Global.class.getMethod("initBuiltinObjects", ScriptEngine.class);
+                    m.invoke(g, s);
+                    g.setScriptContext(scriptContext);
+                } catch (NoSuchMethodException ee) {
+                    System.err.println("COULD NOT INIT!");
+                    throw new IOException("COULD NOT INIT!");
+                }
+            }
+        } catch (Exception ignored) {}
 
         if (files.isEmpty()) {
             return readEvalPrint(context, global);
@@ -254,18 +254,20 @@ public final class JavascriptEngine {
                     return COMPILATION_ERROR;
                 }
 
-                /* new Compiler(context,
+                new Compiler(context,
                         env,
                         null, //null - pass no code installer - this is compile only
                         functionNode.getSource(),
                         context.getErrorManager(),
                         env._strict | functionNode.isStrict()).
-                        compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL); */
+                        compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL); //*/
 
+                /*
                 Compiler.forNoInstallerCompilation(context,
                         functionNode.getSource(),
                         env._strict | functionNode.isStrict()).
                         compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL);
+                //*/
 
                 if (env._print_ast) {
                     context.getErr().println(new ASTWriter(functionNode));

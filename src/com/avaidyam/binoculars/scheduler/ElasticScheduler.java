@@ -28,10 +28,9 @@ import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.SignalWrapper;
-import com.avaidyam.binoculars.management.SchedulerStatusMXBean;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
-import com.avaidyam.binoculars.util.Log;
+import com.avaidyam.binoculars.Log;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -56,13 +55,12 @@ public class ElasticScheduler implements Scheduler {
     public static int DEFQSIZE = 32768; // will be alligned to 2^x
 
     public static boolean DEBUG_SCHEDULING = false;
-    public static boolean REALLY_DEBUG_SCHEDULING = false; // logs any move and remove
 
     public static int RECURSE_ON_BLOCK_THRESHOLD = 2;
     public static Timer delayedCalls = new Timer();
     final Dispatcher threads[];
     final Object balanceLock = new Object();
-    protected BackOffStrategy backOffStrategy = new BackOffStrategy();
+    protected SchedulingStrategy schedulingStrategy = new SchedulingStrategy();
     protected ExecutorService exec = Executors.newFixedThreadPool(MAX_EXTERNAL_THREADS_POOL_SIZE);
     int maxThread = Runtime.getRuntime().availableProcessors();
     int defQSize = DEFQSIZE;
@@ -110,7 +108,7 @@ public class ElasticScheduler implements Scheduler {
 
     @Override
     public void pollDelay(int count) {
-        backOffStrategy.yield(count);
+        schedulingStrategy.yield(count);
     }
 
     @Override
@@ -132,7 +130,7 @@ public class ElasticScheduler implements Scheduler {
 
 //                    Nucleus sendingNucleus = Nucleus.sender.get();
                     Dispatcher dp = (Dispatcher) Thread.currentThread();
-                    if (dp.__stack.size() < MAX_STACK_ON_SYNC_CBDISPATCH && dp.getNucleiNoCopy().length > 1) {
+                    if (dp.__stack.size() < MAX_STACK_ON_SYNC_CBDISPATCH && dp.getNuclei().length > 1) {
                         Nucleus recAct = (Nucleus) receiver;
                         recAct = recAct.getNucleusRef();
                         if (dp.schedules(recAct)) {
@@ -147,7 +145,7 @@ public class ElasticScheduler implements Scheduler {
                     }
                 }
             }
-            if (backOffStrategy.isYielding(count)) {
+            if (schedulingStrategy.isYielding(count)) {
                 Nucleus sendingNucleus = Nucleus.sender.get();
                 if (receiver instanceof Nucleus && ((Nucleus) receiver).__stopped) {
                     String dl;
@@ -162,7 +160,7 @@ public class ElasticScheduler implements Scheduler {
                 }
                 if (sendingNucleus != null && sendingNucleus.__throwExAtBlock)
                     throw Exceptions.NucleusBlockedException.INSTANCE;
-                if (backOffStrategy.isSleeping(count)) {
+                if (schedulingStrategy.isSleeping(count)) {
                     if (!warningPrinted) {
                         warningPrinted = true;
                         String receiverString;
@@ -187,15 +185,15 @@ public class ElasticScheduler implements Scheduler {
                         Dispatcher dp = (Dispatcher) Thread.currentThread();
                         dp.schedulePendingAdds();
 //                    if ( dp.getNuclei().length > 1 && dp.schedules( receiver ) )
-                        if (dp.getNuclei().length > 1) // try isolating in any case
+                        if (dp.copyNuclei().length > 1) // try isolating in any case
                         {
                             if (DEBUG_SCHEDULING)
-                                Log.w(this.toString(), "  try unblock Thread " + Thread.currentThread().getName() + " actors:" + dp.getNuclei().length);
+                                Log.w(this.toString(), "  try unblock Thread " + Thread.currentThread().getName() + " actors:" + dp.copyNuclei().length);
                             dp.getScheduler().tryIsolate(dp, sendingNucleus.getNucleusRef());
                             if (DEBUG_SCHEDULING)
-                                Log.w(this.toString(), "  unblock done Thread " + Thread.currentThread().getName() + " actors:" + dp.getNuclei().length);
+                                Log.w(this.toString(), "  unblock done Thread " + Thread.currentThread().getName() + " actors:" + dp.copyNuclei().length);
                         } else {
-                            if (dp.getNuclei().length > 1) {
+                            if (dp.copyNuclei().length > 1) {
                                 // this indicates there are at least two actors on different threads blocking each other
                                 // only solution to unlock is increase the Q of one of the actors
 //                            System.out.println("POK "+dp.schedules( receiver )+" "+sendingNucleus.__currentDispatcher+" "+ ((Nucleus) receiver).__currentDispatcher);
@@ -386,10 +384,10 @@ public class ElasticScheduler implements Scheduler {
             }
             int qSizes = dispatcher.getAccumulatedQSizes();
             // move actors
-            Nucleus[] qList = dispatcher.getNuclei();
+            Nucleus[] qList = dispatcher.copyNuclei();
             long otherQSizes = minLoadThread.getAccumulatedQSizes();
             if (4 * otherQSizes / 3 > qSizes) {
-                if (REALLY_DEBUG_SCHEDULING) {
+                if (DEBUG_SCHEDULING) {
                     Log.i(this.toString(), "no payoff, skip rebalance load:" + qSizes + " other:" + otherQSizes);
                 }
                 return;
@@ -399,7 +397,7 @@ public class ElasticScheduler implements Scheduler {
                 if (otherQSizes + nucleus.getQSizes() < qSizes - nucleus.getQSizes()) {
                     otherQSizes += nucleus.getQSizes();
                     qSizes -= nucleus.getQSizes();
-                    if (REALLY_DEBUG_SCHEDULING)
+                    if (DEBUG_SCHEDULING)
                         Log.i(this.toString(), "move " + nucleus.getQSizes() + " myload " + qSizes + " otherload " + otherQSizes + " from " + dispatcher.getName() + " to " + minLoadThread.getName());
                     dispatcher.removeNucleusImmediate(nucleus);
                     minLoadThread.addNucleus(nucleus);
@@ -419,7 +417,7 @@ public class ElasticScheduler implements Scheduler {
             if (refToExclude == null) {
                 throw new IllegalArgumentException("excluderef should not be null");
             }
-            Nucleus qList[] = dispatcher.getNuclei();
+            Nucleus qList[] = dispatcher.copyNuclei();
             Dispatcher minLoadThread = findMinLoadThread(Integer.MAX_VALUE, dispatcher);
             for (int i = 0; i < threads.length; i++) { // avoid further dispatch
                 if (threads[i] == dispatcher) {
@@ -455,7 +453,7 @@ public class ElasticScheduler implements Scheduler {
                     dispatcher.removeNucleusImmediate(nucleus);
                     minLoadThread.addNucleus(nucleus);
                 }
-                if (REALLY_DEBUG_SCHEDULING)
+                if (DEBUG_SCHEDULING)
                     Log.i(this.toString(), "move for unblock " + nucleus.getQSizes() + " myload " + dispatcher.getAccumulatedQSizes() + " actors " + qList.length);
             }
         }
@@ -465,7 +463,7 @@ public class ElasticScheduler implements Scheduler {
 	public int getNumNuclei() {
 		int l = 0;
 		for(int i = 0; i < threads.length; i++)
-			l += threads[i].getNucleiNoCopy().length;
+			l += threads[i].getNuclei().length;
 		return l;
 	}
 
@@ -488,7 +486,7 @@ public class ElasticScheduler implements Scheduler {
             if (minLoadThread == null)
                 return;
             // move to nuclei with minimal load
-            Nucleus qList[] = dispatcher.getNuclei();
+            Nucleus qList[] = dispatcher.copyNuclei();
             for (int i = 0; i < threads.length; i++) { // avoid further dispatch
                 if (threads[i] == dispatcher) {
                     threads[i] = null;
@@ -502,15 +500,15 @@ public class ElasticScheduler implements Scheduler {
                     throw new RuntimeException("this should not happen ever");
                 dispatcher.removeNucleusImmediate(nucleus);
                 minLoadThread.addNucleus(nucleus);
-                if (REALLY_DEBUG_SCHEDULING)
+                if (DEBUG_SCHEDULING)
                     Log.i(this.toString(), "move for idle " + nucleus.getQSizes() + " myload " + dispatcher.getAccumulatedQSizes() + " actors " + qList.length);
             }
         }
     }
 
     @Override
-    public BackOffStrategy getBackoffStrategy() {
-        return backOffStrategy;
+    public SchedulingStrategy getBackoffStrategy() {
+        return schedulingStrategy;
     }
 
     class CallbackInvokeHandler implements InvocationHandler {
@@ -534,13 +532,4 @@ public class ElasticScheduler implements Scheduler {
             return null;
         }
     }
-
-	public SchedulerStatusMXBean schedulerStatus() {
-		int count = 0;
-		for (Dispatcher thread : threads)
-			if(thread != null)
-				count++;
-
-		return new SchedulerStatusMXBean.SchedulerStatus(count, defQSize, isolateCount.get());
-	}
 }
