@@ -208,14 +208,8 @@ public class ElasticScheduler implements Scheduler {
         }
     }
 
-
     @Override
-    public Object enqueueCall(Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB) {
-        return enqueueCallFromRemote(null, sendingNucleus, receiver, methodName, args, isCB);
-    }
-
-    @Override
-    public Object enqueueCallFromRemote(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB) {
+    public Object enqueueCall(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB) {
         // System.out.println("dispatch "+methodName+" "+Thread.currentThread());
         // here sender + receiver are known in a ST context
         Nucleus nucleus = receiver.getNucleus();

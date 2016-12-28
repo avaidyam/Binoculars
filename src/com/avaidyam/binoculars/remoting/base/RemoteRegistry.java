@@ -319,7 +319,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 				return false;
 			}
 			try {
-				Object future = targetNucleus.__scheduler.enqueueCallFromRemote(this, null, targetNucleus, read.getMethod(), read.getArgs(), false);
+				Object future = targetNucleus.__scheduler.enqueueCall(this, null, targetNucleus, read.getMethod(), read.getArgs(), false);
 				if ( future instanceof Future) {
 					CompletableFuture p = null;
 					if ( createdFutures != null ) {
@@ -402,7 +402,7 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	public void receiveCBResult(ObjectFlow.Source chan, int id, Object result, Object error) throws Exception {
 		if (facadeNucleus !=null) {
 			Thread debug = facadeNucleus.__dispatcher;
-			if ( Thread.currentThread() != facadeNucleus.__dispatcher ) {
+			if ( Thread.currentThread() != debug ) {
 				facadeNucleus.execute( () -> {
 					try {
 						if ( Thread.currentThread() != debug )

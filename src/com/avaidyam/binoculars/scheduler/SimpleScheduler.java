@@ -37,10 +37,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Queue;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  *
@@ -165,14 +162,7 @@ public class SimpleScheduler implements Scheduler {
 	}
 	
 	@Override
-	public Object enqueueCall(Nucleus sendingNucleus, Nucleus receiver, String methodName, Object[] args, boolean isCB) {
-		return enqueueCallFromRemote(null, sendingNucleus, receiver, methodName, args, isCB);
-	}
-	
-	@Override
-	public Object enqueueCallFromRemote(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object[] args, boolean isCB) {
-		// System.out.println("dispatch "+methodName+" "+Thread.currentThread());
-		// here sender + receiver are known in a ST context
+	public Object enqueueCall(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object[] args, boolean isCB) {
 		Nucleus nucleus = receiver.getNucleus();
 		Method method = nucleus.__getCachedMethod(methodName, nucleus);
 		
@@ -244,9 +234,8 @@ public class SimpleScheduler implements Scheduler {
 		Class<?>[] interfaces = callback.getClass().getInterfaces();
 		InvocationHandler invoker = nucleus.__scheduler.getInvoker(nucleus, callback);
 		if(invoker == null) // called from outside nuclei world
-		{
 			return callback; // callback in callee thread
-		}
+		//noinspection unchecked
 		return (T) Proxy.newProxyInstance(callback.getClass().getClassLoader(), interfaces, invoker);
 	}
 	
@@ -301,5 +290,7 @@ public class SimpleScheduler implements Scheduler {
 	public int getNumNuclei() {
 		return myThread.getNuclei().length;
 	}
+
+
 }
 

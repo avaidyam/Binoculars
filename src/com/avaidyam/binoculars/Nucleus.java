@@ -22,12 +22,12 @@
 
 package com.avaidyam.binoculars;
 
-import com.avaidyam.binoculars.remoting.asyncio.WrapperExecutorService;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.Spore;
 import com.avaidyam.binoculars.remoting.RemoteConnection;
+import com.avaidyam.binoculars.remoting.asyncio.WrapperExecutorService;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
 import com.avaidyam.binoculars.scheduler.ElasticScheduler;
 import com.avaidyam.binoculars.scheduler.Scheduler;
@@ -74,11 +74,9 @@ import java.util.function.Supplier;
  */
 public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, AutoCloseable {
     public Channel __channel;
-    public Thread __dispatcher;
+    public Dispatcher __dispatcher;
     public Scheduler __scheduler;
-    public volatile boolean __stopped = false;
-    public Nucleus __self; // the proxy
-    public int __remoteId;
+    public SELF __self; // the proxy
 
     /**
      * tell the execution machinery to throw an NucleusBlockedException in case the nuclei is blocked trying to
@@ -86,6 +84,8 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
      * a remote client (might block or lag due to connection issues).
      */
     public boolean __throwExAtBlock = false;
+    public volatile boolean __stopped = false;
+    public int __remoteId;
     // a list of connection required to be notified on close
     public volatile ConcurrentLinkedQueue<RemoteConnection> __connections;
     // register callbacks notified on stop
@@ -586,14 +586,13 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     // dispatch an outgoing call to the target nuclei queue. Runs in Caller Thread
 
     public Object __enqueueCall(Nucleus receiver, String methodName, Object args[], boolean isCB) {
-        //System.out.println("INVOKE " + methodName + " (" + args.length + ") ON " + receiver);
+        //System.err.println("INVOKE " + methodName + " (" + args.length + ") ON " + receiver);
         if (__stopped) {
             if (methodName.equals("stop")) // ignore double stop
                 return null;
             __addDeadLetter(receiver, methodName);
-            //throw new RuntimeException("Nucleus " + this + " received message after being stopped " + methodName);
         }
-        return __scheduler.enqueueCall(sender.get(), receiver, methodName, args, isCB);
+        return __scheduler.enqueueCall(null, sender.get(), receiver, methodName, args, isCB);
     }
 
 
@@ -608,9 +607,9 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     // FIXME: would be much better to do lookup at method invoke time INSIDE nuclei thread instead of doing it on callside (contended)
     ConcurrentHashMap<String, Method> methodCache;
     public Method __getCachedMethod(String methodName, Nucleus nucleus) {
-	    if ( methodCache == null ) {
-		    methodCache = new ConcurrentHashMap<>(7);
-	    }
+        if ( methodCache == null ) {
+            methodCache = new ConcurrentHashMap<>(7);
+        }
         Method method = methodCache.get(methodName);
         if (method == null) {
             Method[] methods = nucleus.getClass().getMethods();
