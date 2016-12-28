@@ -22,12 +22,12 @@ public class Channel {
     /**
      * The letter queue used for messages that don't need to be responded to.
      */
-    public Queue inbox;
+    public Queue<Message> inbox;
 
     /**
      * The letter queue used for messages that require a reply (i.e. higher priority).
      */
-    public Queue outbox;
+    public Queue<Message> outbox;
 
     /**
      * The capacity of the inbox, useful for calculating pressure.
@@ -40,8 +40,8 @@ public class Channel {
      * @param queueSize initial inbox/outbox queue size.
      */
     public Channel(int queueSize) {
-        this.inbox = new MpscConcurrentQueue(queueSize);
-        this.outbox = new MpscConcurrentQueue(queueSize);
+        this.inbox = new MpscConcurrentQueue<>(queueSize);
+        this.outbox = new MpscConcurrentQueue<>(queueSize);
         this.capacity = ((MpscConcurrentQueue)this.inbox).getCapacity();
     }
 
