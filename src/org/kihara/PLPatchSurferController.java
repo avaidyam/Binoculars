@@ -22,7 +22,7 @@
 
 package org.kihara;
 
-import com.avaidyam.binoculars.Domain;
+import com.avaidyam.binoculars.Export;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
@@ -225,7 +225,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      *
      * @return
      */
-    @Domain.Export
+    @Export
     public Future<Configuration> getConfiguration() {
         return new CompletableFuture<>(configuration);
     }
@@ -234,7 +234,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      *
      * @param configuration
      */
-    @Domain.Export
+    @Export
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }
@@ -243,7 +243,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      *
      * @param state
      */
-    @Domain.Export
+    @Export
     public void setState(State state) {
         this.state = state;
     }
@@ -252,7 +252,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      *
      * @return
      */
-    @Domain.Export
+    @Export
     public Future<Boolean> hasState() {
         return new CompletableFuture<>((this.state != null));
     }
@@ -260,7 +260,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     /**
      *
      */
-    @Domain.Export
+    @Export
     public void clearState() {
         this.state = null;
     }
@@ -300,7 +300,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      *
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public void runJob(Map<String, String> manifest) throws Exception {
         if (self().hasState().await() || manifest == null) {
             throw new RuntimeException("Can't do that!");
@@ -354,8 +354,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     /**
      *
      */
-    @Domain.Export
-    @Domain.Local
+    @Export(transport=false)
     public void notifyJob() throws Exception {
         if (!self().hasState().await() && allJobs.size() > 0)
             self().runJob(allJobs.pop());
@@ -373,7 +372,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> provideInputs(String root, String db, String email,
                                       String chainID, String ligandID, String pdb) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
@@ -417,7 +416,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> generateInputs() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         Configuration conf = this.configuration;
@@ -468,7 +467,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> splitXtalLigand() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (this.state == null || this.configuration == null) {
@@ -496,7 +495,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> prepareReceptor() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (this.state == null || this.configuration == null) {
@@ -519,7 +518,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> compareSeeds() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (this.state == null || this.configuration == null) {
@@ -540,7 +539,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> compareSeedsDB() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (this.state == null || this.configuration == null) {
@@ -584,7 +583,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> compareLigands() throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         if (this.state == null || this.configuration == null) {
@@ -609,7 +608,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> reportProgress(int current, int total, boolean failed) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
         promise.complete();
@@ -623,7 +622,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
      * @return
      * @throws Exception
      */
-    @Domain.Export
+    @Export
     public Future<Void> reportCompletion(int num_preview) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 

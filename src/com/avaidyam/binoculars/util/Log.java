@@ -22,7 +22,7 @@
 
 package com.avaidyam.binoculars.util;
 
-import com.avaidyam.binoculars.Domain;
+import com.avaidyam.binoculars.Export;
 import com.avaidyam.binoculars.Nucleus;
 
 import java.text.DateFormat;
@@ -171,32 +171,28 @@ public class Log extends Nucleus<Log> {
 
 	/** INTERNAL LOGGING DELEGATION */
 
-	@Domain.CallerSide
 	public void verbose(String tag, String msg, Throwable ex) {
 		self().println(Thread.currentThread(), Severity.VERBOSE, tag, msg, ex);
 	}
 
-	@Domain.CallerSide
 	public void debug(String tag, String msg, Throwable ex) {
 		self().println(Thread.currentThread(), Severity.DEBUG, tag, msg, ex);
 	}
 
-	@Domain.CallerSide
     public void info(String tag, String msg, Throwable ex) {
         self().println(Thread.currentThread(), Severity.INFO, tag, msg, ex);
     }
 
-    @Domain.CallerSide
+
     public void warn(String tag, String msg, Throwable ex) {
         self().println(Thread.currentThread(), Severity.WARN, tag, msg, ex);
     }
 
-    @Domain.CallerSide
+
     public void error(String tag, String msg, Throwable ex) {
         self().println(Thread.currentThread(), Severity.ERROR, tag, msg, ex);
     }
 
-	@Domain.CallerSide
 	public void $assert(String tag, String msg, Throwable ex) {
 		self().println(Thread.currentThread(), Severity.ASSERT, tag, msg, ex);
 
@@ -215,7 +211,7 @@ public class Log extends Nucleus<Log> {
 	 *
 	 * @param severity the severity to assume
 	 */
-	@Domain.Export
+	@Export
 	public void setSeverity(Severity severity) {
 		getNucleus().severity = severity;
 	}
@@ -225,7 +221,6 @@ public class Log extends Nucleus<Log> {
 	 *
 	 * @return the current severity
 	 */
-	@Domain.CallerSide
 	public Severity getSeverity() {
 		return getNucleus().severity;
 	}
@@ -235,7 +230,7 @@ public class Log extends Nucleus<Log> {
 	 *
 	 * @param logger a delegate implementation of Logger
 	 */
-	@Domain.Export
+	@Export
 	public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
@@ -243,7 +238,6 @@ public class Log extends Nucleus<Log> {
 	/**
 	 * Resets the current Logger to the default Logger implementation.
 	 */
-	@Domain.CallerSide
 	public void resetLogger() {
 		this.logger = defaultLogger.get();
 	}
@@ -258,7 +252,7 @@ public class Log extends Nucleus<Log> {
 	 * @param msg the message to log
 	 * @param ex an optional exception to log
 	 */
-	@Domain.Export
+	@Export
     public void println(Thread thread, Severity severity, String tag, String msg, Throwable ex) {
 	    if (this.severity.ordinal() <= severity.ordinal())
 		    logger.log(thread, severity, tag, msg, ex);

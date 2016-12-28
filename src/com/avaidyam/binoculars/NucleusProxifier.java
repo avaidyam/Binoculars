@@ -109,7 +109,7 @@ public class NucleusProxifier {
                             .and(not(isFinal()))
                             .and(not(isStatic()))
                             .and(not(named("self")))
-                            .and(isAnnotatedWith(Domain.Export.class)))
+                            .and(isAnnotatedWith(Export.class)))
                     .intercept(MethodDelegation.to(ProxyInterceptor.class))
                     .make()
                     .load(getClass().getClassLoader(), WRAPPER)
@@ -140,7 +140,7 @@ public class NucleusProxifier {
             Annotation[][] params = method.getParameterAnnotations();
             for (int i = 0; i < params.length; i++) {
                 for (Annotation a : params[i]) {
-                    if (a.annotationType().equals(Domain.InThread.class) && allArguments[i] != null) {
+                    if (a.annotationType().equals(Export.InThread.class) && allArguments[i] != null) {
                         Nucleus sender = Nucleus.sender.get();
                         if (sender != null)
                             allArguments[i] = sender.__scheduler.inThread(sender.__self, allArguments[i]);
@@ -149,8 +149,9 @@ public class NucleusProxifier {
                 }
             }
 
-            boolean isCallbackCall = method.getAnnotation(Domain.SignalPriority.class) != null;
-            Object result = getTarget(_this).__enqueueCall(getTarget(_this), method.getName(), allArguments, isCallbackCall);
+            Export a = method.getAnnotation(Export.class);
+            boolean isSignal = a != null && a.signalPriority();
+            Object result = getTarget(_this).__enqueueCall(getTarget(_this), method.getName(), allArguments, isSignal);
             return method.getReturnType().cast(result);
         }
     }

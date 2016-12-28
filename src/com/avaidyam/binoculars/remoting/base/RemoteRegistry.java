@@ -22,8 +22,8 @@
 
 package com.avaidyam.binoculars.remoting.base;
 
-import com.avaidyam.binoculars.Domain;
 import com.avaidyam.binoculars.Exceptions;
+import com.avaidyam.binoculars.Export;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.remoting.RemoteConnection;
@@ -77,7 +77,8 @@ public abstract class RemoteRegistry implements RemoteConnection {
 	protected BiFunction<Nucleus,String,Boolean> remoteCallInterceptor =
 			(a,methodName) -> {
 				Method method = a.__getCachedMethod(methodName, a);
-				if ( method == null || method.getAnnotation(Domain.Local.class) != null ) {
+				Export e = method.getAnnotation(Export.class);
+				if ( method == null || (e != null && !e.transport()) ) {
 					return false;
 				}
 				return true;
