@@ -27,17 +27,13 @@ import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.Log;
+import org.kihara.util.FileWatcher;
 import org.kihara.util.Mailer;
 import org.kihara.util.MigrationVisitor;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -55,18 +51,18 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 */
 
 /**
- * The PLPatchSurferController nucleus is designed to wrap the PLPatchSurfer
+ * The PLPSController nucleus is designed to wrap the PLPatchSurfer
  * tools and execute them in a managed distributed manner with state safety.
  */
-public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
-    public static final String TAG = "[PLPatchSurferController]";
+public class PLPSController extends Nucleus<PLPSController> {
+    public static final String TAG = "[PLPSController]";
     public static LinkedList<Map<String, String>> allJobs = new LinkedList<>();
 
     Configuration configuration = null;
     State state = null;
 
     /**
-     * The Configuration of a PLPatchSurferController defines its tool locations
+     * The Configuration of a PLPSController defines its tool locations
      * and working directory; this rarely needs to be changed, and if it does,
      * it will invalidate the state of every instance of the controller with it.
      */
@@ -144,7 +140,7 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
     }
 
     /**
-     * The State of a PLPatchSurferController indicates its current job and
+     * The State of a PLPSController indicates its current job and
      * the completion of that job; it's designed to be capable of splitting
      * and redistributing the job amongst distant nodes and relies on an
      * underlying distributed file system (like MooseFS) to operate.
@@ -677,5 +673,68 @@ public class PLPatchSurferController extends Nucleus<PLPatchSurferController> {
 
         promise.complete();
         return promise;
+    }
+
+    /**
+     * For every added folder, grab the manifest.mf file and translate it
+     * into a map (which contains POST and FILES data for the job.
+     *
+     * @param source
+     * @param events
+     * @return
+     */
+    private static List<Map<String, String>> jobWatcher(Path source, List<WatchEvent<?>> events, String jobType, Path jobDest) {
+        List<Map<String, String>> jobs = new LinkedList<>();
+        for (WatchEvent<?> event : events) {
+            Path file = source.resolve((Path) event.context());
+            if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                try {
+                    Thread.sleep(500); // pls die already
+
+                    Map<String, String> m = Files.lines(file.resolve("manifest.mf")).map(s -> {
+                        String parts[] = s.split(": ");
+                        return new AbstractMap.SimpleEntry<>(parts[0], parts[1]);
+                    }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    if (Objects.equals(m.get("service"), jobType)) {
+                        Path end = jobDest.resolve(file.getFileName()).toAbsolutePath();
+                        MigrationVisitor.migrate(file, end, true, REPLACE_EXISTING);
+                        m.put("_path", end.toString() + "/");
+                        Log.d("JOB", "Job Discovered [" + jobType + "] = " + m.toString());
+                        jobs.add(m);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return jobs;
+    }
+
+    /**
+     * Initialize the PLPSController and watch for jobs.
+     */
+    public static void main(String[] args) throws Exception {
+        Log.get().setSeverity(Log.Severity.DEBUG);
+        PLPSController controller = Nucleus.of(PLPSController.class);
+
+        controller.delayed(1000, () -> {
+            Log.d("TEST", "One second later...");
+            controller.exec(() -> {
+                Log.w("INSIDE", "Test");
+                return "test";
+            }).then((r, e) -> {
+                Log.i("DONE", "YAY");
+            });
+        });
+
+        FileWatcher watcher = FileWatcher.watch((p, e) -> {
+            PLPSController.allJobs.addAll(PLPSController.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
+
+            try {
+                controller.notifyJob();
+            } catch(Exception e2) {
+                e2.printStackTrace();
+            }
+        }, "/bio/kihara-web/www/binoculars/upload/");
     }
 }
