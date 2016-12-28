@@ -24,7 +24,6 @@ package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Exceptions;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.management.DispatcherStatusMXBean;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.util.Log;
 import com.avaidyam.binoculars.future.Signal;
@@ -529,12 +528,4 @@ public class Dispatcher extends Thread {
         }
         return false;
     }
-
-	/**
-	 * Returns the MXBean for monitoring of this Dispatcher.
-	 * @return the MXBean for monitoring of this Dispatcher
-	 */
-	public DispatcherStatusMXBean dispatcherStatus() {
-		return new DispatcherStatusMXBean.DispatcherStatus(getName(), nuclei.length, getLoad(), getAccumulatedQSizes());
-	}
 }

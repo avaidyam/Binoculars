@@ -215,6 +215,7 @@ public class Log extends Nucleus<Log> {
 	 *
 	 * @param severity the severity to assume
 	 */
+	@Domain.Export
 	public void setSeverity(Severity severity) {
 		getNucleus().severity = severity;
 	}
@@ -234,6 +235,7 @@ public class Log extends Nucleus<Log> {
 	 *
 	 * @param logger a delegate implementation of Logger
 	 */
+	@Domain.Export
 	public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
@@ -256,6 +258,7 @@ public class Log extends Nucleus<Log> {
 	 * @param msg the message to log
 	 * @param ex an optional exception to log
 	 */
+	@Domain.Export
     public void println(Thread thread, Severity severity, String tag, String msg, Throwable ex) {
 	    if (this.severity.ordinal() <= severity.ordinal())
 		    logger.log(thread, severity, tag, msg, ex);

@@ -25,8 +25,7 @@ package com.avaidyam.binoculars;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.*;
-import com.avaidyam.binoculars.management.NucleusStatusMXBean;
-import com.avaidyam.binoculars.remoting.NucleusProxifier;
+import com.avaidyam.binoculars.internal.NucleusProxifier;
 import com.avaidyam.binoculars.remoting.RemoteConnection;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.scheduler.Dispatcher;
@@ -430,6 +429,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 
 	// internal. tweak to check for remote ref before sending
     // Don't actually use!
+    @Domain.Export
     @Domain.Local
     public void asyncStop() {
 		deinit(); // IS NOT QUEUED! locally executed
@@ -439,6 +439,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 	/**
 	 * Called upon construction of Nucleus, and should be used instead of a constructor.
 	 */
+    @Domain.Export
     @Domain.Local
 	public void init() {
 		// Unimplemented.
@@ -447,6 +448,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 	/**
 	 * Called upon destruction of a Nucleus, and should be used as a destructor.
 	 */
+    @Domain.Export
     @Domain.Local
 	public void deinit() {
         // Unimplemented.
@@ -488,6 +490,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 		self().__submit(command);
 	}
 
+    @Domain.Export
 	public void __submit(Runnable toRun) {
 		toRun.run();
 	}
@@ -515,6 +518,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
      * @param <T>
      * @return
      */
+    @Domain.Export
     public <T> Future<T> exec(Callable<T> callable) {
         CompletableFuture<T> prom = new CompletableFuture<>();
         __scheduler.runBlockingCall(self(), callable, prom);
@@ -525,6 +529,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 	 * can be used to wait for all messages having been processed and get a signal from the returned future once this is complete
 	 * @return
 	 */
+    @Domain.Export
 	@Domain.Local
 	public Future<Void> ping() {
 		return new CompletableFuture<>();
@@ -536,6 +541,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
      * self().$run( () -> .. ) - run the runnable after the current message has been processed
      * this.$run( () -> .. )   - runs the runnable synchronous (actually useless, could call it directly)
      */
+    @Domain.Export
     public <I, O> void spore(Spore<I, O> spore) {
         if(spore != null)
             spore.doRemote(null);
@@ -620,6 +626,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     /**
      * generic method for untyped messages.
      */
+    @Domain.Export
     public Future ask(String interest, Object contents) {
         return new CompletableFuture();
     }
@@ -627,6 +634,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
     /**
      * generic method for untyped messages.
      */
+    @Domain.Export
     public void tell(String interest, Object contents) {
         //
     }
@@ -655,6 +663,7 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
 	 * Close refers to "unmapping" the nuclei, underlying network connections will not be
 	 * closed (else server down on single client disconnect)
 	 */
+    @Domain.Export
 	@Domain.Local
     public void close() {
         if (__connections != null) {
@@ -844,9 +853,4 @@ public class Nucleus<SELF extends Nucleus> implements Serializable, Executor, Au
         }
         return method;
     }
-
-	public NucleusStatusMXBean actorStatus() {
-		return new NucleusStatusMXBean.NucleusStatus(getNucleus().getClass().getSimpleName(), getMailboxSize(),
-				getCallbackSize());
-	}
 }

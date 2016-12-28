@@ -92,6 +92,17 @@ public class Main {
         Log.get().setSeverity(Log.Severity.DEBUG);
 
         PLPatchSurferController controller = Nucleus.of(PLPatchSurferController.class);
+
+        controller.delayed(1000, () -> {
+            Log.d("TEST", "One second later...");
+            controller.exec(() -> {
+                Log.w("INSIDE", "Test");
+                return "test";
+            }).then((r, e) -> {
+                Log.i("DONE", "YAY");
+            });
+        });
+
         FileWatcher watcher = FileWatcher.watch((p, e) -> {
             PLPatchSurferController.allJobs.addAll(Main.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
 

@@ -1,4 +1,4 @@
-package com.avaidyam.binoculars.remoting;
+package com.avaidyam.binoculars.internal;
 
 import com.avaidyam.binoculars.Domain;
 import com.avaidyam.binoculars.Nucleus;
@@ -106,24 +106,13 @@ public class NucleusProxifier {
                     .method(returns(Nucleus.class).and(isPublic()).and(named("getNucleus")))
                     .intercept(FieldAccessor.ofField("__target"))
                     .method(isPublic()
-                            .and(not(isAnnotatedWith(Domain.CallerSide.class)))
                             .and(not(isAbstract()))
                             .and(not(isNative()))
                             .and(not(isFinal()))
                             .and(not(isStatic()))
                             .and(not(named("self")))
-                            .and(not(isDeclaredBy(Object.class)))
-                            .and(not(isDeclaredBy(Nucleus.class).and(not(
-                                    named("getSubMonitorables").or(named("getReport")).or(named("ask"))
-                                    .or(named("tell")).or(named("__unpublish")).or(named("__republished"))
-                                    .or(named("ping")).or(named("__submit")).or(named("exec")).or(named("asyncStop"))
-                                    .or(named("receive")).or(named("receive")).or(named("complete")).or(named("close"))
-                                    .or(named("spore")).or(named("init")).or(named("deinit")))))))
+                            .and(isAnnotatedWith(Domain.Export.class)))
                     .intercept(MethodDelegation.to(ProxyInterceptor.class))
-                    .method(isNative().or(isFinal()).or(isStatic())
-                            .and(not(named("getNucleus")).or(named("delayed")).or(named("exec")))
-                            .and(not(isDeclaredBy(Object.class))))
-                    .intercept(MethodDelegation.to(NonProxyInterceptor.class))
                     .make()
                     .load(getClass().getClassLoader(), WRAPPER)
                     .getLoaded();

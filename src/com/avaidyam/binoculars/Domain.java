@@ -33,60 +33,40 @@ import java.lang.annotation.Target;
 public @interface Domain {
 
 	/**
-	 * Ignored by the runtime message producer -- will not become async.
+	 * Nucleus methods explicitly marked with the @Export annotation will be
+	 * transformed to allow queueing and remote invocation. A public void or
+	 * Signal-returning method MUST declare this annotation to support it.
 	 */
 	@Target({ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@interface Ignore {}
+	@interface Export {
 
-	/**
-	 * Specifies this method is a utility processed on client side / inside sender thread:
-	 *
-	 * class .. extends Nucleus {
-	 *     public void message( long timeStamp, String stuff ) {..}
-	 *
-	 *     // just an utility executed inside calling thread
-	 *     @CallerSide public void message( String stuff ) {
-	 *         message( System.currentTimeMillis(), stuff );
-	 *     }
-	 *
-	 *     @CallerSide public int getId() {
-	 *         // get "real" nuclei impl
-	 *         return getNucleus().id; // concurrent access !! final, volatile and locks might be required
-	 *     }
-	 * }
-	 *
-	 * Note those method cannot access local state of the nuclei, they just might invoke methods as they
-	 * are called on the proxy object (Nucleus Ref).
-	 *
-	 * If one urgently needs to access local nuclei state synchronous, its possible to obtain the real nuclei instance by calling getNucleus().
-	 * Note that multithreading primitives might required then, as internal nuclei state is accessed concurrently
-	 * this way.
-	 *
-	 * WARNING: @CallerSide's cannot be invoked from remote (via network)
-	 */
+		/**
+		 * Allow this method to be exposed and invoked via a remoting interface.
+		 */
+		boolean transport = true;
+
+		/**
+		 * Force this method to have the same priority as one that returns a Signal.
+		 * Note: this flag has no effect on a method already returning a Signal.
+		 *
+		 * For a Signal-returning method, the scheduler is allowed to execute the method
+		 * synchronously if the sender and receiver happen to be scheduled on the same thread.
+		 *
+		 * Besides performance improvements, this also enables some scheduling
+		 * tweaks to automatically prevent deadlocks.
+		 */
+		boolean signalPriority = false;
+	}
+
+	// TODO DEPRECATE THESE
 	@Target({ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface CallerSide {}
-
-	/**
-	 * handle this method like a callback method. The contract for callbacks is weaker than for regular
-	 * nuclei methods. For a callback method, the scheduler is allowed to execute the method synchronous
-	 * if the sender and receiver happen to be scheduled on the same thread.
-	 *
-	 * Additionally callback messages have higher priority compared to regualt nuclei messages. A dispatcher thread
-	 * will always first check the callback queue befor looking for messages on the actors mailbox.
-	 *
-	 * Besides performance improvements, this also enables some scheduling tweaks to automatically prevent deadlocks.
-	 */
 	@Target({ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface SignalPriority {}
-
-	/**
-	 * method modifier to signal this method should not be exposed via an remoting interface (process local message)
-	 */
-	@Target({ElementType.METHOD, ElementType.TYPE})
+	@Target({ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface Local {}
 

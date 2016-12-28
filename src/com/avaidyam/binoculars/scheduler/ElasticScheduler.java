@@ -28,7 +28,6 @@ import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
 import com.avaidyam.binoculars.future.Signal;
 import com.avaidyam.binoculars.future.SignalWrapper;
-import com.avaidyam.binoculars.management.SchedulerStatusMXBean;
 import com.avaidyam.binoculars.remoting.RemoteInvocation;
 import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.util.Log;
@@ -534,13 +533,4 @@ public class ElasticScheduler implements Scheduler {
             return null;
         }
     }
-
-	public SchedulerStatusMXBean schedulerStatus() {
-		int count = 0;
-		for (Dispatcher thread : threads)
-			if(thread != null)
-				count++;
-
-		return new SchedulerStatusMXBean.SchedulerStatus(count, defQSize, isolateCount.get());
-	}
 }

@@ -23,14 +23,13 @@
 package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Exceptions;
-import com.avaidyam.binoculars.management.SchedulerStatusMXBean;
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.RemoteInvocation;
-import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
-import com.avaidyam.binoculars.future.Signal;
-import com.avaidyam.binoculars.future.SignalWrapper;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
+import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.future.SignalWrapper;
+import com.avaidyam.binoculars.remoting.RemoteInvocation;
+import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.util.Log;
 
 import java.lang.reflect.InvocationHandler;
@@ -285,10 +284,6 @@ public class SimpleScheduler implements Scheduler {
 	@Override
 	public int getNumNuclei() {
 		return myThread.getNucleiNoCopy().length;
-	}
-
-	public SchedulerStatusMXBean schedulerStatus() {
-		return new SchedulerStatusMXBean.SchedulerStatus(1, getDefaultQSize(), 0);
 	}
 }
 
