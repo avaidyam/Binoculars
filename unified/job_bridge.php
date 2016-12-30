@@ -39,7 +39,6 @@
             echo "<br /><br />";
         }
         
-        echo "<br />Manifest: ".$manifest."<br />";
         file_put_contents($upload_folder . 'manifest.mf', $manifest);
         rmdir($upload_folder);
     }

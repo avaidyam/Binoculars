@@ -22,7 +22,6 @@
 
 package org.kihara;
 
-import com.avaidyam.binoculars.Cortex;
 import com.avaidyam.binoculars.Export;
 import com.avaidyam.binoculars.Log;
 import com.avaidyam.binoculars.Nucleus;
@@ -650,7 +649,6 @@ public class PLPSController extends Nucleus<PLPSController> {
         String template = new BufferedReader(new InputStreamReader(t))
                 .lines().collect(Collectors.joining("\n"));
         final String inside = template.replaceAll("[\\s\\S]*(<!--START-->)|(<!--END-->)[\\s\\S]*", "");
-        Log.d(TAG, "Formed template inner: " + inside);
 
         final int[] idx = {0};
         String output[] = {""};
@@ -738,13 +736,13 @@ public class PLPSController extends Nucleus<PLPSController> {
      */
     public static void main(String[] args) throws Exception {
         Log.get().setSeverity(Log.Severity.DEBUG);
-        Cortex<PLPSController> cortex = Cortex.of(PLPSController.class);
+        PLPSController controller = Nucleus.of(PLPSController.class);
 
         FileWatcher watcher = FileWatcher.watch((p, e) -> {
             PLPSController.allJobs.addAll(PLPSController.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
 
             try {
-                cortex.getNodes().get(0).notifyJob();
+                controller.notifyJob();
             } catch(Exception e2) {
                 e2.printStackTrace();
             }

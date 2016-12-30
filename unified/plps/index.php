@@ -40,15 +40,15 @@
                             <form id="form" method="POST" enctype="multipart/form-data" action="../job_bridge.php" onsubmit="return validateForm()" target="_result">
                                 <div style="height: 22px;">
                                     <label for="receptor">Receptor:</label>
-                                    <input type="receptor" id="receptor" name="receptor" required />
+                                    <input type="file" id="receptor" name="receptor" required />
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:18%">
-                                    <input class="mdl-textfield__input" type="text" pattern="^.{0,5}$" id="chain" required />
+                                    <input class="mdl-textfield__input" type="text" pattern="^.{0,5}$" name="chain" id="chain" required />
                                     <label class="mdl-textfield__label" for="chain">Chain ID...</label>
                                     <span class="mdl-textfield__error">Must be a chain ID</span>
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:18%">
-                                    <input class="mdl-textfield__input" type="text" pattern="^.{0,5}$" id="ligand" required />
+                                    <input class="mdl-textfield__input" type="text" pattern="^.{0,5}$" name="ligand" id="ligand" required />
                                     <label class="mdl-textfield__label" for="ligand">Ligand ID...</label>
                                     <span class="mdl-textfield__error">Must be a ligand ID</span>
                                 </div>
@@ -64,7 +64,7 @@
                                 </div>
                                 <div style="width:100%;"></div> <!--\n-->
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input class="mdl-textfield__input" type="text" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" id="email" required />
+                                    <input class="mdl-textfield__input" type="text" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" name="email" id="email" required />
                                     <label class="mdl-textfield__label" for="email">Email...</label>
                                     <span class="mdl-textfield__error">Input is not an email!</span>
                                 </div>
@@ -152,8 +152,8 @@
                         return false;
                     }
                     alert("Job submitted!");
-                    document.forms["form"].reset();
-                    return true;
+                    document.forms["form"].submit();
+                    return false;
                 }
             </script>
         </div>
