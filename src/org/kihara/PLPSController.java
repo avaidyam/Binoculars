@@ -22,11 +22,12 @@
 
 package org.kihara;
 
+import com.avaidyam.binoculars.Cortex;
 import com.avaidyam.binoculars.Export;
+import com.avaidyam.binoculars.Log;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.Log;
 import org.kihara.util.FileWatcher;
 import org.kihara.util.Mailer;
 import org.kihara.util.MigrationVisitor;
@@ -60,6 +61,28 @@ public class PLPSController extends Nucleus<PLPSController> {
 
     Configuration configuration = null;
     State state = null;
+
+    public static class RemoteHeartbeat implements Serializable {
+        public static List<String> remotes = Arrays.asList(
+                "alien.bio.purdue.edu",
+                "beluga.bio.purdue.edu",
+                "dragon.bio.purdue.edu", 
+                "emu.bio.purdue.edu",
+                "giraffe.bio.purdue.edu",
+                "kiwi1.bio.purdue.edu",
+                "kiwi2.bio.purdue.edu",
+                "liger3.bio.purdue.edu",
+                "lion.bio.purdue.edu",
+                "maroon.bio.purdue.edu",
+                "miffy.bio.purdue.edu",
+                "owl.bio.purdue.edu",
+                "panda.bio.purdue.edu",
+                "poas.bio.purdue.edu",
+                "puma.bio.purdue.edu",
+                "qilin.bio.purdue.edu",
+                "snake.bio.purdue.edu",
+                "tiger.bio.purdue.edu");
+    }
 
     /**
      * The Configuration of a PLPSController defines its tool locations
@@ -715,23 +738,13 @@ public class PLPSController extends Nucleus<PLPSController> {
      */
     public static void main(String[] args) throws Exception {
         Log.get().setSeverity(Log.Severity.DEBUG);
-        PLPSController controller = Nucleus.of(PLPSController.class);
-
-        controller.delayed(1000, () -> {
-            Log.d("TEST", "One second later...");
-            controller.exec(() -> {
-                Log.w("INSIDE", "Test");
-                return "test";
-            }).then((r, e) -> {
-                Log.i("DONE", "YAY");
-            });
-        });
+        Cortex<PLPSController> cortex = Cortex.of(PLPSController.class);
 
         FileWatcher watcher = FileWatcher.watch((p, e) -> {
             PLPSController.allJobs.addAll(PLPSController.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
 
             try {
-                controller.notifyJob();
+                cortex.getNodes().get(0).notifyJob();
             } catch(Exception e2) {
                 e2.printStackTrace();
             }

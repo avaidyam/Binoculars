@@ -1,135 +1,161 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <!-- Meta Information -->
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="description" content="PFP Frontend" />
+        <meta name="description" content="PL-PatchSurfer Frontend" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <meta name="apple-mobile-web-app-title" content="PFP" />
-        
+        <meta name="apple-mobile-web-app-title" content="PL-PatchSurfer" />
         <title>PL-PatchSurfer</title>
-        
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-        <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.teal-red.min.css" />
-        
-        <style>
-            .demo-ribbon {
-                width: 100%;
-                height: 40vh;
-                background-color: #3F51B5;
-                flex-shrink: 0;
-            }
-        
-        .demo-main {
-            margin-top: -35vh;
-            flex-shrink: 0;
-        }
-        
-        .demo-header .mdl-layout__header-row {
-            padding-left: 40px;
-        }
-        
-        .demo-container {
-            max-width: 1600px;
-            width: calc(100% - 16px);
-            margin: 0 auto;
-        }
-        
-        .demo-content {
-            border-radius: 2px;
-            padding: 80px 56px;
-            margin-bottom: 80px;
-        }
-        
-        .demo-layout.is-small-screen .demo-content {
-            padding: 40px 28px;
-        }
-        
-        .demo-content h3 {
-            margin-top: 48px;
-        }
-        
-        .demo-footer {
-            padding-left: 40px;
-        }
-        
-        .demo-footer .mdl-mini-footer--link-list a {
-            font-size: 13px;
-        }
-        
-        #view-source {
-            position: fixed;
-            display: block;
-            right: 0;
-            bottom: 0;
-            margin-right: 40px;
-            margin-bottom: 40px;
-            z-index: 900;
-        }
-        </style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+        <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        <style>html>body{font-family:'Roboto','Helvetica','Arial',sans-serif!important;</style>
     </head>
     <body>
-        <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
-            <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+            <header class="mdl-layout__header">
                 <div class="mdl-layout__header-row">
                     <span class="mdl-layout-title">PL-PatchSurfer</span>
                     <div class="mdl-layout-spacer"></div>
                 </div>
-            </header>
-            <div class="demo-ribbon"></div>
-            <main class="demo-main mdl-layout__content">
-                <div class="demo-container mdl-grid">
-                    <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
-                    <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
-                        <iframe name="_result" width="0" height="0" border="0" style="display: none;"></iframe>
-                        <form id="form" method="POST" enctype="multipart/form-data" action="job_bridge.php" target="_result">
-                            <div style="height: 28px;">
-                                <label for="receptor">Receptor:</label>
-                                <input type="file" id="receptor" name="receptor" />
-                            </div>
-                            <div style="height: 28px;">
-                                <label for="chain">Chain ID:</label>
-                                <input type="text" name="chain" style="width: 48px;" />
-                                <label for="ligand">Ligand ID:</label>
-                                <input type="text" name="ligand" style="width: 48px;" />
-                            </div>
-                            <div style="height: 28px;">
-                                <label for="db">Database:</label>
-                                <select id="db" name="db">
-                                    <option value="chembl_19">chembl_19</option>
-                                    <option value="zinc_druglike">zinc_druglike</option>
-                                    <option value="debug_1">debug_1</option>
-                                    <option value="debug_2">debug_2</option>
-                                </select>
-                            </div>
-                            <div style="height: 28px;">
-                                <label for="email">Email:</label>
-                                <input type="email" name="email" />
-                            </div>
-                            <div style="height: 28px;">
-                                <input type="hidden" name="service" value="plps" />
-                                <input id="form-submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick='alert("Job submitted!"); document.forms["form"].submit();' type="reset" value="Submit Job" />
-                            </div>
-                        </form>
-                    </div>
+                <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+                    <a href="#action-tab" class="mdl-layout__tab is-active">Run</a>
+                    <a href="#help-tab" class="mdl-layout__tab">Help</a>
                 </div>
-                <footer class="demo-footer mdl-mini-footer">
-                    <div class="mdl-mini-footer--left-section">
-                        <ul class="mdl-mini-footer--link-list">
-                            <li><a href="#">Help</a></li>
-                            <li><a href="#">Privacy and Terms</a></li>
-                            <li><a href="#">User Agreement</a></li>
-                        </ul>
+            </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">Kihara Lab</span>
+            </div>
+            <main class="mdl-layout__content">
+                <section class="mdl-layout__tab-panel is-active" id="action-tab">
+                    <div class="mdl-grid">
+                        <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+                        <div class="mdl-card mdl-shadow--16dp content mdl-cell mdl-cell--8-col" style="margin-top:32px;padding:32px;">
+                            <iframe name="_result" width="0" height="0" border="0" style="display: none;"></iframe>
+                            <form id="form" method="POST" enctype="multipart/form-data" action="job_bridge.php" onsubmit="return validateForm()" target="_result">
+                                <div style="height: 22px;">
+                                    <label for="receptor">Receptor:</label>
+                                    <input type="file" id="receptor" name="receptor" required />
+                                </div>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:18%">
+                                    <input class="mdl-textfield__input" type="text" pattern="^.{0,5}$" id="chain" required />
+                                    <label class="mdl-textfield__label" for="chain">Chain ID...</label>
+                                    <span class="mdl-textfield__error">Must be a chain ID</span>
+                                </div>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:18%">
+                                    <input class="mdl-textfield__input" type="text" pattern="^.{0,5}$" id="ligand" required />
+                                    <label class="mdl-textfield__label" for="ligand">Ligand ID...</label>
+                                    <span class="mdl-textfield__error">Must be a ligand ID</span>
+                                </div>
+                                <div style="width:100%;"></div> <!--\n-->
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <select class="mdl-textfield__input" id="db" name="db" required>
+                                        <option value="chembl_19">chembl_19</option>
+                                        <option value="zinc_druglike">zinc_druglike</option>
+                                        <option value="debug_1">debug_1</option>
+                                        <option value="debug_2">debug_2</option>
+                                    </select>
+                                    <label class="mdl-textfield__label" for="db">Database</label>
+                                </div>
+                                <div style="width:100%;"></div> <!--\n-->
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="text" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" id="email" required />
+                                    <label class="mdl-textfield__label" for="email">Email...</label>
+                                    <span class="mdl-textfield__error">Input is not an email!</span>
+                                </div>
+                                <div style="margin-top:8px;height: 28px;">
+                                    <input type="hidden" name="service" value="plps" />
+                                    <input id="form-submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                        type="submit" value="Submit Job" />
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </footer>
+                </section>
+                <section class="mdl-layout__tab-panel" id="help-tab">
+                    <div class="mdl-grid">
+                        <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+                        <div class="mdl-card mdl-shadow--16dp content mdl-cell mdl-cell--8-col" style="margin-top:32px;padding:32px;">
+                            <p>
+                            PL-PatchSurfer2 is a virtual screening program that matches local surface
+                            patches of receptor pocket and ligand that are represented by three-dimensional
+                            Zernike decriptors. Four physico-chemical features are used to describe surface
+                            patch: shape, electrostatic potential, hydrophobicity, and hydrogen bonding.
+                            </p>
+                            <hr />
+                            <p>
+                            To use the tool, submit a PDB file containing a protein with at least one subunit
+                            and one ligand (HETATM), along with the IDs of both. Your job will fail if the IDs
+                            given don't exist in the PDB file uploaded. In addition, select the database you wish
+                            to submit your job against, and provide a valid email to receive job progress at.
+                            </p>
+                            <hr />
+                            <p>
+                            <b>References</b>
+                            <ol>
+                                <li>Shin, W. -H.; Christoffer, C. W.; Wang, J.; Kihara, D.<br />
+                                    PL-PatchSurfer2: Improved Local Surface Matching-Based Virtual Screening<br />
+                                    Method that is Tolerant to Target and Ligand Structure Variation
+                                </li>
+                                <li>
+                                    J. Chem. Inf. Model. Submitted.
+                                </li>
+                                <li>
+                                    Shin, W. -H.; Bures, M. G.; Kihara, D.<br />
+                                    PatchSurfers: Two methods for local molecular property-based binding<br />
+                                    ligand prediction
+                                    Methods 2016, 93, 41-50.
+                                </li>
+                                <li>Hu, B.; Zhu, X.; Monroe, L.; Bures, M. G.; Kihara, D.<br />
+                                    PL-PatchSurfer: A novel molecular local surface-based method for exploring<br />
+                                    protein-ligand interactions.<br />
+                                    Int. J. Mol. Sci. 2014, 15, 15122-15145.
+                                </li>
+                            </ol>
+                            </p>
+                        </div>
+                    </div>
+                </section>
             </main>
+            <footer class="mdl-mini-footer">
+                <div class="mdl-mini-footer--left-section">
+                    <ul class="mdl-mini-footer--link-list">
+                        <li>Copyright © 2016 <a href="http://kiharalab.org/">Kihara Lab</a></li>
+                    </ul>
+                </div>
+            </footer>
+            <script>
+                function validateForm() {
+                    if (!document.forms["form"]["receptor"].checkValidity()) {
+                        alert("No PDB file selected.");
+                        return false;
+                    }
+                    if (!document.forms["form"]["chain"].checkValidity()) {
+                        alert("No chain ID provided.");
+                        return false;
+                    }
+                    if (!document.forms["form"]["ligand"].checkValidity()) {
+                        alert("No ligand ID provided.");
+                        return false;
+                    }
+                    if (!document.forms["form"]["db"].checkValidity()) {
+                        alert("No ligand database selected.");
+                        return false;
+                    }
+                    if (!document.forms["form"]["email"].checkValidity()) {
+                        alert("No recipient email provided.");
+                        return false;
+                    }
+                    alert("Job submitted!");
+                    document.forms["form"].reset();
+                    return true;
+                }
+            </script>
         </div>
-        <script src="http://www.getmdl.io/material.min.js"></script>
     </body>
 </html>
