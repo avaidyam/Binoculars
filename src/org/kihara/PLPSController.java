@@ -341,7 +341,7 @@ public class PLPSController extends Nucleus<PLPSController> {
             Log.d("MAIN", "Finished task, sending results.");
 
             // Move the results to the outbox.
-            String outbox = "/bio/kihara-web/www/binoculars/outbox";
+            String outbox = "/bio/kihara-web/www/unified/outbox";
             Path start = Paths.get(manifest.get("_path")).resolve("output");
             Path end = Paths.get(outbox);
             MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
@@ -349,7 +349,7 @@ public class PLPSController extends Nucleus<PLPSController> {
             // Send the results being available as an email.
             String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
             Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Results",
-                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
+                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/unified/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
 
             self().clearState();
             self().setConfiguration(null);
@@ -748,6 +748,6 @@ public class PLPSController extends Nucleus<PLPSController> {
             } catch(Exception e2) {
                 e2.printStackTrace();
             }
-        }, "/bio/kihara-web/www/binoculars/upload/");
+        }, "/bio/kihara-web/www/unified/inbox/");
     }
 }
