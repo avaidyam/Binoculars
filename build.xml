@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="binoculars" default="all">
+
+    <!-- The following file contains:
+        jdk.home.1.8={{path}} // Required
+        skip.tests={{true|false}} // Optional
+        artifact.class={{classname}} // Required
+    -->
+    <property file="build.properties"/>
+
+    <!-- Compiler options -->
+    <property name="compiler.debug" value="on"/>
+    <property name="compiler.generate.no.warnings" value="off"/>
+    <property name="compiler.args" value=""/>
+    <property name="compiler.max.memory" value="700m"/>
+    <patternset id="ignored.files">
+        <exclude name="**/*.hprof/**"/>
+        <exclude name="**/*.pyc/**"/>
+        <exclude name="**/*.pyo/**"/>
+        <exclude name="**/*.rbc/**"/>
+        <exclude name="**/*~/**"/>
+        <exclude name="**/.DS_Store/**"/>
+        <exclude name="**/.git/**"/>
+        <exclude name="**/.hg/**"/>
+        <exclude name="**/.svn/**"/>
+        <exclude name="**/CVS/**"/>
+        <exclude name="**/RCS/**"/>
+        <exclude name="**/SCCS/**"/>
+        <exclude name="**/__pycache__/**"/>
+        <exclude name="**/_svn/**"/>
+        <exclude name="**/rcs/**"/>
+        <exclude name="**/vssver.scc/**"/>
+        <exclude name="**/vssver2.scc/**"/>
+    </patternset>
+    <patternset id="library.patterns">
+        <include name="*.war"/>
+        <include name="*.swc"/>
+        <include name="*.apk"/>
+        <include name="*.zip"/>
+        <include name="*.ear"/>
+        <include name="*.egg"/>
+        <include name="*.ane"/>
+        <include name="*.jar"/>
+    </patternset>
+    <patternset id="compiler.resources">
+        <exclude name="**/?*.java"/>
+        <exclude name="**/?*.form"/>
+        <exclude name="**/?*.class"/>
+        <exclude name="**/?*.groovy"/>
+        <exclude name="**/?*.scala"/>
+        <exclude name="**/?*.flex"/>
+        <exclude name="**/?*.kt"/>
+        <exclude name="**/?*.clj"/>
+        <exclude name="**/?*.aj"/>
+    </patternset>
+
+    <!-- JDK definitions -->
+    <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+    <path id="jdk.classpath.1.8">
+        <fileset dir="${jdk.home.1.8}">
+            <include name="jre/lib/charsets.jar"/>
+            <include name="jre/lib/deploy.jar"/>
+            <include name="jre/lib/ext/cldrdata.jar"/>
+            <include name="jre/lib/ext/dnsns.jar"/>
+            <include name="jre/lib/ext/jaccess.jar"/>
+            <include name="jre/lib/ext/jfxrt.jar"/>
+            <include name="jre/lib/ext/localedata.jar"/>
+            <include name="jre/lib/ext/nashorn.jar"/>
+            <include name="jre/lib/ext/sunec.jar"/>
+            <include name="jre/lib/ext/sunjce_provider.jar"/>
+            <include name="jre/lib/ext/sunpkcs11.jar"/>
+            <include name="jre/lib/ext/zipfs.jar"/>
+            <include name="jre/lib/javaws.jar"/>
+            <include name="jre/lib/jce.jar"/>
+            <include name="jre/lib/jfr.jar"/>
+            <include name="jre/lib/jfxswt.jar"/>
+            <include name="jre/lib/jsse.jar"/>
+            <include name="jre/lib/management-agent.jar"/>
+            <include name="jre/lib/plugin.jar"/>
+            <include name="jre/lib/resources.jar"/>
+            <include name="jre/lib/rt.jar"/>
+            <include name="lib/ant-javafx.jar"/>
+            <include name="lib/dt.jar"/>
+            <include name="lib/javafx-mx.jar"/>
+            <include name="lib/jconsole.jar"/>
+            <include name="lib/packager.jar"/>
+            <include name="lib/sa-jdi.jar"/>
+            <include name="lib/tools.jar"/>
+        </fileset>
+    </path>
+    <property name="project.jdk.home" value="${jdk.home.1.8}"/>
+    <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
+    <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
+
+    <!-- Module Binoculars -->
+    <dirname property="module.binoculars.basedir" file="${ant.file}"/>
+    <property name="module.jdk.home.binoculars" value="${project.jdk.home}"/>
+    <property name="module.jdk.bin.binoculars" value="${project.jdk.bin}"/>
+    <property name="module.jdk.classpath.binoculars" value="${project.jdk.classpath}"/>
+    <property name="compiler.args.binoculars" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+    <property name="binoculars.output.dir" value="${module.binoculars.basedir}/out/production/Binoculars"/>
+    <property name="binoculars.testoutput.dir" value="${module.binoculars.basedir}/out/test/Binoculars"/>
+
+    <!-- Project classpaths -->
+    <path id="binoculars.module.bootclasspath">
+    </path>
+    <path id="binoculars.module.production.classpath">
+        <path refid="${module.jdk.classpath.binoculars}"/>
+        <fileset dir="${basedir}/lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+    <path id="binoculars.runtime.production.module.classpath">
+        <pathelement location="${binoculars.output.dir}"/>
+        <fileset dir="${basedir}/lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+    <path id="binoculars.module.classpath">
+        <path refid="${module.jdk.classpath.binoculars}"/>
+        <pathelement location="${binoculars.output.dir}"/>
+        <fileset dir="${basedir}/lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+    <path id="binoculars.runtime.module.classpath">
+        <pathelement location="${binoculars.testoutput.dir}"/>
+        <pathelement location="${binoculars.output.dir}"/>
+        <fileset dir="${basedir}/lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    <!-- Compiler sourcepaths -->
+    <patternset id="excluded.from.module.binoculars">
+        <patternset refid="ignored.files"/>
+    </patternset>
+    <patternset id="excluded.from.compilation.binoculars">
+        <patternset refid="excluded.from.module.binoculars"/>
+    </patternset>
+    <path id="binoculars.module.sourcepath">
+        <dirset dir="${module.binoculars.basedir}">
+            <include name="src"/>
+        </dirset>
+    </path>
+
+    <!--
+
+    THE FOLLOWING TARGET IS FOR MODULE: Binoculars
+
+    -->
+
+    <target name="compile.module.binoculars" depends="compile.module.binoculars.production,compile.module.binoculars.tests" description="Compile module Binoculars"/>
+
+    <target name="compile.module.binoculars.production" description="Compile module Binoculars; production classes">
+        <mkdir dir="${binoculars.output.dir}"/>
+        <javac destdir="${binoculars.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.binoculars}/javac">
+            <compilerarg line="${compiler.args.binoculars}"/>
+            <bootclasspath refid="binoculars.module.bootclasspath"/>
+            <classpath refid="binoculars.module.production.classpath"/>
+            <src refid="binoculars.module.sourcepath"/>
+            <patternset refid="excluded.from.compilation.binoculars"/>
+        </javac>
+
+        <copy todir="${binoculars.output.dir}">
+            <fileset dir="${module.binoculars.basedir}/src">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile.module.binoculars.tests" depends="compile.module.binoculars.production" description="compile module Binoculars; test classes" unless="skip.tests"/>
+
+    <target name="clean.module.binoculars" description="cleanup module">
+        <delete dir="${binoculars.output.dir}"/>
+        <delete dir="${binoculars.testoutput.dir}"/>
+    </target>
+
+    <!--
+
+    THE FOLLOWING TARGETS ARE FOR ALL MODULES
+
+    -->
+
+    <!-- Perform any build initialization in this target -->
+    <target name="init" description="Build initialization" />
+
+    <!-- Clean and remove the built classfiles for all targets -->
+    <target name="clean" depends="clean.module.binoculars" description="cleanup all"/>
+
+    <!-- Build all modules -->
+    <target name="build.modules" depends="init, clean, compile.module.binoculars" description="build all modules"/>
+
+    <target name="init.artifacts">
+        <property name="artifacts.temp.dir" value="${basedir}/.artifacts_temp"/>
+        <property name="artifact.output.binoculars:jar" value="${basedir}"/>
+        <mkdir dir="${artifacts.temp.dir}"/>
+        <property name="temp.jar.path.Binoculars.jar" value="${artifacts.temp.dir}/Binoculars.jar"/>
+    </target>
+
+    <target name="artifact.binoculars:jar" depends="init.artifacts, compile.module.binoculars" description="Build &#39;Binoculars:jar&#39; artifact">
+        <property name="artifact.temp.output.binoculars:jar" value="${artifacts.temp.dir}/Binoculars_jar"/>
+        <mkdir dir="${artifact.temp.output.binoculars:jar}"/>
+        <jar destfile="${temp.jar.path.Binoculars.jar}" duplicate="preserve" filesetmanifest="skip">
+            <manifest>
+                <attribute name="Main-Class" value="${artifact.class}"/>
+            </manifest>
+            <zipfileset dir="${binoculars.output.dir}"/>
+            <zipgroupfileset dir="${basedir}/lib" includes="*.jar"/>
+            <zipfileset file="${basedir}/unified/plps/visualizer_template.html" prefix="templates"/>
+            <zipfileset file="${basedir}/unified/plps/status_template.html" prefix="templates"/>
+        </jar>
+        <copy file="${temp.jar.path.Binoculars.jar}" tofile="${artifact.temp.output.binoculars:jar}/Binoculars.jar"/>
+    </target>
+
+    <target name="build.all.artifacts" depends="artifact.binoculars:jar" description="Build all artifacts">
+        <mkdir dir="${artifact.output.binoculars:jar}"/>
+        <copy todir="${artifact.output.binoculars:jar}">
+            <fileset dir="${artifact.temp.output.binoculars:jar}"/>
+        </copy>
+        <delete dir="${artifacts.temp.dir}"/>
+    </target>
+
+    <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+    <target name="run" description="run artifacts">
+        <java jar="Binoculars.jar" fork="true"/>
+    </target>
+</project>
