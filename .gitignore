@@ -5,3 +5,5 @@ out/
 .idea/tasks.xml
 .idea
 .DS_Store
+build.properties
+.artifacts_temp/
