@@ -37,12 +37,23 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Queue;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
+import java.util.concurrent.*;
 
 /**
  *
  */
 public class SimpleScheduler implements Scheduler {
+
+	public static final int MAX_EXTERNAL_THREADS_POOL_SIZE = 1000; // max threads used when externalizing blocking api
+	public static ThreadPoolExecutor exec;
+	static {
+		exec = new ThreadPoolExecutor(
+				MAX_EXTERNAL_THREADS_POOL_SIZE, MAX_EXTERNAL_THREADS_POOL_SIZE,
+				1L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<>()
+		);
+		exec.allowCoreThreadTimeOut(true);
+	}
 
 	/**
 	 * time ms until a warning is printed once a sender is blocked by a full nuclei queue
@@ -118,10 +129,10 @@ public class SimpleScheduler implements Scheduler {
 						String receiverString;
 						warningPrinted = true;
 						if(receiver instanceof Nucleus) {
-							if(q == ((Nucleus) receiver).__cbQueue) {
-								receiverString = receiver.getClass().getSimpleName() + " callbackQ";
-							} else if(q == ((Nucleus) receiver).__mailbox) {
-								receiverString = receiver.getClass().getSimpleName() + " mailbox";
+							if(q == ((Nucleus) receiver).__channel.outbox) {
+								receiverString = receiver.getClass().getSimpleName() + " outbox";
+							} else if(q == ((Nucleus) receiver).__channel.inbox) {
+								receiverString = receiver.getClass().getSimpleName() + " inbox";
 							} else {
 								receiverString = receiver.getClass().getSimpleName() + " unknown queue";
 							}
@@ -146,19 +157,12 @@ public class SimpleScheduler implements Scheduler {
 		} else
 			fut = null;
 		Nucleus targetNucleus = e.getTargetNucleus();
-		put2QueuePolling(e.isCallback() ? targetNucleus.__cbQueue : targetNucleus.__mailbox, false, e, targetNucleus);
+		put2QueuePolling(e.isCallback() ? targetNucleus.__channel.outbox : targetNucleus.__channel.inbox, false, e, targetNucleus);
 		return fut;
 	}
 	
 	@Override
-	public Object enqueueCall(Nucleus sendingNucleus, Nucleus receiver, String methodName, Object[] args, boolean isCB) {
-		return enqueueCallFromRemote(null, sendingNucleus, receiver, methodName, args, isCB);
-	}
-	
-	@Override
-	public Object enqueueCallFromRemote(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object[] args, boolean isCB) {
-		// System.out.println("dispatch "+methodName+" "+Thread.currentThread());
-		// here sender + receiver are known in a ST context
+	public Object enqueueCall(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object[] args, boolean isCB) {
 		Nucleus nucleus = receiver.getNucleus();
 		Method method = nucleus.__getCachedMethod(methodName, nucleus);
 		
@@ -214,7 +218,7 @@ public class SimpleScheduler implements Scheduler {
 				return method.invoke(proxy, args); // toString, hashCode etc. invoke sync (DANGER if hashcode accesses mutable local state)
 			if(target != null) {
 				RemoteInvocation ce = new RemoteInvocation(target, method, args, Nucleus.sender.get(), targetNucleus, true);
-				put2QueuePolling(targetNucleus.__cbQueue, true, ce, targetNucleus);
+				put2QueuePolling(targetNucleus.__channel.outbox, true, ce, targetNucleus);
 			}
 			return null;
 		}
@@ -230,9 +234,8 @@ public class SimpleScheduler implements Scheduler {
 		Class<?>[] interfaces = callback.getClass().getInterfaces();
 		InvocationHandler invoker = nucleus.__scheduler.getInvoker(nucleus, callback);
 		if(invoker == null) // called from outside nuclei world
-		{
 			return callback; // callback in callee thread
-		}
+		//noinspection unchecked
 		return (T) Proxy.newProxyInstance(callback.getClass().getClassLoader(), interfaces, invoker);
 	}
 	
@@ -250,7 +253,7 @@ public class SimpleScheduler implements Scheduler {
 	@Override
 	public <T> void runBlockingCall(Nucleus emitter, Callable<T> toCall, Signal<T> resultHandler) {
 		final SignalWrapper<T> resultWrapper = new SignalWrapper<>(emitter, resultHandler);
-		Nucleus.exec.execute(() -> {
+		SimpleScheduler.exec.execute(() -> {
 			try {
 				resultWrapper.complete(toCall.call(), null);
 			} catch(Throwable th) {
@@ -287,5 +290,7 @@ public class SimpleScheduler implements Scheduler {
 	public int getNumNuclei() {
 		return myThread.getNuclei().length;
 	}
+
+
 }
 

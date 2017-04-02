@@ -22,9 +22,13 @@
 
 package com.avaidyam.binoculars.future;
 
+import com.avaidyam.binoculars.Log;
+import com.avaidyam.binoculars.Nucleus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -89,6 +93,25 @@ public class TicketMachine {
 
     public HashMap<Object, List<Ticket>> getTickets() {
         return tickets;
+    }
+
+    /**
+     * enforce serial execution of asynchronous tasks. The 'toRun' closure must call '.signal()' on the given future
+     * to signal his processing has finished and the next item locked on 'transactionKey' can be processed.
+     *
+     * @param transactionKey
+     * @param toRun
+     */
+    public void serialOn(Nucleus n, Object transactionKey, Consumer<Future> toRun) {
+        if (n.isProxy())
+            throw new RuntimeException("cannot call on nuclei proxy object");
+        this.getTicket(transactionKey).onResult(finSig -> {
+            try {
+                toRun.accept(finSig);
+            } catch (Throwable th) {
+                Log.w("TicketMachine", "", th);
+            }
+        });
     }
 
     static class Ticket {

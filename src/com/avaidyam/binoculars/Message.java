@@ -36,7 +36,7 @@ public interface Message<T> extends Serializable {
 
     /**
      * Returns the target of the message. For Nuclei, this is
-     * not the NucleusProxy, but the instance of the Nucleus itself.
+     * not the Proxy, but the instance of the Nucleus itself.
      *
      * @return the target of this message
      */
@@ -44,7 +44,7 @@ public interface Message<T> extends Serializable {
 
     /**
      * Returns the method to call on the target. For Nuclei, this is
-     * not the NucleusProxy, but the instance of the Nucleus itself.
+     * not the Proxy, but the instance of the Nucleus itself.
      *
      * @return the method of this message
      */

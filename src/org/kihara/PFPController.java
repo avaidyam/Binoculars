@@ -31,6 +31,7 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.Eponym;
 import com.avaidyam.binoculars.Log;
+import org.kihara.util.JavascriptEngine;
 import org.kihara.util.ParameterFilter;
 import org.kihara.util.SeekableFile;
 

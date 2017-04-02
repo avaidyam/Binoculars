@@ -102,7 +102,7 @@ public class ElasticScheduler implements Scheduler {
         } else
             fut = null;
         Nucleus targetNucleus = e.getTargetNucleus();
-        put2QueuePolling(e.isCallback() ? targetNucleus.__cbQueue : targetNucleus.__mailbox, false, e, targetNucleus);
+        put2QueuePolling(e.isCallback() ? targetNucleus.__channel.outbox : targetNucleus.__channel.inbox, false, e, targetNucleus);
         return fut;
     }
 
@@ -165,9 +165,9 @@ public class ElasticScheduler implements Scheduler {
                         warningPrinted = true;
                         String receiverString;
                         if (receiver instanceof Nucleus) {
-                            if (q == ((Nucleus) receiver).__cbQueue) {
+                            if (q == ((Nucleus) receiver).__channel.outbox) {
                                 receiverString = receiver.getClass().getSimpleName() + " callbackQ";
-                            } else if (q == ((Nucleus) receiver).__mailbox) {
+                            } else if (q == ((Nucleus) receiver).__channel.inbox) {
                                 receiverString = receiver.getClass().getSimpleName() + " mailbox";
                             } else {
                                 receiverString = receiver.getClass().getSimpleName() + " unknown queue";
@@ -208,14 +208,8 @@ public class ElasticScheduler implements Scheduler {
         }
     }
 
-
     @Override
-    public Object enqueueCall(Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB) {
-        return enqueueCallFromRemote(null, sendingNucleus, receiver, methodName, args, isCB);
-    }
-
-    @Override
-    public Object enqueueCallFromRemote(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB) {
+    public Object enqueueCall(RemoteRegistry reg, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB) {
         // System.out.println("dispatch "+methodName+" "+Thread.currentThread());
         // here sender + receiver are known in a ST context
         Nucleus nucleus = receiver.getNucleus();
@@ -394,11 +388,11 @@ public class ElasticScheduler implements Scheduler {
             }
             for (int i = 0; i < qList.length; i++) {
                 Nucleus nucleus = qList[i];
-                if (otherQSizes + nucleus.getQSizes() < qSizes - nucleus.getQSizes()) {
-                    otherQSizes += nucleus.getQSizes();
-                    qSizes -= nucleus.getQSizes();
+                if (otherQSizes + nucleus.__channel.getQSizes() < qSizes - nucleus.__channel.getQSizes()) {
+                    otherQSizes += nucleus.__channel.getQSizes();
+                    qSizes -= nucleus.__channel.getQSizes();
                     if (DEBUG_SCHEDULING)
-                        Log.i(this.toString(), "move " + nucleus.getQSizes() + " myload " + qSizes + " otherload " + otherQSizes + " from " + dispatcher.getName() + " to " + minLoadThread.getName());
+                        Log.i(this.toString(), "move " + nucleus.__channel.getQSizes() + " myload " + qSizes + " otherload " + otherQSizes + " from " + dispatcher.getName() + " to " + minLoadThread.getName());
                     dispatcher.removeNucleusImmediate(nucleus);
                     minLoadThread.addNucleus(nucleus);
                 }
@@ -454,7 +448,7 @@ public class ElasticScheduler implements Scheduler {
                     minLoadThread.addNucleus(nucleus);
                 }
                 if (DEBUG_SCHEDULING)
-                    Log.i(this.toString(), "move for unblock " + nucleus.getQSizes() + " myload " + dispatcher.getAccumulatedQSizes() + " actors " + qList.length);
+                    Log.i(this.toString(), "move for unblock " + nucleus.__channel.getQSizes() + " myload " + dispatcher.getAccumulatedQSizes() + " actors " + qList.length);
             }
         }
     }
@@ -501,7 +495,7 @@ public class ElasticScheduler implements Scheduler {
                 dispatcher.removeNucleusImmediate(nucleus);
                 minLoadThread.addNucleus(nucleus);
                 if (DEBUG_SCHEDULING)
-                    Log.i(this.toString(), "move for idle " + nucleus.getQSizes() + " myload " + dispatcher.getAccumulatedQSizes() + " actors " + qList.length);
+                    Log.i(this.toString(), "move for idle " + nucleus.__channel.getQSizes() + " myload " + dispatcher.getAccumulatedQSizes() + " actors " + qList.length);
             }
         }
     }
@@ -527,7 +521,7 @@ public class ElasticScheduler implements Scheduler {
                 return method.invoke(proxy, args); // toString, hashCode etc. invoke sync (DANGER if hashcode accesses mutable local state)
             if (target != null) {
                 RemoteInvocation ce = new RemoteInvocation(target, method, args, Nucleus.sender.get(), targetNucleus, true);
-                put2QueuePolling(targetNucleus.__cbQueue, true, ce, targetNucleus);
+                put2QueuePolling(targetNucleus.__channel.outbox, true, ce, targetNucleus);
             }
             return null;
         }

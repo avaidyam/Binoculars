@@ -23,10 +23,10 @@
 package org.kihara;
 
 import com.avaidyam.binoculars.Export;
+import com.avaidyam.binoculars.Log;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.Log;
 import org.kihara.util.FileWatcher;
 import org.kihara.util.Mailer;
 import org.kihara.util.MigrationVisitor;
@@ -60,6 +60,28 @@ public class PLPSController extends Nucleus<PLPSController> {
 
     Configuration configuration = null;
     State state = null;
+
+    public static class RemoteHeartbeat implements Serializable {
+        public static List<String> remotes = Arrays.asList(
+                "alien.bio.purdue.edu",
+                "beluga.bio.purdue.edu",
+                "dragon.bio.purdue.edu", 
+                "emu.bio.purdue.edu",
+                "giraffe.bio.purdue.edu",
+                "kiwi1.bio.purdue.edu",
+                "kiwi2.bio.purdue.edu",
+                "liger3.bio.purdue.edu",
+                "lion.bio.purdue.edu",
+                "maroon.bio.purdue.edu",
+                "miffy.bio.purdue.edu",
+                "owl.bio.purdue.edu",
+                "panda.bio.purdue.edu",
+                "poas.bio.purdue.edu",
+                "puma.bio.purdue.edu",
+                "qilin.bio.purdue.edu",
+                "snake.bio.purdue.edu",
+                "tiger.bio.purdue.edu");
+    }
 
     /**
      * The Configuration of a PLPSController defines its tool locations
@@ -318,7 +340,7 @@ public class PLPSController extends Nucleus<PLPSController> {
             Log.d("MAIN", "Finished task, sending results.");
 
             // Move the results to the outbox.
-            String outbox = "/bio/kihara-web/www/binoculars/outbox";
+            String outbox = "/bio/kihara-web/www/unified/outbox";
             Path start = Paths.get(manifest.get("_path")).resolve("output");
             Path end = Paths.get(outbox);
             MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
@@ -326,7 +348,7 @@ public class PLPSController extends Nucleus<PLPSController> {
             // Send the results being available as an email.
             String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
             Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "PL-PatchSurfer2 Job Results",
-                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/binoculars/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
+                    "Your PL-PatchSurfer job results can be found at http://kiharalab.org/unified/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
 
             self().clearState();
             self().setConfiguration(null);
@@ -627,7 +649,6 @@ public class PLPSController extends Nucleus<PLPSController> {
         String template = new BufferedReader(new InputStreamReader(t))
                 .lines().collect(Collectors.joining("\n"));
         final String inside = template.replaceAll("[\\s\\S]*(<!--START-->)|(<!--END-->)[\\s\\S]*", "");
-        Log.d(TAG, "Formed template inner: " + inside);
 
         final int[] idx = {0};
         String output[] = {""};
@@ -717,16 +738,6 @@ public class PLPSController extends Nucleus<PLPSController> {
         Log.get().setSeverity(Log.Severity.DEBUG);
         PLPSController controller = Nucleus.of(PLPSController.class);
 
-        controller.delayed(1000, () -> {
-            Log.d("TEST", "One second later...");
-            controller.exec(() -> {
-                Log.w("INSIDE", "Test");
-                return "test";
-            }).then((r, e) -> {
-                Log.i("DONE", "YAY");
-            });
-        });
-
         FileWatcher watcher = FileWatcher.watch((p, e) -> {
             PLPSController.allJobs.addAll(PLPSController.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
 
@@ -735,6 +746,6 @@ public class PLPSController extends Nucleus<PLPSController> {
             } catch(Exception e2) {
                 e2.printStackTrace();
             }
-        }, "/bio/kihara-web/www/binoculars/upload/");
+        }, "/bio/kihara-web/www/unified/inbox/");
     }
 }

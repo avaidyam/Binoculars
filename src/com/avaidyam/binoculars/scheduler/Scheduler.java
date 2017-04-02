@@ -23,8 +23,8 @@
 package com.avaidyam.binoculars.scheduler;
 
 import com.avaidyam.binoculars.Nucleus;
-import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 import com.avaidyam.binoculars.future.Signal;
+import com.avaidyam.binoculars.remoting.base.RemoteRegistry;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.Queue;
@@ -35,35 +35,14 @@ import java.util.concurrent.Callable;
  */
 public interface Scheduler {
 
-	/**
-     *
-     * @return
-     */
-    int getDefaultQSize();
-
-    // yield during polling/spinlooping
-    void pollDelay(int count);
-
-    void put2QueuePolling(Queue q, boolean isCBQ, Object o, Object sender);
-
-    Object enqueueCall(Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB);
-
-    Object enqueueCallFromRemote(RemoteRegistry registry, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB);
-
-    void threadStopped(Dispatcher th);
-
-    void terminateIfIdle();
-
-    InvocationHandler getInvoker(Nucleus dispatcher, Object toWrap);
-
     /**
      * Creates a wrapper on the given object enqueuing allOf calls to INTERFACE methods of the given object to the given actors's queue.
      * This is used to enable processing of resulting callback's in the callers thread.
      * see also @InThread annotation.
      *
-     * @param callback
-     * @param <T>
-     * @return
+     * in case called from an nuclei, wraps the given interface instance into a proxy such that
+     * a calls on the interface get scheduled on the actors thread (avoids accidental multithreading
+     * when handing out callback/listener interfaces from an nuclei)
      */
     <T> T inThread(Nucleus nucleus, T callback);
 
@@ -71,25 +50,51 @@ public interface Scheduler {
 
     <T> void runBlockingCall(Nucleus emitter, Callable<T> toCall, Signal<T> resultHandler);
 
+    Object enqueueCall(RemoteRegistry registry, Nucleus sendingNucleus, Nucleus receiver, String methodName, Object args[], boolean isCB);
+
+
+
+
+    // FIXME: REMOVE
+    int getDefaultQSize();
+
+    // FIXME: REMOVE
+    void threadStopped(Dispatcher th);
+
+    /**
+     * yield during polling/spinlooping
+     */
+    // FIXME: REMOVE
+    void pollDelay(int count);
+
+    // FIXME: REMOVE
+    void put2QueuePolling(Queue q, boolean isCBQ, Object o, Object sender);
+
+    // FIXME: REMOVE
+    InvocationHandler getInvoker(Nucleus dispatcher, Object toWrap);
+
+    // FIXME: REMOVE
     Dispatcher assignDispatcher(int minLoadPerc);
 
     /**
      * called from inside overloaded thread with load
      * allOf actors assigned to the calling thread therefore can be safely moved
-     *
-     * @param dispatcher
      */
+    // FIXME: REMOVE
     void rebalance(Dispatcher dispatcher);
 
+    // FIXME: REMOVE
     SchedulingStrategy getBackoffStrategy();
 
+    // FIXME: REMOVE
     void tryStopThread(Dispatcher dispatcher);
 
+    // FIXME: REMOVE
     void tryIsolate(Dispatcher dp, Nucleus nucleusRef);
 
-    /**
-     * @return number of actors scheduled by this scheduler. Note this
-     * is not precise as not thread safe'd.
-     */
+    // FIXME: REMOVE
     int getNumNuclei();
+
+    // FIXME: REMOVE
+    void terminateIfIdle();
 }
