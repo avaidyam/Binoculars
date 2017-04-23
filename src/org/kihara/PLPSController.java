@@ -65,7 +65,7 @@ public class PLPSController extends Nucleus<PLPSController> {
         public static List<String> remotes = Arrays.asList(
                 "alien.bio.purdue.edu",
                 "beluga.bio.purdue.edu",
-                "dragon.bio.purdue.edu", 
+                "dragon.bio.purdue.edu",
                 "emu.bio.purdue.edu",
                 "giraffe.bio.purdue.edu",
                 "kiwi1.bio.purdue.edu",

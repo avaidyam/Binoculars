@@ -22,30 +22,26 @@
 
 package org.kihara;
 
-import com.avaidyam.binoculars.Cortex;
+import com.avaidyam.binoculars.Export;
 import com.avaidyam.binoculars.Log;
 import com.avaidyam.binoculars.Nucleus;
 import com.avaidyam.binoculars.future.CompletableFuture;
 import com.avaidyam.binoculars.future.Future;
-import com.avaidyam.binoculars.future.FutureLatch;
-import com.sun.net.httpserver.HttpContext;
-import com.sun.net.httpserver.HttpServer;
 import org.kihara.util.FileWatcher;
-import org.kihara.util.JavascriptEngine;
-import org.kihara.util.ParameterFilter;
-import org.kihara.util.TicketManager;
+import org.kihara.util.Mailer;
+import org.kihara.util.MigrationVisitor;
 
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.WatchEvent;
+import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.lang.ProcessBuilder.Redirect.appendTo;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 public class LZerDController extends Nucleus<LZerDController> {
 
@@ -56,68 +52,260 @@ public class LZerDController extends Nucleus<LZerDController> {
     // --------------------------------------------------------------------
     // Context for PFP application jobs, including FASTA and divisions.
     public static final String TAG = "[LZerD]";
+    public static LinkedList<Map<String, String>> allJobs = new LinkedList<>();
 
-    static class JobContext implements Serializable {
-        PrintWriter writer = null;
-        FutureLatch<Void> latch = null;
+    Configuration configuration = null;
+    State state = null;
+
+    public static class RemoteHeartbeat implements Serializable {
+        public static List<String> remotes = Arrays.asList(
+                "alien.bio.purdue.edu",
+                "beluga.bio.purdue.edu",
+                "dragon.bio.purdue.edu",
+                "emu.bio.purdue.edu",
+                "giraffe.bio.purdue.edu",
+                "kiwi1.bio.purdue.edu",
+                "kiwi2.bio.purdue.edu",
+                "liger3.bio.purdue.edu",
+                "lion.bio.purdue.edu",
+                "maroon.bio.purdue.edu",
+                "miffy.bio.purdue.edu",
+                "owl.bio.purdue.edu",
+                "panda.bio.purdue.edu",
+                "poas.bio.purdue.edu",
+                "puma.bio.purdue.edu",
+                "qilin.bio.purdue.edu",
+                "snake.bio.purdue.edu",
+                "tiger.bio.purdue.edu");
+    }
+
+    public static class State implements Serializable {
+
+        enum Stage implements Serializable {
+            FAILED,
+            INITIALIZED,
+            PREP,
+            LZERD,
+            POSTPROCESSING,
+            COMPLETE
+        }
+
+        enum PrepStage implements Serializable {
+            FAILED,
+            WAITING,
+            INITIALIZED,
+            MARK_SUR,
+            GETPOINTS,
+            LZD32,
+            COMPLETE
+        }
+
+        enum PostStage implements Serializable {
+            FAILED,
+            WAITING,
+            INITIALIZED,
+            GREP,
+            PDBGEN,
+            CLUSTERING,
+            DFIRE,
+            GOAP,
+            ITSCORE,
+            COMPLETE
+        }
+
+        Stage stage = Stage.INITIALIZED;
+        PrepStage receptorStage = PrepStage.WAITING;
+        PrepStage ligandStage = PrepStage.WAITING;
+        PostStage postStage = PostStage.WAITING;
+
         String path = "";
-        List<Integer> divisions = new ArrayList<>();
-        String name = "";
-        int total = 0;
-    }
-    // --------------------------------------------------------------------
 
-    //
-    // SET + GET
-    //
+        String email = "";
 
-    // --------------------------------------------------------------------
-    // Set + Get for current execution context.
-    JobContext context = null;
-    public void startJobContext(String path, String name, int total, List<Integer> divisions) {
-        JobContext ctx = new JobContext();
-        ctx.path = path;
-        ctx.divisions = divisions;
-        ctx.name = name;
-        ctx.total = total;
-        self().context = ctx;
-    }
-    public Future<Boolean> hasJobContext() {
-        return new CompletableFuture<>((self().context != null));
-    }
-    public void clearJobContext() {
-        self().context = null;
-    }
-    // --------------------------------------------------------------------
+        String receptorFile = "";
+        String ligandFile = "";
 
-    // --------------------------------------------------------------------
-    // Set + Get for current store path.
-    String storePath = System.getProperty("user.dir");
-    String LZerDdir = storePath + "/bin/lzerd";
-    public Future<String> getStorePath() {
-        return new CompletableFuture<>(storePath);
-    }
-    public void setStorePath(String storePath) {
-        this.storePath = storePath;
-    }
-    // --------------------------------------------------------------------
+        String recMarkSur = "";
+        String ligMarkSur = "";
 
-    // --------------------------------------------------------------------
-    // Handy JS function to begin PFP without messing with Cortex.
-    public static void go(String receptorFile, String ligandFile) throws Exception {
-        Cortex.of(LZerDController.class)
-                .getNodes().get(0)
-                .runScoring();
-    }
-    // --------------------------------------------------------------------
+        String recGetPointsCP = "";
+        String recGetPointsGTS = "";
+        String ligGetPointsCP = "";
+        String ligGetPointsGTS = "";
 
-    public static TicketManager<String> getTicketManager() {
-        return new TicketManager<>();
+        String recLzd32 = "";
+        String ligLzd32 = "";
+
+        String recBaseName = "";
+        String ligBaseName = "";
+
+        String lzerdOutput = "";
+
+        // TODO add variables for different result files
+
+        @Override
+        public String toString() {
+            return "State{" +
+                    "stage=" + stage +
+                    ", receptorStage=" + receptorStage +
+                    ", ligandStage=" + ligandStage +
+                    ", postStage=" + postStage +
+                    ", path=" + path +
+                    ", email=" + email +
+                    ", receptorFile=" + receptorFile +
+                    ", ligandFile=" + ligandFile +
+                    ", recMarkSur=" + recMarkSur +
+                    ", ligMarkSur=" + ligMarkSur +
+                    ", recGetPointsCP=" + recGetPointsCP +
+                    ", recGetPointsGTS=" + recGetPointsGTS +
+                    ", ligGetPointsCP=" + ligGetPointsCP +
+                    ", ligGetPointsGTS=" + ligGetPointsGTS +
+                    ", recLzd32=" + recLzd32 +
+                    ", ligLzd32=" + ligLzd32 +
+                    ", recBaseName=" + recBaseName +
+                    ", ligBaseName=" + ligBaseName +
+                    ", lzerdOutput=" + lzerdOutput +
+                    "}";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            State state = (State) o;
+            if (!stage.equals(state.stage)) return false;
+            if (!receptorStage.equals(state.receptorStage)) return false;
+            if (!ligandStage.equals(state.ligandStage)) return false;
+            if (!postStage.equals(state.postStage)) return false;
+            if (!path.equals(state.path)) return false;
+            if (!email.equals(state.email)) return false;
+            if (!receptorFile.equals(state.receptorFile)) return false;
+            if (!ligandFile.equals(state.ligandFile)) return false;
+            if (!recMarkSur.equals(state.recMarkSur)) return false;
+            if (!ligMarkSur.equals(state.ligMarkSur)) return false;
+            if (!recGetPointsCP.equals(state.recGetPointsCP)) return false;
+            if (!recGetPointsGTS.equals(state.recGetPointsGTS)) return false;
+            if (!ligGetPointsCP.equals(state.ligGetPointsCP)) return false;
+            if (!ligGetPointsGTS.equals(state.ligGetPointsGTS)) return false;
+            if (!recLzd32.equals(state.recLzd32)) return false;
+            if (!ligLzd32.equals(state.ligLzd32)) return false;
+            if (!lzerdOutput.equals(state.lzerdOutput)) return false;
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = stage.hashCode();
+            result = 31 * result + receptorStage.hashCode();
+            result = 31 * result + ligandStage.hashCode();
+            result = 31 * result + postStage.hashCode();
+            result = 31 * result + path.hashCode();
+            result = 31 * result + email.hashCode();
+            result = 31 * result + receptorFile.hashCode();
+            result = 31 * result + ligandFile.hashCode();
+            result = 31 * result + recMarkSur.hashCode();
+            result = 31 * result + ligMarkSur.hashCode();
+            result = 31 * result + recGetPointsCP.hashCode();
+            result = 31 * result + recGetPointsGTS.hashCode();
+            result = 31 * result + ligGetPointsCP.hashCode();
+            result = 31 * result + ligGetPointsGTS.hashCode();
+            result = 31 * result + recLzd32.hashCode();
+            result = 31 * result + ligLzd32.hashCode();
+            result = 31 * result + recBaseName.hashCode();
+            result = 31 * result + ligBaseName.hashCode();
+            result = 31 * result + lzerdOutput.hashCode();
+            return result;
+        }
+    }
+
+    public static class Configuration implements Serializable {
+
+        double rfmin = 4.0;
+        double rfmax = 9.0;
+        double rfpmax = 15.0;
+        int nvotes = 8;
+        double cor = 0.7;
+        double dist = 2.0;
+        double nrad = 2.5;
+
+        String lzerdPath = tilde("~/LZerD");
+        String workingPath = tilde("~/LZerDFiles");
+
+        @Override
+        public String toString() {
+            return "Configuration{" +
+                    "rfmin=" + rfmin +
+                    ", rfmax=" + rfmax +
+                    ", rfpmax=" + rfpmax +
+                    ", nvotes=" + nvotes +
+                    ", cor=" + cor +
+                    ", dist=" + dist +
+                    ", nrad=" + nrad +
+                    ", lzerdPath='" + lzerdPath + '\'' +
+                    ", workingPath='" + workingPath + '\'' +
+                    "}";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Configuration that = (Configuration) o;
+            if (!rfmin.equals(that.rfmin)) return false;
+            if (!rfmax.equals(that.rfmax)) return false;
+            if (!rfpmax.equals(that.rfpmax)) return false;
+            if (!nvotes.equals(that.nvotes)) return false;
+            if (!cor.equals(that.cor)) return false;
+            if (!dist.equals(that.dist)) return false;
+            if (!nrad.equals(that.nrad)) return false;
+            if (!lzerdPath.equals(that.lzerdPath)) return false;
+            if (!workingPath.equals(that.workingPath)) return false;
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = rfmin.hashCode();
+            result = 31 * result + rfmax.hashCode();
+            result = 31 * result + rfpmax.hashCode();
+            result = 31 * result + nvotes.hashCode();
+            result = 31 * result + cor.hashCode();
+            result = 31 * result + dist.hashCode();
+            result = 31 * result + nrad.hashCode();
+            result = 31 * result + lzerdPath.hashCode();
+            result = 31 * result + workingPath.hashCode();
+            return result;
+        }
+    }
+
+    @Export
+    public Future<Configuration> getConfiguration() {
+        return new CompletableFuture<>(configuration);
+    }
+
+    @Export
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    @Export
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    @Export
+    public Future<Boolean> hasState() {
+        return new CompletableFuture<>((this.state != null));
+    }
+
+    @Export
+    public void clearState() {
+        this.state = null;
     }
 
     // --------------------------------------------------------------------
     // Helper lambda to concisely produce processes for PFP.
-    Function<String[], ProcessBuilder> _lzerd = (String[] args) -> {
+    Function<String[], ProcessBuilder> _lzerd = (String ... args) -> {
         System.out.println("Running " + Arrays.toString(args));
         ProcessBuilder pb = new ProcessBuilder(args)
                 .directory(new File(LZerDdir))
@@ -128,6 +316,90 @@ public class LZerDController extends Nucleus<LZerDController> {
     };
     // --------------------------------------------------------------------
 
+    private static String tilde(String path) {
+        return path.replaceFirst("^~", System.getProperty("user.home"));
+    }
+
+
+    @Export
+    public void runJob(Map<String, String> manifest) throws Exception {
+
+        if (self().hasState().await() || manifest == null) {
+            throw new RuntimeException("Can't do that!");
+        }
+        try {
+            String path = manifest.get("_path");
+            self().provideInputs(path, manifest.get("email"), manifest.get("receptor"), manifest.get("ligand"));
+            self().prepareFiles().await();
+            self().runLzerd().await();
+            self().runGrep().await();
+            self().runPDBGEN().await();
+            self().runPostProcessing().await();
+
+            String outbox = "/bio/kihara-web/www/unified/outbox";
+            Path start = Paths.get(manifest.get("_path")).resolve("output");
+            Path end = Paths.get(outbox);
+            MigrationVisitor.migrate(start, end, true, REPLACE_EXISTING);
+
+            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "LZerD Job Results",
+                    "Your LZerD job results can be found at http://kiharalab.org/unified/outbox/" + jobName + "/ and will be available for the next six months. Please access and download your results as needed.");
+
+            self().clearState();
+            self().setConfiguration(null);
+            self().notifyJob();
+        } catch(Exception e2) {
+            Log.e("MAIN", "Failed to complete task.", e2);
+            StringWriter sw = new StringWriter();
+            e2.printStackTrace(new PrintWriter(sw));
+
+            // Send the job failed message as an email.
+            String jobName = Paths.get(manifest.get("_path")).getFileName().toString();
+            Mailer.mail("Kihara Lab <sbit-admin@bio.purdue.edu>", manifest.get("email"), "LZerD Job Failed",
+                    "Your LZerD job (" + jobName + ") failed to complete. Please contact us for support and provide the below trace message.\n\n" + sw.toString() + "\n");
+
+            self().clearState();
+            self().setConfiguration(null);
+            self().notifyJob();
+        }
+    }
+
+    @Export(transport=false)
+    public void notifyJob() throws Exception {
+        if (!self().hasState().await() && allJobs.size() > 0)
+            self().runJob(allJobs.pop());
+    }
+
+    public Future<Void> provideInputs(String root, String email, String receptorFile, String ligandFile) {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+        if (this.state != null && this.configuration != null) {
+            return new CompletableFuture<>();
+        }
+
+        Configuration conf = new Configuration();
+        this.configuration = conf;
+
+        State st = new State();
+
+        st.receptorFile = receptorFile;
+        String recBaseName = Paths.get(receptorFile).getFileName().toString();
+        if (recBaseName.indexOf('.') > 0) recBaseName = recBaseName.substring(0, recBaseName.indexOf('.'));
+        st.recBaseName = recBaseName;
+
+        state.ligandFile = ligandFile;
+        String ligBaseName = Paths.get(ligandFile).getFileName().toString();
+        if (ligBaseName.indexOf('.') > 0) ligBaseName = ligBaseName.substring(0, ligBaseName.indexOf('.'));
+        state.ligBaseName = ligBaseName;
+
+        st.path = tilde(root);
+        st.email = email;
+        st.receptorFile = receptorFile;
+        st.ligandFile = ligandFile;
+        st.stage = State.Stage.INITIALIZED;
+        this.state = st;
+
+        promise.complete();
+    }
 
     // Runs mark_sur
     // Returns output file abs. path as String
@@ -139,6 +411,30 @@ public class LZerDController extends Nucleus<LZerDController> {
         _lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
                 .start().waitFor();
         promise.complete(outputFile);
+        return promise;
+    }
+
+    public Future<Void> runRecMarkSur() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.receptorStage = State.PrepStage.MARK_SUR;
+
+        self().runMarkSur(state.recBaseName).then((o, e) -> {
+            state.recMarkSur = o;
+        });
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runLigMarkSur() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.ligandStage = State.PrepStage.MARK_SUR;
+
+        self().runMarkSur(state.ligBaseName).then((o, e) -> {
+            state.ligMarkSur = o;
+        });
+        promise.complete();
         return promise;
     }
 
@@ -170,6 +466,32 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
+    public Future<Void> runRecGetPoints() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.receptorStage = State.PrepStage.GETPOINTS;
+
+        self().runGetPoints(state.recBaseName).then((o, e) -> {
+            state.recGetPointsCP = o.get("cp-txt");
+            state.recGetPointsGTS = o.get("gts");
+        })
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runLigGetPoints() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.ligandStage = State.PrepStage.GETPOINTS;
+
+        self().runGetPoints(state.ligBaseName).then((o, e) -> {
+            state.ligGetPointsCP = o.get("cp-txt");
+            state.ligGetPointsGTS = o.get("gts");
+        });
+        promise.complete();
+        return promise;
+    }
+
     // Runs LZD32
     // Returns output file abs. path as String
     public Future<String> runLzd32(String inputFileBase) throws IOException, InterruptedException {
@@ -192,32 +514,104 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
+    public Future<Void> runRecLzd32() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.receptorStage = State.PrepStage.LZD32;
+
+        self().runLzd32(state.recBaseName).then((o, e) -> {
+            state.recLzd32 = o;
+        });
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> runLigLzd32() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.ligandStage = State.PrepStage.LZD32;
+
+        self().runLzd32(state.ligBaseName).then((o, e) -> {
+            state.ligLzd32 = o;
+        });
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> prepareReceptorFiles() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.receptorStage = State.PrepStage.INITIALIZED;
+
+        self().runRecMarkSur().await();
+        self().runRecGetPoints().await();
+        self().runRecLzd32().await();
+
+        state.receptorStage = State.PrepStage.COMPLETE;
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> prepareLigandFiles() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.ligandStage = State.PrepStage.INITIALIZED;
+
+        self().runLigMarkSur().await();
+        self().runLigGetPoints().await();
+        self().runLigLzd32().await();
+
+        state.ligandStage = State.PrepStage.COMPLETE;
+
+        promise.complete();
+        return promise;
+    }
+
+    public Future<Void> prepareFiles() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.stage = State.Stage.PREP;
+
+        Future<Void> recFuture = prepareReceptorFiles();
+        Future<Void> ligFuture = prepareLigandFiles();
+
+        recFuture.await();
+        ligFuture.await();
+
+        promise.complete();
+        return promise;
+    }
+
     // Runs LZerD
     // Returns output file abs. path as String
-    public Future<String> runLzerd(HashMap<String, String> inputFiles) throws IOException, InterruptedException {
-        CompletableFuture<String> promise = new CompletableFuture<>();
+    public Future<Void> runLzerd() {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        state.stage = State.Stage.LZERD;
+
         Log.i(TAG, "Step 4: Running LZerD.");
 
-        String rec_cp = inputFiles.get("receptor-getpoints-cp-txt");
-        String lig_cp = inputFiles.get("ligand-getpoints-cp-txt");
+        String rec_cp = state.recGetPointsCP;
+        String lig_cp = state.ligGetPointsCP;
 
-        String recBaseName = inputFiles.get("receptor-base");
+        String recBaseName = state.recBaseName;
 
-        String ligBaseName = inputFiles.get("ligand-base");
+        String ligBaseName = state.ligBaseName;
 
-        String rec_ms = inputFiles.get("receptor-mark_sur");
-        String lig_ms = inputFiles.get("ligand-mark_sur");
+        String rec_ms = state.recMarkSur;
+        String lig_ms = state.ligMarkSur;
 
-        String rec_inv = inputFiles.get("receptor-lzd32");
-        String lig_inv = inputFiles.get("ligand-lzd32");
+        String rec_inv = state.recLzd32;
+        String lig_inv = state.ligLzd32;
 
-        double rfmin = 4.0;
-        double rfmax = 9.0;
-        double rfpmax = 15.0;
-        int nvotes = 8;
-        double cor = 0.7;
-        double dist = 2.0;
-        double nrad = 2.5;
+        double rfmin = configuration.rfmin;
+        double rfmax = configuration.rfmax;
+        double rfpmax = configuration.rfpmax;
+        int nvotes = configuration.nvotes;
+        double cor = configuration.cor;
+        double dist = configuration.dist;
+        double nrad = configuration.nrad;
 
         String outFile = recBaseName + "_" + ligBaseName + ".out";
 
@@ -229,13 +623,16 @@ public class LZerDController extends Nucleus<LZerDController> {
                 .redirectOutput(new File(LZerDdir + "/" + outFile))
                 .start().waitFor();
 
-        promise.complete(outFile);
+        state.lzerdOutput = outFile;
+
+        promise.complete();
         return promise;
     }
 
-    public Future<String> runGrep(String inputFile) throws IOException, InterruptedException {
-        CompletableFuture<String> promise = new CompletableFuture<>();
+    public Future<Void> runGrep() throws IOException, InterruptedException {
+        CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        String inputFile = state.lzerdOutput;
         File tmpFile = new File(inputFile + ".tmp");
         File redirectFile = new File(inputFile + ".v.tmp");
 
@@ -255,12 +652,16 @@ public class LZerDController extends Nucleus<LZerDController> {
         _lzerd.apply(new String[]{"mv", tmpFile.getAbsolutePath(), inputFile})
                 .start().waitFor();
 
-        promise.complete(inputFile);
+        promise.complete();
         return promise;
     }
 
-    public Future<Void> runPDBGEN(String receptorFile, String ligandFile, String outFile) throws IOException, InterruptedException {
+    public Future<Void> runPDBGEN() throws IOException, InterruptedException {
         CompletableFuture<Void> promise = new CompletableFuture<>();
+
+        String receptorFile = state.receptorFile;
+        String ligandFile = state.ligandFile;
+        String outFile = state.lzerdOutput;
 
         _lzerd.apply(new String[]{"./PDBGEN", receptorFile, ligandFile, outFile, "3"})
                 .start().waitFor();
@@ -345,308 +746,71 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
-    public Future<HashMap<String, String>> prepareFile(String inputFileBase) {
-        CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
-
-        try {
-            Log.i(TAG, "Initiating file preparation.");
-
-            HashMap<String, String> outputFiles = new HashMap<>();
-            outputFiles.put("base", inputFileBase);
-
-            runMarkSur(inputFileBase).then((mso, mse) -> {
-                outputFiles.put("mark_sur", mso);
-                try {
-                    runGetPoints(inputFileBase).then((gpo, gpe) -> {
-                        outputFiles.put("getpoints-cp-txt", gpo.get("cp-txt"));
-                        outputFiles.put("getpoints-gts", gpo.get("gts"));
-                        try {
-                            runLzd32(inputFileBase).then((lzo, lze) -> {
-                                outputFiles.put("lzd32", lzo);
-                                promise.complete(outputFiles);
-                            });
-                        } catch (IOException | InterruptedException e) {
-                            promise.completeExceptionally(e);
-                        }
-                    });
-                } catch (IOException | InterruptedException e) {
-                    promise.completeExceptionally(e);
-                }
-            });
-        } catch (IOException | InterruptedException e) {
-            promise.completeExceptionally(e);
-        }
-
-        return promise;
-    }
-
-    public void appendInputFiles(String prefix, HashMap<String, String> inputFiles, HashMap<String, String> appendTo) {
-        for (String key : inputFiles.keySet()) {
-            appendTo.put(prefix + "-" + key, inputFiles.get(key));
-        }
-    }
-
-    // Deletes a file by its path
-    public Future<Void> deleteFile(String filePath) {
-        CompletableFuture<Void> promise = new CompletableFuture<>();
-        Path thePath = Paths.get(filePath);
-        try {
-            Files.delete(thePath);
-            promise.complete();
-        } catch (IOException e) {
-            promise.completeExceptionally(e);
-        }
-        return promise;
-    }
-
-    // Removes all the intermediate files
-    public Future<Void> cleanOutFiles(HashMap<String, String> outFiles) {
+    @Export
+    public Future<Void> reportCompletion(int num_preview) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
-        String[] fileKeys = {"receptor-mark_sur", "ligand-mark_sur",
-                "receptor-getpoints-cp-txt", "ligand-getpoints-cp-txt",
-                "receptor-getpoints-gts", "ligand-getpoints-gts",
-                "receptor-lzd32", "ligand-lzd32"
-               // , "lzerd-out"
-        };
+        //
+        InputStream t = getClass().getResourceAsStream("/templates/visualizer_template.html");
+        String template = new BufferedReader(new InputStreamReader(t))
+                .lines().collect(Collectors.joining("\n"));
+        final String inside = template.replaceAll("[\\s\\S]*(<!--START-->)|(<!--END-->)[\\s\\S]*", "");
 
-        for (String key : fileKeys) {
-            deleteFile(outFiles.get(key));
-        }
+        final int[] idx = {0};
+        String output[] = {""};
 
         promise.complete();
-        return promise;
-    }
-
-    public Future<Void> sendEmail(int ticket) {
-        CompletableFuture<Void> promise = new CompletableFuture<>();
-        try {
-            _lzerd.apply(new String[]{"./notify.sh", String.valueOf(ticket)})
-                .start().waitFor();
-            promise.complete();
-        } catch (InterruptedException | IOException e) {
-            promise.completeExceptionally(e);
-        }
-        return promise;
-    }
-
-    // Runs LZerD pipeline
-    // Returns output file abs. path as String
-    public Future<String> runLzerdFlow(String receptorFile, String ligandFile) {
-        CompletableFuture<String> promise = new CompletableFuture<>();
-        Log.i(TAG, "Initating LZerD.");
-
-        String recBaseName = Paths.get(receptorFile).getFileName().toString();
-        if (recBaseName.indexOf('.') > 0) recBaseName = recBaseName.substring(0, recBaseName.indexOf('.'));
-        String ligBaseName = Paths.get(ligandFile).getFileName().toString();
-        if (ligBaseName.indexOf('.') > 0) ligBaseName = ligBaseName.substring(0, ligBaseName.indexOf('.'));
-
-        // Convert to .pdb.ms (mark_sur)
-        // Get CP (GETPOINTS)
-        // Get ZINV (LZD32)
-        // Run LZerD (LZerD1.0)
-        // Sort output (grep and stuff)
-        // Output top ranked results (PDBGEN)
-
-        List<LZerDController> lzerd = Cortex.of(LZerDController.class).getNodes();
-
-        boolean whichFile = true;
-        HashMap<String, String> inputFiles = new HashMap<>();
-
-        ArrayList<Future> futureQueue = new ArrayList<>();
-        for (LZerDController c : lzerd) {
-            if (c.hasJobContext().await())
-                continue;
-
-            futureQueue.add(c.prepareFile(recBaseName).then((ro, re) -> {
-                appendInputFiles("receptor", ro, inputFiles);
-            }));
-            futureQueue.add(c.prepareFile(ligBaseName).then((lo, le) -> {
-                appendInputFiles("ligand", lo, inputFiles);
-            }));
-            break;
-        }
-
-        // Wait for all of the futures to complete
-        for (Future f : futureQueue) f.await();
-        futureQueue.clear();
-
-        Log.i(TAG, "Should be done with file preparation.");
-        Log.i(TAG, "Results:");
-        for (String key : inputFiles.keySet()) {
-            Log.i(TAG, key + " : " + inputFiles.get(key));
-        }
-
-        for (LZerDController c : lzerd) {
-            if (c.hasJobContext().await())
-                continue;
-            try {
-                c.runLzerd(inputFiles).then((lo, le) -> {
-                    Log.i(TAG, "Finished LzerD.");
-                    try {
-                        Log.i(TAG, "Starting grep.");
-                        c.runGrep(lo).then((go, ge) -> {
-                            Log.i(TAG, "Finished grep.");
-
-                            cleanOutFiles(inputFiles);
-                            inputFiles.put("lzerd-out", go);
-                            promise.complete(go);
-                        });
-                    } catch (IOException | InterruptedException e) {
-                        promise.completeExceptionally(e);
-                    }
-                });
-            } catch (IOException | InterruptedException e) {
-                promise.completeExceptionally(e);
-                break;
-            }
-        }
-        return promise;
-    }
-
-    private static TicketManager<String> ticketManager;
-
-    /**
-     * Initialize the Cortex, and start the HTTP server and shell.
-     */
-    public static void main(String[] args) throws Exception {
-        Log.get().setSeverity(Log.Severity.DEBUG);
-        // Cortex<PFPController> cortex = Cortex.of(PFPController.class);
-
-        FileWatcher fw = FileWatcher.watch((p, e) -> {
-            for (WatchEvent<?> event : e) {
-                Path file = p.resolve((Path) event.context());
-                System.out.println("Notified: " + event.kind() + " on file: " + file);
-            }
-        }, "/bio/kihara-web/www/binoculars/upload");
-
-        Cortex<LZerDController> cortex = Cortex.of(LZerDController.class);
-        try {
-            // PFPController main = cortex.getNodes().get(0);
-            LZerDController main = cortex.getNodes().get(0);
-            // startHTTP(8080, main);
-            startShell(cortex.getNodes());
-        } catch (Exception e) {
-            Log.e("Main", "Could not begin application.", e);
-        }
     }
 
     /**
-     * Jumpstart a quick HTTPServer atop the PFPController
-     * Yes! We can turn the PFPController into an Executor,
-     * and then apply parallelism or any API onto it.
+     * For every added folder, grab the manifest.mf file and translate it
+     * into a map (which contains POST and FILES data for the job.
      *
-     * http://stackoverflow.com/questions/33732110/file-upload-using-httphandler
-     *
-     * @param port
-     *
-     * @param executor
-     *
-     * @throws IOException
+     * @param source
+     * @param events
+     * @return
      */
-    public static void startHTTP(int port, Executor executor) throws Exception {
-        if (port <= 0) port = 8080;
-        HttpServer server = HttpServer.create(new InetSocketAddress(port), 256);
-        HttpContext context = server.createContext("/", exchange -> {
-
-            // If params exists, then we're doing a response
-            // otherwise, if it's empty, we're requesting.
-            @SuppressWarnings("unchecked")
-            Map<String, String> params = (Map<String, String>)exchange.getAttribute("parameters");
-
-            String responseURI = exchange.getRequestURI().toString();
-            if (responseURI.startsWith("/")) {
-                responseURI = responseURI.substring(1);
-            }
-
-            String response = "";
-            if (!params.containsKey("data") || params.get("data") == null) {
-                Path p = new File(responseURI).toPath();
-                if (responseURI.length() == 0)
-                    response = new String(Files.readAllBytes(new File("index.html").toPath()));
-                else if (Files.exists(p))
-                    response = new String(Files.readAllBytes(p));
-                else
-                    response = new String(Files.readAllBytes(new File("404.html").toPath()));
-            }
-            else
-                response = "FASTA input received.";
-
-            exchange.sendResponseHeaders(200, response.length());
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-
-            // Begin the PFP processing from HTTP.
-            /*
-            if (params.get("data") != null)
-                Cortex.of(PFPController.class)
-                        .getNodes().get(0)
-                        .beginPFP(params.get("data"));
-            */
-            // Test LZerDController;
-        });
-        context.getFilters().add(new ParameterFilter());
-
-        ticketManager = new TicketManager<>();
-        int testId1 = ticketManager.getNewTicket();
-        ticketManager.set(testId1, "The quick brown fox jumps over the lazy dog");
-        Log.d("Main.java", "testId1: " + String.valueOf(testId1));
-        int testId2 = ticketManager.getNewTicket();
-        ticketManager.set(testId2, "The fish was delish and it made quite a dish");
-        Log.d("Main.java", "testId2: " + String.valueOf(testId2));
-
-        HttpContext ticketContext = server.createContext("/ticket", exchange -> {
-            Map<String, String> params = (Map<String, String>)exchange.getAttribute("parameters");
-            String response = "Ticket not found";
-            if (params.containsKey("id") && params.get("id") != null) {
-                String idString = params.get("id");
+    private static List<Map<String, String>> jobWatcher(Path source, List<WatchEvent<?>> events, String jobType, Path jobDest) {
+        List<Map<String, String>> jobs = new LinkedList<>();
+        for (WatchEvent<?> event : events) {
+            Path file = source.resolve((Path) event.context());
+            if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                 try {
-                    int id = Integer.parseInt(idString);
-                    if (ticketManager.hasTicket(id) && ticketManager.isSet(id)) {
-                        response = ticketManager.get(id);
+                    Thread.sleep(500); // pls die already
+
+                    Map<String, String> m = Files.lines(file.resolve("manifest.mf")).map(s -> {
+                        String parts[] = s.split(": ");
+                        return new AbstractMap.SimpleEntry<>(parts[0], parts[1]);
+                    }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    if (Objects.equals(m.get("service"), jobType)) {
+                        Path end = jobDest.resolve(file.getFileName()).toAbsolutePath();
+                        MigrationVisitor.migrate(file, end, true, REPLACE_EXISTING);
+                        m.put("_path", end.toString() + "/");
+                        Log.d("JOB", "Job Discovered [" + jobType + "] = " + m.toString());
+                        jobs.add(m);
                     }
-                } catch (NumberFormatException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-
-            exchange.sendResponseHeaders(200, response.length());
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        });
-        ticketContext.getFilters().add(new ParameterFilter());
-        server.setExecutor(executor);
-        server.start();
+        }
+        return jobs;
     }
 
     /**
-     * Setup and deploy the JS Runtime wrapper.
-     *
-     * @param nodes
-     *
-     * @throws Exception
+     * Initialize the LZerDController and watch for jobs.
      */
-    // public static void startShell(List<PFPController> nodes) throws Exception {
-    public static void startShell(List<LZerDController> nodes) throws Exception {
-        System.err.println("Binoculars Runtime Environment (ver. b1.0.0)");
-        System.err.println("For help, enter \"help()\" and press enter.");
-        JavascriptEngine.bindings = bindings -> {
-            bindings.put("$nodes", nodes);
-            bindings.put("help", (Runnable)() -> {
-                System.err.println("\nWelcome to the Binoculars Runtime Environment.");
-                System.err.println("This is a JavaScript read-print-eval-loop (REPL) shell.");
-                System.err.println("Through bidirectional Java to JavaScript communication,");
-                System.err.println("the distributed node system may accessed with ease.\n");
-                System.err.println("To access nodes, use \'$NODES\'. The root node is at index 0.");
-                System.err.println("For information about a function or method, see its JavaDoc.\n");
-            });
-            bindings.put("info", (Consumer)(s) -> System.err.println("Command Info: " + s));
-            bindings.put("time", (Supplier) System::currentTimeMillis);
-        };
-        JavascriptEngine.script = () -> "var PFP = Java.type(\"org.kihara.PFPController\");\n" +
-                "var LZerD = Java.type(\"org.kihara.LZerDController\")\n";
-        JavascriptEngine.shell(System.in, System.out, System.err);
+    public static void main(String[] args) throws Exception {
+        Log.get().setSeverity(Log.Severity.DEBUG);
+        LZerDController controller = Nucleus.of(LZerDController.class);
+
+        FileWatcher watcher = FileWatcher.watch((p, e) -> {
+            LZerDController.allJobs.addAll(LZerDController.jobWatcher(p, e, "lzerd", Paths.get("/net/kihara/waldena/LZerDFiles/")));
+
+            try {
+                controller.notifyJob();
+            } catch(Exception e2) {
+                e2.printStackTrace();
+            }
+        }, "/bio/kihara-web/www/unified/inbox/");
     }
-}
