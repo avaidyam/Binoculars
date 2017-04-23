@@ -55,7 +55,8 @@
     </patternset>
 
     <!-- JDK definitions -->
-    <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+    <property name="jdk.home.1.8" value="/usr/lib/jvm/java-8-openjdk-amd64/"/>
+	<property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
     <path id="jdk.classpath.1.8">
         <fileset dir="${jdk.home.1.8}">
             <include name="jre/lib/charsets.jar"/>
@@ -154,7 +155,7 @@
 
     <target name="compile.module.binoculars.production" description="Compile module Binoculars; production classes">
         <mkdir dir="${binoculars.output.dir}"/>
-        <javac destdir="${binoculars.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.binoculars}/javac">
+        <javac includeantruntime="false" destdir="${binoculars.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.binoculars}/javac">
             <compilerarg line="${compiler.args.binoculars}"/>
             <bootclasspath refid="binoculars.module.bootclasspath"/>
             <classpath refid="binoculars.module.production.classpath"/>
