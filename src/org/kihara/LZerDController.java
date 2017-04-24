@@ -504,7 +504,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs LZD32
     // Returns output file abs. path as String
-    public Future<String> runLzd32(String inputFileBase) throws IOException, InterruptedException {
+    public Future<String> runLzd32(String inputFileBase) {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 3: Running LZD32.");
 
