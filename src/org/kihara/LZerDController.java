@@ -270,7 +270,7 @@ public class LZerDController extends Nucleus<LZerDController> {
             result = 31 * result + (new Double(nvotes)).hashCode();
             result = 31 * result + (new Double(cor)).hashCode();
             result = 31 * result + (new Double(dist)).hashCode();
-            result = 31 * result + Double(nrad).hashCode();
+            result = 31 * result + (new Double(nrad)).hashCode();
             result = 31 * result + lzerdPath.hashCode();
             result = 31 * result + workingPath.hashCode();
             return result;
