@@ -250,13 +250,13 @@ public class LZerDController extends Nucleus<LZerDController> {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Configuration that = (Configuration) o;
-            if (!rfmin.equals(that.rfmin)) return false;
-            if (!rfmax.equals(that.rfmax)) return false;
-            if (!rfpmax.equals(that.rfpmax)) return false;
-            if (!nvotes.equals(that.nvotes)) return false;
-            if (!cor.equals(that.cor)) return false;
-            if (!dist.equals(that.dist)) return false;
-            if (!nrad.equals(that.nrad)) return false;
+            if (rfmin != that.rfmin) return false;
+            if (rfmax != that.rfmax) return false;
+            if (rfpmax != that.rfpmax) return false;
+            if (nvotes != that.nvotes) return false;
+            if (cor != that.cor) return false;
+            if (dist != that.dist) return false;
+            if (nrad != that.nrad) return false;
             if (!lzerdPath.equals(that.lzerdPath)) return false;
             if (!workingPath.equals(that.workingPath)) return false;
             return true;
@@ -265,12 +265,12 @@ public class LZerDController extends Nucleus<LZerDController> {
         @Override
         public int hashCode() {
             int result = rfmin.hashCode();
-            result = 31 * result + rfmax.hashCode();
-            result = 31 * result + rfpmax.hashCode();
-            result = 31 * result + nvotes.hashCode();
-            result = 31 * result + cor.hashCode();
-            result = 31 * result + dist.hashCode();
-            result = 31 * result + nrad.hashCode();
+            result = 31 * result + Double(rfmax).hashCode();
+            result = 31 * result + Double(rfpmax).hashCode();
+            result = 31 * result + Double(nvotes).hashCode();
+            result = 31 * result + Double(cor).hashCode();
+            result = 31 * result + Double(dist).hashCode();
+            result = 31 * result + Double(nrad).hashCode();
             result = 31 * result + lzerdPath.hashCode();
             result = 31 * result + workingPath.hashCode();
             return result;
@@ -307,10 +307,10 @@ public class LZerDController extends Nucleus<LZerDController> {
     Function<String[], ProcessBuilder> _lzerd = (String ... args) -> {
         System.out.println("Running " + Arrays.toString(args));
         ProcessBuilder pb = new ProcessBuilder(args)
-                .directory(new File(LZerDdir))
+                .directory(new File(state.workingPath))
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT);
-        pb.environment().put("BLASTMAT", storePath + "/bin/data");
+        pb.environment().put("BLASTMAT", state.workingPath + "/bin/data");
         return pb;
     };
     // --------------------------------------------------------------------
@@ -510,7 +510,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                 "-dim", String.valueOf(dim), "-rad", String.valueOf(rad), "-ord", String.valueOf(ord) })
                 .start().waitFor();
 
-        promise.complete(LZerDdir + "/" + outputFile);
+        promise.complete(state.workingPath + "/" + outputFile);
         return promise;
     }
 
@@ -620,7 +620,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                 "-zlig", lig_inv, "-rfmin", String.valueOf(rfmin), "-rfmax", String.valueOf(rfmax),
                 "-rfpmax", String.valueOf(rfpmax), "-nvotes", String.valueOf(nvotes), "-cor", String.valueOf(cor),
                 "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad)})
-                .redirectOutput(new File(LZerDdir + "/" + outFile))
+                .redirectOutput(new File(state.workingPath + "/" + outFile))
                 .start().waitFor();
 
         state.lzerdOutput = outFile;
