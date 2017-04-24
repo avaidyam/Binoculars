@@ -264,12 +264,12 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         @Override
         public int hashCode() {
-            int result = rfmin.hashCode();
-            result = 31 * result + Double(rfmax).hashCode();
-            result = 31 * result + Double(rfpmax).hashCode();
-            result = 31 * result + Double(nvotes).hashCode();
-            result = 31 * result + Double(cor).hashCode();
-            result = 31 * result + Double(dist).hashCode();
+            int result = (new Double(rfmin)).hashCode();
+            result = 31 * result + (new Double(rfmax)).hashCode();
+            result = 31 * result + (new Double(rfpmax)).hashCode();
+            result = 31 * result + (new Double(nvotes)).hashCode();
+            result = 31 * result + (new Double(cor)).hashCode();
+            result = 31 * result + (new Double(dist)).hashCode();
             result = 31 * result + Double(nrad).hashCode();
             result = 31 * result + lzerdPath.hashCode();
             result = 31 * result + workingPath.hashCode();
@@ -307,10 +307,10 @@ public class LZerDController extends Nucleus<LZerDController> {
     Function<String[], ProcessBuilder> _lzerd = (String ... args) -> {
         System.out.println("Running " + Arrays.toString(args));
         ProcessBuilder pb = new ProcessBuilder(args)
-                .directory(new File(state.workingPath))
+                .directory(new File(configuration.workingPath))
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT);
-        pb.environment().put("BLASTMAT", state.workingPath + "/bin/data");
+        pb.environment().put("BLASTMAT", configuration.workingPath + "/bin/data");
         return pb;
     };
     // --------------------------------------------------------------------
@@ -510,7 +510,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                 "-dim", String.valueOf(dim), "-rad", String.valueOf(rad), "-ord", String.valueOf(ord) })
                 .start().waitFor();
 
-        promise.complete(state.workingPath + "/" + outputFile);
+        promise.complete(configuration.workingPath + "/" + outputFile);
         return promise;
     }
 
@@ -620,7 +620,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                 "-zlig", lig_inv, "-rfmin", String.valueOf(rfmin), "-rfmax", String.valueOf(rfmax),
                 "-rfpmax", String.valueOf(rfpmax), "-nvotes", String.valueOf(nvotes), "-cor", String.valueOf(cor),
                 "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad)})
-                .redirectOutput(new File(state.workingPath + "/" + outFile))
+                .redirectOutput(new File(configuration.workingPath + "/" + outFile))
                 .start().waitFor();
 
         state.lzerdOutput = outFile;
