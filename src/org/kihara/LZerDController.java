@@ -403,13 +403,18 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs mark_sur
     // Returns output file abs. path as String
-    public Future<String> runMarkSur(String inputFileBase) throws IOException, InterruptedException {
+    public Future<String> runMarkSur(String inputFileBase) {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
         String inputFile = "/tmp/" + inputFileBase + ".pdb";
         String outputFile = inputFile + ".ms";
-        _lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
-                .start().waitFor();
+        try {
+            _lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
+                    .start().waitFor();
+        } catch (Exception e) {
+            promise.completeExceptionally(e);
+            return promise;
+        }
         promise.complete(outputFile);
         return promise;
     }
@@ -440,7 +445,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs GETPOINTS
     // Returns output file abs. path as String
-    public Future<HashMap<String, String>> runGetPoints(String inputFileBase) throws IOException, InterruptedException {
+    public Future<HashMap<String, String>> runGetPoints(String inputFileBase) {
         CompletableFuture<HashMap<String, String>> promise = new CompletableFuture<>();
 
         Log.i(TAG, "Step 2: Running GETPOINTS.");
@@ -450,8 +455,13 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         String inputFile = "/tmp/" + inputFileBase + ".pdb.ms";
 
-        _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
-                .start().waitFor();
+        try {
+            _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
+                    .start().waitFor();
+        } catch (Exception e) {
+            promise.completeExceptionally(e);
+            return promise;
+        }
 
         HashMap<String, String> outputFiles = new HashMap<>();
 
@@ -506,9 +516,14 @@ public class LZerDController extends Nucleus<LZerDController> {
         double rad = 6;
         int ord = 10;
 
-        _lzerd.apply(new String[]{"./LZD32", "-g", gtsInput, "-c", cpInput, "-o", inputFileBase,
-                "-dim", String.valueOf(dim), "-rad", String.valueOf(rad), "-ord", String.valueOf(ord) })
-                .start().waitFor();
+        try {
+            _lzerd.apply(new String[]{"./LZD32", "-g", gtsInput, "-c", cpInput, "-o", inputFileBase,
+                    "-dim", String.valueOf(dim), "-rad", String.valueOf(rad), "-ord", String.valueOf(ord) })
+                    .start().waitFor();
+        } catch (Exception e) {
+            promise.completeExceptionally(e);
+            return promise;
+        }
 
         promise.complete(configuration.workingPath + "/" + outputFile);
         return promise;
@@ -615,13 +630,18 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         String outFile = recBaseName + "_" + ligBaseName + ".out";
 
-        _lzerd.apply(new String[]{"./LZerD1.0", "-rec", rec_cp, "-lig", lig_cp,
-                "-prec", rec_ms, "-plig", lig_ms, "-zrec", rec_inv,
-                "-zlig", lig_inv, "-rfmin", String.valueOf(rfmin), "-rfmax", String.valueOf(rfmax),
-                "-rfpmax", String.valueOf(rfpmax), "-nvotes", String.valueOf(nvotes), "-cor", String.valueOf(cor),
-                "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad)})
-                .redirectOutput(new File(configuration.workingPath + "/" + outFile))
-                .start().waitFor();
+        try {
+            _lzerd.apply(new String[]{"./LZerD1.0", "-rec", rec_cp, "-lig", lig_cp,
+                    "-prec", rec_ms, "-plig", lig_ms, "-zrec", rec_inv,
+                    "-zlig", lig_inv, "-rfmin", String.valueOf(rfmin), "-rfmax", String.valueOf(rfmax),
+                    "-rfpmax", String.valueOf(rfpmax), "-nvotes", String.valueOf(nvotes), "-cor", String.valueOf(cor),
+                    "-dist", String.valueOf(dist), "-nrad", String.valueOf(nrad)})
+                    .redirectOutput(new File(configuration.workingPath + "/" + outFile))
+                    .start().waitFor();
+        } catch (Exception e) {
+            promise.completeExceptionally(e);
+            return promise;
+        }
 
         state.lzerdOutput = outFile;
 
@@ -629,42 +649,52 @@ public class LZerDController extends Nucleus<LZerDController> {
         return promise;
     }
 
-    public Future<Void> runGrep() throws IOException, InterruptedException {
+    public Future<Void> runGrep() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
         String inputFile = state.lzerdOutput;
         File tmpFile = new File(inputFile + ".tmp");
         File redirectFile = new File(inputFile + ".v.tmp");
 
-        _lzerd.apply(new String[]{"grep", "^LIG", inputFile})
-                .redirectOutput(tmpFile)
-                .start().waitFor();
+        try {
+            _lzerd.apply(new String[]{"grep", "^LIG", inputFile})
+                    .redirectOutput(tmpFile)
+                    .start().waitFor();
 
-        _lzerd.apply(new String[]{"grep", "-v", "^LIG", inputFile})
-                .redirectOutput(redirectFile)
-                .start().waitFor();
+            _lzerd.apply(new String[]{"grep", "-v", "^LIG", inputFile})
+                    .redirectOutput(redirectFile)
+                    .start().waitFor();
 
-        _lzerd.apply(new String[]{"sort", "-k", "13,13", "-nr"})
-                .redirectInput(redirectFile)
-                .redirectOutput(ProcessBuilder.Redirect.appendTo(tmpFile))
-                .start().waitFor();
+            _lzerd.apply(new String[]{"sort", "-k", "13,13", "-nr"})
+                    .redirectInput(redirectFile)
+                    .redirectOutput(ProcessBuilder.Redirect.appendTo(tmpFile))
+                    .start().waitFor();
 
-        _lzerd.apply(new String[]{"mv", tmpFile.getAbsolutePath(), inputFile})
-                .start().waitFor();
+            _lzerd.apply(new String[]{"mv", tmpFile.getAbsolutePath(), inputFile})
+                    .start().waitFor();
+        } catch (Exception e) {
+            promise.completeExceptionally(e);
+            return promise;
+        }
 
         promise.complete();
         return promise;
     }
 
-    public Future<Void> runPDBGEN() throws IOException, InterruptedException {
+    public Future<Void> runPDBGEN() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
         String receptorFile = state.receptorFile;
         String ligandFile = state.ligandFile;
         String outFile = state.lzerdOutput;
 
-        _lzerd.apply(new String[]{"./PDBGEN", receptorFile, ligandFile, outFile, "3"})
-                .start().waitFor();
+        try {
+            _lzerd.apply(new String[]{"./PDBGEN", receptorFile, ligandFile, outFile, "3"})
+                    .start().waitFor();
+        } catch (Exception e) {
+            promise.completeExceptionally(e);
+            return promise;
+        }
 
         promise.complete();
         return promise;
