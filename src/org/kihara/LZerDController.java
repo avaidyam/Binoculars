@@ -44,7 +44,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 public class LZerDController extends Nucleus<LZerDController> {
-
     //
     // CONTEXT:
     //
@@ -399,6 +398,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         this.state = st;
 
         promise.complete();
+        return promise;
     }
 
     // Runs mark_sur
@@ -421,8 +421,8 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         self().runMarkSur(state.recBaseName).then((o, e) -> {
             state.recMarkSur = o;
+            promise.complete();
         });
-        promise.complete();
         return promise;
     }
 
@@ -433,8 +433,8 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         self().runMarkSur(state.ligBaseName).then((o, e) -> {
             state.ligMarkSur = o;
+            promise.complete();
         });
-        promise.complete();
         return promise;
     }
 
@@ -474,8 +474,8 @@ public class LZerDController extends Nucleus<LZerDController> {
         self().runGetPoints(state.recBaseName).then((o, e) -> {
             state.recGetPointsCP = o.get("cp-txt");
             state.recGetPointsGTS = o.get("gts");
-        })
-        promise.complete();
+            promise.complete();
+        });
         return promise;
     }
 
@@ -487,8 +487,8 @@ public class LZerDController extends Nucleus<LZerDController> {
         self().runGetPoints(state.ligBaseName).then((o, e) -> {
             state.ligGetPointsCP = o.get("cp-txt");
             state.ligGetPointsGTS = o.get("gts");
+            promise.complete();
         });
-        promise.complete();
         return promise;
     }
 
@@ -521,8 +521,8 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         self().runLzd32(state.recBaseName).then((o, e) -> {
             state.recLzd32 = o;
+            promise.complete();
         });
-        promise.complete();
         return promise;
     }
 
@@ -533,8 +533,8 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         self().runLzd32(state.ligBaseName).then((o, e) -> {
             state.ligLzd32 = o;
+            promise.complete();
         });
-        promise.complete();
         return promise;
     }
 
@@ -739,10 +739,9 @@ public class LZerDController extends Nucleus<LZerDController> {
         runClustering().then((r, e) -> {
             runScoring().then((r2, e2) -> {
                 Log.i(TAG, "Should be done with post processing.");
+                promise.complete();
             });
         });
-
-        promise.complete();
         return promise;
     }
 
@@ -750,7 +749,6 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> reportCompletion(int num_preview) throws Exception {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
-        //
         InputStream t = getClass().getResourceAsStream("/templates/visualizer_template.html");
         String template = new BufferedReader(new InputStreamReader(t))
                 .lines().collect(Collectors.joining("\n"));
@@ -760,6 +758,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         String output[] = {""};
 
         promise.complete();
+        return promise;
     }
 
     /**
