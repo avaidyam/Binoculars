@@ -55,7 +55,7 @@
     </patternset>
 
     <!-- JDK definitions -->
-    <property name="jdk.home.1.8" value="~/libraries/jdk/"/>
+    <property name="jdk.home.1.8" value="/net/kihara/waldena/libraries/jdk/"/>
 	<property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
     <path id="jdk.classpath.1.8">
         <fileset dir="${jdk.home.1.8}">
