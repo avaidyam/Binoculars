@@ -254,14 +254,14 @@ public final class JavascriptEngine {
                     return COMPILATION_ERROR;
                 }
 
+                /*
                 new Compiler(context,
                         env,
                         null, //null - pass no code installer - this is compile only
                         functionNode.getSource(),
                         context.getErrorManager(),
                         env._strict | functionNode.isStrict()).
-                        compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL); //*/
-
+                        compile(functionNode, Compiler.CompilationPhases.COMPILE_ALL_NO_INSTALL); */
                 /*
                 Compiler.forNoInstallerCompilation(context,
                         functionNode.getSource(),
