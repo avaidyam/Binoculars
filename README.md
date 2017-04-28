@@ -6,6 +6,7 @@ Distributed Heterogeneous Cluster Computing in Computational Proteomics
 ## Instructions
 1. `git clone <url>` -- Clone the repository to your local system.
 1. `cd Binoculars/`
+1. `nano build.properties` -- Add the properties described in `build.xml` (`jdk.home.1.8` for JDK, and `artifact.class` for running the project).
 1. `ant build` -- Build the framework along with PFP, LZerD, or PL-PatchSurfer.
 1. `ant run` -- Run the framework and project.
   
