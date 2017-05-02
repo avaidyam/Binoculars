@@ -790,7 +790,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         // Gather state and move things over.
         String dbDest = this.state.path + "/output";
         Path folder = Paths.get(this.state.path).getFileName();
-        String dbSource = this.configuration.pdbSources;
+        // String dbSource = this.configuration.pdbSources;
         String rank = this.state.lzerdOutput;
 
         //
@@ -798,29 +798,20 @@ public class LZerDController extends Nucleus<LZerDController> {
         Files.createDirectory(Paths.get(dbDest).resolve(folder));
         Files.copy(Paths.get(rank), Paths.get(dbDest).resolve(folder).resolve("out.rank"));
 
+        /*
         Files.lines(Paths.get(rank)).limit(num_preview).forEachOrdered((s) -> {
             String parts[] = s.split("\\s+");
-
-            // Copy any PDB files we need (~600kB) to the outbox.
-            String pdbSource = parts[0] + ".pdb";
-            Path source = Paths.get(dbSource).resolve(pdbSource);
-            Path dest = Paths.get(dbDest).resolve(pdbSource);
-            try { Files.copy(source, dest);
-            } catch (FileNotFoundException e) {
-                Log.e(TAG, "Copy from " + source + " to " + dest + " failed because source was not found.");
-            } catch (Exception ignored) {}
 
             // Makeshift templating engine here...
             String temp = inside;
             temp = temp.replace("![NUM]", "" + idx[0]);
             temp = temp.replace("![NAME]", parts[0]);
             temp = temp.replace("![SCORE]", parts[1]);
-            temp = temp.replace("![PATH]", "../" + pdbSource);
 
             output[0] += temp;
             idx[0]++;
         });
-
+        */
         // Write the results HTML output.
         String out = template.replaceFirst("(<!--START-->)[\\s\\S]*(<!--END-->)", output[0]);
         Files.write(Paths.get(dbDest).resolve(folder).resolve("index.html"), out.getBytes());
