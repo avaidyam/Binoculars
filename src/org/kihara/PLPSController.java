@@ -739,7 +739,7 @@ public class PLPSController extends Nucleus<PLPSController> {
         PLPSController controller = Nucleus.of(PLPSController.class);
 
         FileWatcher watcher = FileWatcher.watch((p, e) -> {
-            PLPSController.allJobs.addAll(PLPSController.jobWatcher(p, e, "plps", Paths.get("/net/kihara/avaidyam/PatchSurferFiles/")));
+            PLPSController.allJobs.addAll(PLPSController.jobWatcher(p, e, "plps", Paths.get("/bio/kihara-web/www/unified/inbox/")));
 
             try {
                 controller.notifyJob();
