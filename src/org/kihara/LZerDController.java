@@ -322,6 +322,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     @Export
     public void runJob(Map<String, String> manifest) throws Exception {
+        Log.d("MAIN", "Found the files! Starting the job");
 
         if (self().hasState().await() || manifest == null) {
             throw new RuntimeException("Can't do that!");
@@ -422,7 +423,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     public Future<Void> runRecMarkSur() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
-
+        Log.d("MAIN", "recMarkSur");
         state.receptorStage = State.PrepStage.MARK_SUR;
 
         self().runMarkSur(state.recBaseName).then((o, e) -> {
@@ -435,6 +436,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runLigMarkSur() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "ligMarkSur");
         state.ligandStage = State.PrepStage.MARK_SUR;
 
         self().runMarkSur(state.ligBaseName).then((o, e) -> {
@@ -480,6 +482,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runRecGetPoints() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "recGetPoints");
         state.receptorStage = State.PrepStage.GETPOINTS;
 
         self().runGetPoints(state.recBaseName).then((o, e) -> {
@@ -493,6 +496,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runLigGetPoints() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "ligGetPoints");
         state.ligandStage = State.PrepStage.GETPOINTS;
 
         self().runGetPoints(state.ligBaseName).then((o, e) -> {
@@ -533,6 +537,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runRecLzd32() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "recLzd32");
         state.receptorStage = State.PrepStage.LZD32;
 
         self().runLzd32(state.recBaseName).then((o, e) -> {
@@ -545,6 +550,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runLigLzd32() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "ligLzd32");
         state.ligandStage = State.PrepStage.LZD32;
 
         self().runLzd32(state.ligBaseName).then((o, e) -> {
@@ -604,6 +610,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runLzerd() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "lzerd");
         state.stage = State.Stage.LZERD;
 
         Log.i(TAG, "Step 4: Running LZerD.");
@@ -653,6 +660,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runGrep() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "grep");
         String inputFile = state.lzerdOutput;
         File tmpFile = new File(inputFile + ".tmp");
         File redirectFile = new File(inputFile + ".v.tmp");
@@ -685,6 +693,7 @@ public class LZerDController extends Nucleus<LZerDController> {
     public Future<Void> runPDBGEN() {
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
+        Log.d("MAIN", "pdbgen");
         String receptorFile = state.receptorFile;
         String ligandFile = state.ligandFile;
         String outFile = state.lzerdOutput;
@@ -831,6 +840,7 @@ public class LZerDController extends Nucleus<LZerDController> {
      */
     private static List<Map<String, String>> jobWatcher(Path source, List<WatchEvent<?>> events, String jobType, Path jobDest) {
         List<Map<String, String>> jobs = new LinkedList<>();
+        Log.d(TAG, "Should start job watcher");
         for (WatchEvent<?> event : events) {
             Path file = source.resolve((Path) event.context());
             if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
@@ -847,6 +857,9 @@ public class LZerDController extends Nucleus<LZerDController> {
                         m.put("_path", end.toString() + "/");
                         Log.d("JOB", "Job Discovered [" + jobType + "] = " + m.toString());
                         jobs.add(m);
+                    }
+                    else {
+                        Log.d(TAG, "Not the right job type: " + m.get("service"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
