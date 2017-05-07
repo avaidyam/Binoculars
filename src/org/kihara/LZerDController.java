@@ -334,6 +334,7 @@ public class LZerDController extends Nucleus<LZerDController> {
             self().runGrep().await();
             self().runPDBGEN().await();
             self().runPostProcessing().await();
+            self().reportCompletion(10).await();
 
             String outbox = "/bio/kihara-web/www/unified/outbox";
             Path start = Paths.get(manifest.get("_path")).resolve("output");
