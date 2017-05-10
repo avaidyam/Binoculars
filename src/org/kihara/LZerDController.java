@@ -459,6 +459,10 @@ public class LZerDController extends Nucleus<LZerDController> {
         String inputFile = "/tmp/" + inputFileBase + ".pdb.ms";
 
         try {
+            Log.d(TAG, "lzerd: " + _lzerd.toString());
+            Log.d(TAG, "inputFile: " + inputFile);
+            Log.d(TAG, "smooth: " + String.valueOf(smooth));
+            Log.d(TAG, "cut: " + cut);
             _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
                     .start().waitFor();
         } catch (Exception e) {
