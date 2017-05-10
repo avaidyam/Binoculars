@@ -462,6 +462,7 @@ public class LZerDController extends Nucleus<LZerDController> {
             _lzerd.apply(new String[]{"./GETPOINTS", "-pdb", inputFile, "-smooth", String.valueOf(smooth), "-cut", cut})
                     .start().waitFor();
         } catch (Exception e) {
+            Log.d("Failed GETPOINTS");
             promise.completeExceptionally(e);
             return promise;
         }
