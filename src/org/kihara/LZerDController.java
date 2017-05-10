@@ -607,11 +607,8 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         state.stage = State.Stage.PREP;
 
-        Future<Void> recFuture = prepareReceptorFiles();
-        Future<Void> ligFuture = prepareLigandFiles();
-
-        recFuture.await();
-        ligFuture.await();
+        prepareReceptorFiles().await();
+        prepareLigandFiles().await();
 
         promise.complete();
         return promise;
