@@ -463,6 +463,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                     .start().waitFor();
         } catch (Exception e) {
             Log.d(TAG, "Failed GETPOINTS");
+            e.printStackTrace();
             promise.completeExceptionally(e);
             return promise;
         }
