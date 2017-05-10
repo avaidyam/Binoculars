@@ -473,7 +473,9 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         // TODO: Convert to temp files
 
+        Log.d(TAG, "CP-TXT: " + cpTxt);
         outputFiles.put("cp-txt", cpTxt);
+        Log.d(TAG, "GTS: " + gts);
         outputFiles.put("gts", gts);
         promise.complete(outputFiles);
         return promise;
@@ -486,8 +488,12 @@ public class LZerDController extends Nucleus<LZerDController> {
         state.receptorStage = State.PrepStage.GETPOINTS;
 
         self().runGetPoints(state.recBaseName).then((o, e) -> {
-            state.recGetPointsCP = o.get("cp-txt");
-            state.recGetPointsGTS = o.get("gts");
+            String cpTxt = o.get("cp-txt");
+            Log.d(TAG, "CP-TXT: " + cpTxt);
+            state.recGetPointsCP = cpTxt;
+            String gts = o.get("gts");
+            Log.d(TAG, "GTS: " + gts);
+            state.recGetPointsGTS = gts;
             promise.complete();
         });
         return promise;
