@@ -387,10 +387,10 @@ public class LZerDController extends Nucleus<LZerDController> {
         if (recBaseName.indexOf('.') > 0) recBaseName = recBaseName.substring(0, recBaseName.indexOf('.'));
         st.recBaseName = recBaseName;
 
-        state.ligandFile = ligandFile;
+        st.ligandFile = ligandFile;
         String ligBaseName = Paths.get(ligandFile).getFileName().toString();
         if (ligBaseName.indexOf('.') > 0) ligBaseName = ligBaseName.substring(0, ligBaseName.indexOf('.'));
-        state.ligBaseName = ligBaseName;
+        st.ligBaseName = ligBaseName;
 
         st.path = tilde(root);
         st.email = email;
