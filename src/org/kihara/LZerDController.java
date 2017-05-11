@@ -310,11 +310,14 @@ public class LZerDController extends Nucleus<LZerDController> {
                 .directory(new File(configuration.workingPath))
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT);
-        pb.environment().put("BLASTMAT", configuration.workingPath + "/bin/data");
         return pb;
     };
-    // --------------------------------------------------------------------
 
+    public void printPB() {
+        Log.d(TAG, "_lzerd: " + _lzerd.toString());
+    }
+
+    // --------------------------------------------------------------------
     private static String tilde(String path) {
         return path.replaceFirst("^~", System.getProperty("user.home"));
     }
