@@ -318,6 +318,10 @@ public class LZerDController extends Nucleus<LZerDController> {
         return pb;
     };
 
+    Function<String, String> testLambda = (String s) -> {
+        return s;
+    };
+
     public void printPB() {
         Log.d(TAG, "_lzerd: " + _lzerd.toString());
     }
@@ -418,7 +422,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         Log.i(TAG, "Step 1: Running mark_sur.");
         String outputFile = inputFile + ".ms";
         try {
-            Log.d(TAG, "_lzerd: " + _lzerd.toString());
+            Log.d(TAG, "testLambda: " + testLambda.toString());
             //_lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
             //        .start().waitFor();
         } catch (Exception e) {
