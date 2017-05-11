@@ -413,8 +413,9 @@ public class LZerDController extends Nucleus<LZerDController> {
         Log.i(TAG, "Step 1: Running mark_sur.");
         String outputFile = inputFile + ".ms";
         try {
-            _lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
-                    .start().waitFor();
+            Log.d(TAG, "_lzerd: " + _lzerd.toString());
+            //_lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
+            //        .start().waitFor();
         } catch (Exception e) {
             e.printStackTrace();
             promise.completeExceptionally(e);
