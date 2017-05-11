@@ -417,6 +417,7 @@ public class LZerDController extends Nucleus<LZerDController> {
             _lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
                     .start().waitFor();
         } catch (Exception e) {
+            e.printStackTrace();
             promise.completeExceptionally(e);
             return promise;
         }
