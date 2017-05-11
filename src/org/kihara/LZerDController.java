@@ -408,10 +408,9 @@ public class LZerDController extends Nucleus<LZerDController> {
 
     // Runs mark_sur
     // Returns output file abs. path as String
-    public Future<String> runMarkSur(String inputFileBase) {
+    public Future<String> runMarkSur(String inputFile) {
         CompletableFuture<String> promise = new CompletableFuture<>();
         Log.i(TAG, "Step 1: Running mark_sur.");
-        String inputFile = "/tmp/" + inputFileBase + ".pdb";
         String outputFile = inputFile + ".ms";
         try {
             _lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
@@ -430,7 +429,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         Log.d("MAIN", "recMarkSur");
         state.receptorStage = State.PrepStage.MARK_SUR;
 
-        self().runMarkSur(state.recBaseName).then((o, e) -> {
+        self().runMarkSur(state.receptorFile).then((o, e) -> {
             state.recMarkSur = o;
             promise.complete();
         });
@@ -443,7 +442,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         Log.d("MAIN", "ligMarkSur");
         state.ligandStage = State.PrepStage.MARK_SUR;
 
-        self().runMarkSur(state.ligBaseName).then((o, e) -> {
+        self().runMarkSur(state.ligandFile).then((o, e) -> {
             state.ligMarkSur = o;
             promise.complete();
         });
