@@ -334,10 +334,10 @@ public class LZerDController extends Nucleus<LZerDController> {
             String path = manifest.get("_path");
             self().provideInputs(path, manifest.get("email"), manifest.get("receptor"), manifest.get("ligand"));
             self().prepareFiles().await();
-            self().runLzerd().await();
-            self().runGrep().await();
-            self().runPDBGEN().await();
-            self().runPostProcessing().await();
+            //self().runLzerd().await();
+            //self().runGrep().await();
+            //self().runPDBGEN().await();
+            //self().runPostProcessing().await();
             self().reportCompletion(10).await();
 
             String outbox = "/bio/kihara-web/www/unified/outbox";
@@ -581,8 +581,8 @@ public class LZerDController extends Nucleus<LZerDController> {
         state.receptorStage = State.PrepStage.INITIALIZED;
 
         self().runRecMarkSur().await();
-        self().runRecGetPoints().await();
-        self().runRecLzd32().await();
+        //self().runRecGetPoints().await();
+        // self().runRecLzd32().await();
 
         state.receptorStage = State.PrepStage.COMPLETE;
 
@@ -611,7 +611,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         state.stage = State.Stage.PREP;
 
         prepareReceptorFiles().await();
-        prepareLigandFiles().await();
+        // prepareLigandFiles().await();
 
         promise.complete();
         return promise;
