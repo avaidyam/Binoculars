@@ -306,10 +306,11 @@ public class LZerDController extends Nucleus<LZerDController> {
     // Helper lambda to concisely produce processes for PFP.
     Function<String[], ProcessBuilder> _lzerd = (String[] args) -> {
         System.out.println("Running " + Arrays.toString(args));
+        String log = this.state.path + "log.txt";
         ProcessBuilder pb = new ProcessBuilder(args)
-                .directory(new File(configuration.workingPath))
-                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                .redirectError(ProcessBuilder.Redirect.INHERIT);
+                .directory(new File(this.state.path))
+                .redirectOutput(appendTo(Paths.get(log).toFile()))
+                .redirectError(appendTo(Paths.get(log).toFile()));
         return pb;
     };
 
