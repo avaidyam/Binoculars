@@ -229,6 +229,7 @@ public class LZerDController extends Nucleus<LZerDController> {
 
         String lzerdPath = tilde("~/LZerD");
         String workingPath = tilde("~/LZerDFiles");
+        String binPath = tilde("~/Documents/Kihara/Binoculars/bin/lzerd/");
 
         @Override
         public String toString() {
@@ -242,6 +243,7 @@ public class LZerDController extends Nucleus<LZerDController> {
                     ", nrad=" + nrad +
                     ", lzerdPath='" + lzerdPath + '\'' +
                     ", workingPath='" + workingPath + '\'' +
+                    ", binPath='" + binPath + '\'' +
                     "}";
         }
 
@@ -259,6 +261,7 @@ public class LZerDController extends Nucleus<LZerDController> {
             if (nrad != that.nrad) return false;
             if (!lzerdPath.equals(that.lzerdPath)) return false;
             if (!workingPath.equals(that.workingPath)) return false;
+            if (!binPath.equals(that.binPath)) return false;
             return true;
         }
 
@@ -273,6 +276,7 @@ public class LZerDController extends Nucleus<LZerDController> {
             result = 31 * result + (new Double(nrad)).hashCode();
             result = 31 * result + lzerdPath.hashCode();
             result = 31 * result + workingPath.hashCode();
+            result = 31 * result + binPath.hashCode();
             return result;
         }
     }
