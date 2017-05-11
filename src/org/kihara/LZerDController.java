@@ -422,6 +422,7 @@ public class LZerDController extends Nucleus<LZerDController> {
         Log.i(TAG, "Step 1: Running mark_sur.");
         String outputFile = inputFile + ".ms";
         try {
+            Log.d(TAG, "state: " + state.toString());
             Log.d(TAG, "testLambda: " + testLambda.toString());
             //_lzerd.apply(new String[]{"./mark_sur", inputFile, outputFile})
             //        .start().waitFor();
